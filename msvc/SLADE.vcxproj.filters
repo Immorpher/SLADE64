@@ -1949,6 +1949,7 @@
     <None Include="..\dist\makebuild.ps1">
       <Filter>Installer</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="SLADE.manifest" />

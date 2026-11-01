@@ -41,3 +41,4 @@
 !/dist/res
 !/dist/CMakeLists.txt
 !/dist/makebuild.ps1
+/msvc/packages
