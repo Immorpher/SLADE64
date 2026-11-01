@@ -608,7 +608,7 @@ bool Tokenizer::openFile(string_view filename, size_t offset, size_t length)
 
 	// If length isn't specified or exceeds the file length,
 	// only read to the end of the file
-	if (offset + length > file.Length() || length == 0)
+	if (offset + length > static_cast<size_t>(file.Length()) || length == 0)
 		length = (size_t)file.Length() - offset;
 
 	// Read the file portion

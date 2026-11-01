@@ -697,14 +697,14 @@ bool DatArchive::isDatArchive(const string& filename)
 	size_t len   = 1;
 	size_t start = nameofs + dir_offset;
 	// Sanity checks again. Make sure there is actually a name.
-	if (start > file.Length())
+	if (start > static_cast<size_t>(file.Length()))
 		return false;
 	uint8_t temp;
 	file.Seek(start, wxFromStart);
 	file.Read(&temp, 1);
 	if (temp < 33)
 		return false;
-	for (size_t i = start; i < file.Length(); ++i, ++len)
+	for (size_t i = start; i < static_cast<size_t>(file.Length()); ++i, ++len)
 	{
 		file.Read(&temp, 1);
 		// Found end of name

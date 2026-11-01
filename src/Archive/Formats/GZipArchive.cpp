@@ -482,7 +482,7 @@ bool GZipArchive::isGZipArchive(const string& filename)
 	size_t mds = 18;
 
 	// Check it opened ok
-	if (!file.IsOpened() || file.Length() < mds)
+	if (!file.IsOpened() || static_cast<size_t>(file.Length()) < mds)
 	{
 		return false;
 	}
