@@ -24,8 +24,8 @@
     <ProjectGuid>{33CC5FBD-4EB0-48A9-9069-0EC0B5FF5A46}</ProjectGuid>
     <RootNamespace>SLADE</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
-    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static-md</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static-md</VcpkgTriplet>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -85,13 +85,13 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)..\src;$(ProjectDir)\fluidsynth\include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)..\src;$(ProjectDir)\fluidsynth\include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)..\src;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\fluidsynth\lib;$(SolutionDir)..\build\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\fluidsynth\lib;$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)..\src;$(ProjectDir)\fluidsynth\include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)..\src;$(ProjectDir)\fluidsynth\include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)..\src;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\fluidsynth\lib;$(SolutionDir)..\build\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\fluidsynth\lib;$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SLADE-dbg</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SLADE-dbg64</TargetName>
   </PropertyGroup>
@@ -158,7 +158,7 @@
       <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -188,7 +188,7 @@
       <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -199,14 +199,12 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName).exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>SLADE.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -221,7 +219,7 @@
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -261,7 +259,7 @@
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -274,10 +272,9 @@
       <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -286,7 +283,6 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AllowIsolation>true</AllowIsolation>
       <Profile>true</Profile>
-      <AdditionalLibraryDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>SLADE.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
