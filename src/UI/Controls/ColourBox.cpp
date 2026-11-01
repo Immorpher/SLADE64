@@ -48,7 +48,7 @@ using namespace slade;
 // Variables
 //
 // -----------------------------------------------------------------------------
-DEFINE_EVENT_TYPE(wxEVT_COLOURBOX_CHANGED)
+wxDEFINE_EVENT(wxEVT_COLOURBOX_CHANGED, wxCommandEvent);
 
 
 // -----------------------------------------------------------------------------

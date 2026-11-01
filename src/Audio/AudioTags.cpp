@@ -1511,7 +1511,7 @@ wxString audio::getWavInfo(MemChunk& mc)
 		wxString channelstr  = "Channels: ";
 		for (size_t i = 0; i < 18; ++i)
 		{
-			size_t mask = 1 << i;
+			size_t mask = static_cast<size_t>(1) << i;
 			if (channelmask & mask)
 			{
 				channelstr += wxString::Format("%s", speaker_pos[i]);

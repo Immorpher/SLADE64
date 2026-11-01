@@ -68,8 +68,11 @@ namespace ui
 		ArchivePathPanel*    path_panel_         = nullptr;
 
 		// wxDataViewModel
+#if !wxCHECK_VERSION(3, 3, 0)
+		// Deprecated in wxWidgets 3.3+ (wxDataViewCtrl::GetColumnCount() is used instead)
 		unsigned int   GetColumnCount() const override { return 4; }
 		wxString       GetColumnType(unsigned int col) const override;
+#endif
 		void           GetValue(wxVariant& variant, const wxDataViewItem& item, unsigned int col) const override;
 		bool           GetAttr(const wxDataViewItem& item, unsigned int col, wxDataViewItemAttr& attr) const override;
 		bool           SetValue(const wxVariant& variant, const wxDataViewItem& item, unsigned int col) override;

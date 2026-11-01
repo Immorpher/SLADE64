@@ -41,4 +41,4 @@ private:
 };
 } // namespace slade
 
-DECLARE_EVENT_TYPE(wxEVT_COLOURBOX_CHANGED, -1)
+wxDECLARE_EVENT(wxEVT_COLOURBOX_CHANGED, wxCommandEvent);

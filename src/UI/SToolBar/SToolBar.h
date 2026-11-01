@@ -75,6 +75,10 @@ public:
 	void            deleteCustomGroups();
 	void            addActionGroup(const wxString& name, const wxArrayString& actions, bool at_end = false);
 	void            addActionGroup(const wxString& name, const vector<string>& actions, bool at_end = false);
+	void            addActionGroup(const wxString& name, std::initializer_list<string> actions, bool at_end = false)
+	{
+		addActionGroup(name, vector<string>(actions), at_end);
+	}
 	void            enableGroup(const wxString& name, bool enable = true);
 	void            populateGroupsMenu(wxMenu* menu, int start_id = 0) const;
 	void            enableContextMenu(bool enable = true) { enable_context_menu_ = enable; }
