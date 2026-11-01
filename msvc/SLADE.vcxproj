@@ -199,14 +199,14 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName).exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>SLADE.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -274,7 +274,7 @@
       <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -286,7 +286,7 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AllowIsolation>true</AllowIsolation>
       <Profile>true</Profile>
-      <AdditionalLibraryDirectories>C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Programs\bzip2;C:\Programs\zlib;C:\Programs\lua\include;C:\Programs\mpg;C:\Programs\FreeImage\Dist\x64;C:\Programs\Fluidsynth\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>SLADE.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>

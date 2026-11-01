@@ -591,13 +591,19 @@ wxSize SCallTip::drawCallTip(wxDC& dc, int xoff, int yoff)
 // -----------------------------------------------------------------------------
 void SCallTip::updateBuffer()
 {
-	buffer_.SetWidth(1000);
-	buffer_.SetHeight(1000);
+	// Reset buffer to its full size, draw the calltip, then crop the buffer to
+	// the exact size of the text (wxBitmap::SetWidth/SetHeight are deprecated)
+	buffer_ = wxBitmap(1000, 1000, 32);
 
-	wxMemoryDC dc(buffer_);
-	auto       size = drawCallTip(dc);
-	buffer_.SetWidth(size.GetWidth());
-	buffer_.SetHeight(size.GetHeight());
+	wxSize size;
+	{
+		wxMemoryDC dc(buffer_);
+		size = drawCallTip(dc);
+	}
+
+	const int w = (std::max)(1, (std::min)(size.GetWidth(), 1000));
+	const int h = (std::max)(1, (std::min)(size.GetHeight(), 1000));
+	buffer_     = buffer_.GetSubBitmap(wxRect(0, 0, w, h));
 }
 
 

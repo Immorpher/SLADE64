@@ -50,7 +50,7 @@ using namespace slade;
 CVAR(Bool, show_toolbar_names, false, CVar::Flag::Save)
 CVAR(String, toolbars_hidden, "", CVar::Flag::Save)
 CVAR(Int, toolbar_size, 16, CVar::Flag::Save)
-DEFINE_EVENT_TYPE(wxEVT_STOOLBAR_LAYOUT_UPDATED)
+wxDEFINE_EVENT(wxEVT_STOOLBAR_LAYOUT_UPDATED, wxCommandEvent);
 
 
 // -----------------------------------------------------------------------------

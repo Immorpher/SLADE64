@@ -49,9 +49,9 @@ using namespace slade;
 // Variables
 //
 // -----------------------------------------------------------------------------
-DEFINE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED)
-DEFINE_EVENT_TYPE(wxEVT_GFXCANVAS_PIXELS_CHANGED)
-DEFINE_EVENT_TYPE(wxEVT_GFXCANVAS_COLOUR_PICKED)
+wxDEFINE_EVENT(wxEVT_GFXCANVAS_OFFSET_CHANGED, wxNotifyEvent);
+wxDEFINE_EVENT(wxEVT_GFXCANVAS_PIXELS_CHANGED, wxNotifyEvent);
+wxDEFINE_EVENT(wxEVT_GFXCANVAS_COLOUR_PICKED, wxNotifyEvent);
 CVAR(Bool, gfx_show_border, true, CVar::Flag::Save)
 CVAR(Bool, gfx_hilight_mouseover, true, CVar::Flag::Save)
 CVAR(Bool, gfx_arc, false, CVar::Flag::Save)

@@ -344,7 +344,6 @@ void ArchiveViewModel::setPathPanel(ArchivePathPanel* path_panel)
 // -----------------------------------------------------------------------------
 // Returns the wxVariant type for the column [col]
 // -----------------------------------------------------------------------------
-#if !wxCHECK_VERSION(3, 3, 0)
 wxString ArchiveViewModel::GetColumnType(unsigned int col) const
 {
 	switch (col)
@@ -356,7 +355,6 @@ wxString ArchiveViewModel::GetColumnType(unsigned int col) const
 	default: return "string";
 	}
 }
-#endif
 
 // -----------------------------------------------------------------------------
 // Sets [variant] the the value of [item] in the column [col]

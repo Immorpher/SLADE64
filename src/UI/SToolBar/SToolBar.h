@@ -114,4 +114,4 @@ private:
 };
 } // namespace slade
 
-DECLARE_EVENT_TYPE(wxEVT_STOOLBAR_LAYOUT_UPDATED, -1)
+wxDECLARE_EVENT(wxEVT_STOOLBAR_LAYOUT_UPDATED, wxCommandEvent);
