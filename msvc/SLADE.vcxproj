@@ -26,6 +26,9 @@
     <Keyword>Win32Proj</Keyword>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static-md</VcpkgTriplet>
     <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static-md</VcpkgTriplet>
+    <VcpkgManualDir Condition="'$(VcpkgManualDir)'==''">C:\vcpkg\installed\$(VcpkgTriplet)\</VcpkgManualDir>
+    <VcpkgManualLibsRelease Condition="Exists('$(VcpkgManualDir)lib')">$([System.String]::Join(';', $([System.IO.Directory]::GetFiles('$(VcpkgManualDir)lib', '*.lib'))))</VcpkgManualLibsRelease>
+    <VcpkgManualLibsDebug Condition="Exists('$(VcpkgManualDir)debug\lib')">$([System.String]::Join(';', $([System.IO.Directory]::GetFiles('$(VcpkgManualDir)debug\lib', '*.lib'))))</VcpkgManualLibsDebug>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -85,13 +88,13 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)..\src;$(ProjectDir)\fluidsynth\include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)..\src;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)..\src;$(VcpkgManualDir)include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\fluidsynth\lib;$(SolutionDir)..\build\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(VcpkgManualDir)lib;$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)..\src;$(ProjectDir)\fluidsynth\include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)..\src;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)..\src;$(VcpkgManualDir)include;$(ProjectDir)..;$(ProjectDir)..\thirdparty\dumb;$(ProjectDir)..\src\Application;$(ProjectDir)..\thirdparty\glad\include;$(ProjectDir)..\thirdparty\fmt\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\fluidsynth\lib;$(SolutionDir)..\build\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(VcpkgManualDir)debug\lib;$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SLADE-dbg</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SLADE-dbg64</TargetName>
   </PropertyGroup>
@@ -185,7 +188,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FLUIDSYNTH_NOT_A_DLL;WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -201,7 +204,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;$(VcpkgManualLibsDebug);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName).exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -255,7 +258,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>SFML_STATIC;WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;NOLIBMODPLUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FLUIDSYNTH_NOT_A_DLL;SFML_STATIC;WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;NOLIBMODPLUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
@@ -274,7 +277,7 @@
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;ws2_32.lib;crypt32.lib;wldap32.lib;dsound.lib;ThirdPartyLib.lib;$(VcpkgManualLibsRelease);%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
