@@ -56,7 +56,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="packages\wxWidgets.3.2.8\build\wxWidgets.targets" Condition="Exists('packages\wxWidgets.3.2.8\build\wxWidgets.targets')" />
+    <Import Project="packages\wxWidgets.3.2.8\build\wxWidgets.targets" Condition="Exists('packages\wxWidgets.3.2.8\build\wxWidgets.targets') And '$(Platform)'=='Win32'" />
     <Import Project="packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets" Condition="Exists('packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets')" />
     <Import Project="packages\freetype.2.8.0.1\build\native\freetype.targets" Condition="Exists('packages\freetype.2.8.0.1\build\native\freetype.targets')" />
   </ImportGroup>
@@ -979,7 +979,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\wxWidgets.3.2.8\build\wxWidgets.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\wxWidgets.3.2.8\build\wxWidgets.targets'))" />
+    <Error Condition="!Exists('packages\wxWidgets.3.2.8\build\wxWidgets.targets') And '$(Platform)'=='Win32'" Text="$([System.String]::Format('$(ErrorText)', 'packages\wxWidgets.3.2.8\build\wxWidgets.targets'))" />
     <Error Condition="!Exists('packages\SFML-cpp.redist.2.5.1.1\build\native\SFML-cpp.redist.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SFML-cpp.redist.2.5.1.1\build\native\SFML-cpp.redist.props'))" />
     <Error Condition="!Exists('packages\SFML-cpp.2.5.1\build\native\SFML-cpp.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SFML-cpp.2.5.1\build\native\SFML-cpp.props'))" />
     <Error Condition="!Exists('packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets'))" />
