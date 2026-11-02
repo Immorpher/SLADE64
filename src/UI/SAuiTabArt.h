@@ -26,6 +26,13 @@ private:
 	int last_id_;
 };
 
+// wxWidgets 3.3+ passes a wxReadOnlyDC to wxAuiTabArt::GetTabSize
+#if wxCHECK_VERSION(3, 3, 0)
+using SAuiTabSizeDC = wxReadOnlyDC;
+#else
+using SAuiTabSizeDC = wxDC;
+#endif
+
 class SAuiTabArt : public wxAuiGenericTabArt
 {
 public:
@@ -51,7 +58,7 @@ public:
 
 #if wxCHECK_VERSION(3, 1, 6)
 	wxSize GetTabSize(
-		wxDC&                 dc,
+		SAuiTabSizeDC&       dc,
 		wxWindow*             wnd,
 		const wxString&       caption,
 		const wxBitmapBundle& bitmap,
@@ -60,7 +67,7 @@ public:
 		int*                  xExtent) override;
 #else
 	wxSize GetTabSize(
-		wxDC&           dc,
+		SAuiTabSizeDC& dc,
 		wxWindow*       wnd,
 		const wxString& caption,
 		const wxBitmap& bitmap,

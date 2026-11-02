@@ -462,7 +462,7 @@ void SAuiTabArt::DrawTab(
 
 #if wxCHECK_VERSION(3, 1, 6)
 wxSize SAuiTabArt::GetTabSize(
-	wxDC&                 dc,
+	SAuiTabSizeDC&       dc,
 	wxWindow*             wnd,
 	const wxString&       caption,
 	const wxBitmapBundle& bitmap,
@@ -471,7 +471,7 @@ wxSize SAuiTabArt::GetTabSize(
 	int*                  x_extent)
 #else
 wxSize SAuiTabArt::GetTabSize(
-	wxDC& dc,
+	SAuiTabSizeDC& dc,
 	wxWindow* WXUNUSED(wnd),
 	const wxString& caption,
 	const wxBitmap& bitmap,
