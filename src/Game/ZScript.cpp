@@ -105,18 +105,18 @@ string parseType(const vector<string>& tokens, unsigned& index)
 	type += tokens[index];
 
 	// Check for ...
-	if (index + 2 < tokens.size() && tokens[index] == '.' && tokens[index + 1] == '.' && tokens[index + 2] == '.')
+	if (index + 2 < tokens.size() && tokens[index] == "." && tokens[index + 1] == "." && tokens[index + 2] == ".")
 	{
 		type = "...";
 		index += 2;
 	}
 
 	// Check for <>
-	if (tokens[index + 1] == '<')
+	if (tokens[index + 1] == "<")
 	{
 		type += '<';
 		index += 2;
-		while (index < tokens.size() && tokens[index] != '>')
+		while (index < tokens.size() && tokens[index] != ">")
 			type += tokens[index++];
 		type += '>';
 	}
@@ -135,15 +135,15 @@ string parseValue(const vector<string>& tokens, unsigned& index)
 	while (true)
 	{
 		// Read between ()
-		if (tokens[index] == '(')
+		if (tokens[index] == "(")
 		{
 			int level = 1;
 			value += tokens[index++];
 			while (level > 0)
 			{
-				if (tokens[index] == '(')
+				if (tokens[index] == "(")
 					++level;
-				if (tokens[index] == ')')
+				if (tokens[index] == ")")
 					--level;
 
 				value += tokens[index++];
@@ -152,7 +152,7 @@ string parseValue(const vector<string>& tokens, unsigned& index)
 			continue;
 		}
 
-		if (tokens[index] == ',' || tokens[index] == ';' || tokens[index] == ')')
+		if (tokens[index] == "," || tokens[index] == ";" || tokens[index] == ")")
 			break;
 
 		value += tokens[index++];
@@ -175,7 +175,7 @@ bool checkKeywordValueStatement(const vector<string>& tokens, unsigned index, st
 	if (index + 3 >= tokens.size())
 		return false;
 
-	if (strutil::equalCI(tokens[index], word) && tokens[index + 1] == '(' && tokens[index + 3] == ')')
+	if (strutil::equalCI(tokens[index], word) && tokens[index + 1] == "(" && tokens[index + 3] == ")")
 	{
 		value = tokens[index + 2];
 		return true;
@@ -303,7 +303,7 @@ bool Enumerator::parse(const ParsedStatement& statement)
 
 		// Skip past next ,
 		while (index + 1 < count)
-			if (statement.block[0].tokens[++index] == ',')
+			if (statement.block[0].tokens[++index] == ",")
 				break;
 
 		index++;
@@ -337,12 +337,12 @@ unsigned Function::Parameter::parse(const vector<string>& tokens, unsigned start
 	}
 
 	// Name
-	if (start_index >= tokens.size() || tokens[start_index] == ')')
+	if (start_index >= tokens.size() || tokens[start_index] == ")")
 		return start_index;
 	name = tokens[start_index++];
 
 	// Default value
-	if (start_index < tokens.size() && tokens[start_index] == '=')
+	if (start_index < tokens.size() && tokens[start_index] == "=")
 	{
 		++start_index;
 		default_value = parseValue(tokens, start_index);
@@ -385,7 +385,7 @@ bool Function::parse(ParsedStatement& statement)
 			override_      = true;
 			last_qualifier = index;
 		}
-		else if ((int)index > last_qualifier + 2 && statement.tokens[index] == '(')
+		else if ((int)index > last_qualifier + 2 && statement.tokens[index] == "(")
 		{
 			name_        = statement.tokens[index - 1];
 			return_type_ = statement.tokens[index - 2];
@@ -411,7 +411,7 @@ bool Function::parse(ParsedStatement& statement)
 	}
 
 	// Parse parameters
-	while (statement.tokens[index] != '(')
+	while (statement.tokens[index] != "(")
 	{
 		if (index == statement.tokens.size())
 			return true;
@@ -419,13 +419,13 @@ bool Function::parse(ParsedStatement& statement)
 	}
 	++index; // Skip (
 
-	while (index < statement.tokens.size() && statement.tokens[index] != ')')
+	while (index < statement.tokens.size() && statement.tokens[index] != ")")
 	{
 		parameters_.emplace_back();
 		index = parameters_.back().parse(statement.tokens, index);
 
 		// Skip unknown tokens
-		while (index < statement.tokens.size() && statement.tokens[index] != ',' && statement.tokens[index] != ')')
+		while (index < statement.tokens.size() && statement.tokens[index] != "," && statement.tokens[index] != ")")
 		{
 			logParserMessage(
 				statement,
@@ -436,7 +436,7 @@ bool Function::parse(ParsedStatement& statement)
 		}
 
 		// Skip ,
-		if (index < statement.tokens.size() && statement.tokens[index] == ',')
+		if (index < statement.tokens.size() && statement.tokens[index] == ",")
 			++index;
 	}
 
@@ -492,15 +492,15 @@ bool Function::isFunction(const ParsedStatement& statement)
 	bool special_func = false;
 	for (auto& token : statement.tokens)
 	{
-		if (token == '=')
+		if (token == "=")
 			return false;
 
-		if (!special_func && token == '(')
+		if (!special_func && token == "(")
 			return true;
 
 		if (strutil::equalCI(token, "deprecated") || strutil::equalCI(token, "version"))
 			special_func = true;
-		else if (special_func && token == ')')
+		else if (special_func && token == ")")
 			special_func = false;
 	}
 
@@ -556,10 +556,10 @@ bool StateTable::parse(ParsedStatement& states)
 		// Check for state labels
 		for (auto a = 0u; a < statement.tokens.size(); ++a)
 		{
-			if (statement.tokens[a] == ':')
+			if (statement.tokens[a] == ":")
 			{
 				// Ignore ::
-				if (a + 1 < statement.tokens.size() && statement.tokens[a + 1] == ':')
+				if (a + 1 < statement.tokens.size() && statement.tokens[a + 1] == ":")
 				{
 					++a;
 					continue;
@@ -601,7 +601,7 @@ bool StateTable::parse(ParsedStatement& states)
 		{
 			// Parse duration
 			int duration = 0;
-			if (statement.tokens[index + 2] == '-' && index + 3 < statement.tokens.size())
+			if (statement.tokens[index + 2] == "-" && index + 3 < statement.tokens.size())
 			{
 				// Negative number
 				strutil::toInt(statement.tokens[index + 3], duration);
@@ -679,7 +679,7 @@ bool Class::parse(ParsedStatement& class_statement, const vector<Class>& parsed_
 	for (unsigned a = 0; a < class_statement.tokens.size(); a++)
 	{
 		// Inherits
-		if (class_statement.tokens[a] == ':' && a < class_statement.tokens.size() - 1)
+		if (class_statement.tokens[a] == ":" && a < class_statement.tokens.size() - 1)
 		{
 			inherits_class_ = class_statement.tokens[a + 1];
 			for (const auto& pclass : parsed_classes)
@@ -906,9 +906,9 @@ bool Class::parseDefaults(vector<ParsedStatement>& defaults)
 		unsigned count = statement.tokens.size();
 		while (t < count)
 		{
-			if (statement.tokens[t] == '+')
+			if (statement.tokens[t] == "+")
 				default_properties_[strutil::lower(statement.tokens[++t])] = true;
-			else if (statement.tokens[t] == '-')
+			else if (statement.tokens[t] == "-")
 				default_properties_[strutil::lower(statement.tokens[++t])] = false;
 			else
 				break;
@@ -921,7 +921,7 @@ bool Class::parseDefaults(vector<ParsedStatement>& defaults)
 
 		// Name
 		auto name = statement.tokens[t];
-		if (t + 2 < count && statement.tokens[t + 1] == '.')
+		if (t + 2 < count && statement.tokens[t + 1] == ".")
 		{
 			name.append(".").append(statement.tokens[t + 2]);
 			t += 2;

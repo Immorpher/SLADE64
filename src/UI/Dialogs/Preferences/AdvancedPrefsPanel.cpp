@@ -127,7 +127,17 @@ void AdvancedPrefsPanel::applyPreferences()
 		auto cvar = CVar::get(name);
 
 		// Check if cvar value was even modified
-		if (!pg_cvars_->GetProperty(name)->HasFlag(wxPG_PROP_MODIFIED))
+		// (the wxPG_PROP_MODIFIED overload of HasFlag is deprecated in wxWidgets 3.3+, but the replacement
+		// doesn't exist in older versions, so just silence the warning)
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+		const bool prop_modified = pg_cvars_->GetProperty(name)->HasFlag(wxPG_PROP_MODIFIED);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+		if (!prop_modified)
 		{
 			// If unmodified, it might still have been changed in another panel, so refresh it
 			if (cvar->type == CVar::Type::Boolean)
