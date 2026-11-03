@@ -38,7 +38,6 @@
 #include "MainEditor/MainEditor.h"
 #include "MainEditor/UI/ArchiveManagerPanel.h"
 #include "MainEditor/UI/MainWindow.h"
-#include "MainEditor/UI/StartPage.h"
 #include "OpenGL/OpenGL.h"
 #include "UI/WxUtils.h"
 #include "Utility/Parser.h"
@@ -726,19 +725,8 @@ void SLADEWxApp::onVersionCheckCompleted(wxThreadEvent& e)
 	}
 
 	// Prompt to update
-	auto main_window = maineditor::window();
-	if (main_window->startPageTabOpen() && app::useWebView())
-	{
-		// Start Page (webview version) is open, show it there
-		main_window->openStartPageTab();
-		main_window->startPage()->updateAvailable(version);
-	}
-	else
-	{
-		// No start page, show a message box
-		if (wxMessageBox(message, caption, wxOK | wxCANCEL) == wxOK)
-			wxLaunchDefaultBrowser("http://slade.mancubus.net/index.php?page=downloads");
-	}
+	if (wxMessageBox(message, caption, wxOK | wxCANCEL) == wxOK)
+		wxLaunchDefaultBrowser("http://slade.mancubus.net/index.php?page=downloads");
 }
 
 // -----------------------------------------------------------------------------

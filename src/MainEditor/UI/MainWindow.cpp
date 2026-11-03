@@ -41,7 +41,6 @@
 #include "MapEditor/MapEditor.h"
 #include "Scripting/ScriptManager.h"
 #include "SLADEWxApp.h"
-#include "StartPage.h"
 #include "UI/Controls/BaseResourceChooser.h"
 #include "UI/Controls/ConsolePanel.h"
 #include "UI/Controls/PaletteChooser.h"
@@ -70,7 +69,7 @@ namespace
 {
 wxString main_window_layout = "";
 }
-CVAR(Bool, show_start_page, true, CVar::Flag::Save);
+CVAR(Bool, web_dark_theme, false, CVar::Flag::Save);
 CVAR(String, global_palette, "", CVar::Flag::Save);
 CVAR(Bool, mw_maximized, true, CVar::Flag::Save);
 CVAR(Bool, confirm_exit, true, CVar::Flag::Save);
@@ -217,18 +216,6 @@ void MainWindow::setupLayout()
 	p_inf.PaneBorder(false);
 	aui_mgr_->AddPane(stc_tabs_, p_inf);
 
-	// Create Start Page
-	start_page_ = new SStartPage(stc_tabs_);
-	if (show_start_page)
-	{
-		stc_tabs_->AddPage(start_page_, "Start Page");
-		stc_tabs_->SetPageBitmap(0, icons::getIcon(icons::General, "logo"));
-		start_page_->init();
-		createStartPage();
-	}
-	else
-		start_page_->Show(false);
-
 	// -- Console Panel --
 	auto panel_console = new ConsolePanel(this, -1);
 
@@ -310,7 +297,6 @@ void MainWindow::setupLayout()
 	SAction::fromId("main_showam")->addToMenu(view_menu);
 	SAction::fromId("main_showconsole")->addToMenu(view_menu);
 	SAction::fromId("main_showundohistory")->addToMenu(view_menu);
-	SAction::fromId("main_showstartpage")->addToMenu(view_menu);
 	toolbar_menu_ = new wxMenu();
 	view_menu->AppendSubMenu(toolbar_menu_, "Toolbars");
 	menu->Append(view_menu, "&View");
@@ -417,14 +403,6 @@ void MainWindow::setupLayout()
 	Bind(wxEVT_STOOLBAR_LAYOUT_UPDATED, &MainWindow::onToolBarLayoutChanged, this, toolbar_->GetId());
 	Bind(wxEVT_ACTIVATE, &MainWindow::onActivate, this);
 	Bind(
-		wxEVT_AUINOTEBOOK_PAGE_CLOSE,
-		[&](wxAuiNotebookEvent& e)
-		{
-			// Null start_page pointer if start page tab is being closed
-			if (auto page = stc_tabs_->GetPage(stc_tabs_->GetSelection()); page && page->GetName() == "startpage")
-				start_page_ = nullptr;
-		});
-	Bind(
 		wxEVT_AUINOTEBOOK_PAGE_CLOSED,
 		[&](wxAuiNotebookEvent& e)
 		{
@@ -435,15 +413,6 @@ void MainWindow::setupLayout()
 
 	// Initial focus to toolbar
 	toolbar_->SetFocus();
-}
-
-// -----------------------------------------------------------------------------
-// (Re-)Creates the start page
-// -----------------------------------------------------------------------------
-void MainWindow::createStartPage(bool newtip) const
-{
-	if (start_page_)
-		start_page_->load(newtip);
 }
 
 // -----------------------------------------------------------------------------
@@ -484,43 +453,6 @@ bool MainWindow::exitProgram()
 	app::exit(true);
 
 	return true;
-}
-
-// -----------------------------------------------------------------------------
-// Returns true if the Start Page tab is currently open
-// -----------------------------------------------------------------------------
-bool MainWindow::startPageTabOpen() const
-{
-	for (unsigned a = 0; a < stc_tabs_->GetPageCount(); a++)
-	{
-		if (stc_tabs_->GetPage(a)->GetName() == "startpage")
-			return true;
-	}
-
-	return false;
-}
-
-// -----------------------------------------------------------------------------
-// Switches to the Start Page tab, or (re)creates it if it has been closed
-// -----------------------------------------------------------------------------
-void MainWindow::openStartPageTab()
-{
-	// Find existing tab
-	for (unsigned a = 0; a < stc_tabs_->GetPageCount(); a++)
-	{
-		if (stc_tabs_->GetPage(a)->GetName() == "startpage")
-		{
-			stc_tabs_->SetSelection(a);
-			return;
-		}
-	}
-
-	// Not found, create start page tab
-	start_page_ = new SStartPage(stc_tabs_);
-	start_page_->init();
-	stc_tabs_->AddPage(start_page_, "Start Page");
-	stc_tabs_->SetPageBitmap(0, icons::getIcon(icons::General, "logo"));
-	createStartPage();
 }
 
 // -----------------------------------------------------------------------------
@@ -641,10 +573,6 @@ bool MainWindow::handleAction(string_view id)
 		return true;
 	}
 
-	// View->Show Start Page
-	if (id == "main_showstartpage")
-		openStartPageTab();
-
 #ifndef NO_LUA
 	// Tools->Run Script
 	if (id == "main_runscript")
@@ -727,17 +655,8 @@ void MainWindow::onTabChanged(wxAuiNotebookEvent& e)
 	// Get current page
 	auto page = stc_tabs_->GetPage(stc_tabs_->GetSelection());
 
-	// If start page is selected, refresh it
-	if (page->GetName() == "startpage")
-	{
-		createStartPage();
-		SetStatusText("", 1);
-		SetStatusText("", 2);
-		panel_undo_history_->setManager(nullptr);
-	}
-
 	// Archive tab, update undo history panel
-	else if (page->GetName() == "archive")
+	if (page->GetName() == "archive")
 		panel_undo_history_->setManager(((ArchivePanel*)page)->undoManager());
 
 	// Continue
@@ -781,20 +700,6 @@ void MainWindow::onActivate(wxActivateEvent& e)
 	{
 		e.Skip();
 		return;
-	}
-
-	// Get current tab
-	if (stc_tabs_->GetPageCount())
-	{
-		auto page = stc_tabs_->GetPage(stc_tabs_->GetSelection());
-
-		// If start page is selected, refresh it
-		if (page && page->GetName() == "startpage")
-		{
-			createStartPage(false);
-			SetStatusText("", 1);
-			SetStatusText("", 2);
-		}
 	}
 
 	e.Skip();

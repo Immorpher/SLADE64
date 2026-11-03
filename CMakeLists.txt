@@ -19,7 +19,7 @@ endif()
 
 set(SLADE_OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory where slade will be created.")
 
-OPTION(NO_WEBVIEW "Disable wxWebview usage (for start page and documentation)" OFF)
+OPTION(NO_WEBVIEW "Disable wxWebview usage (for the online documentation)" OFF)
 OPTION(USE_SFML_RENDERWINDOW "Use SFML RenderWindow for OpenGL displays" OFF)
 if(NOT APPLE)
 	OPTION(WX_GTK3 "Use GTK3 (if wx is built with it)" ON)

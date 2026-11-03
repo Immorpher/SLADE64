@@ -77,17 +77,13 @@ bool ArchiveManager::validResDir(string_view dir) const
 		"config/executables.cfg",
 		"config/nodebuilders.cfg",
 		"fonts/dejavu_sans.ttf",
-		"html/box-title-back.png",
-		"html/startpage.htm",
 		"icons/entry_list/archive.svg",
 		"icons/general/wiki.svg",
-		"images/arrow.png",
 		"logo.png",
 		"palettes/Doom .pal",
 		"s3dummy.lmp",
 		"slade.ico",
 		"switches.lmp",
-		"tips.txt",
 		"vga-rom-font.16",
 	};
 

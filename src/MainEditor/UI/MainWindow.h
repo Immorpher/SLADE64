@@ -12,7 +12,6 @@ class PaletteChooser;
 class SToolBar;
 class STabCtrl;
 class UndoManagerHistoryPanel;
-class SStartPage;
 #ifdef USE_WEBVIEW_STARTPAGE
 class DocsPage;
 #endif
@@ -28,16 +27,12 @@ public:
 	void saveLayout() const;
 
 	void setupLayout();
-	void createStartPage(bool newtip = true) const;
 	bool exitProgram();
 
-	bool startPageTabOpen() const;
-	void openStartPageTab();
 
 	ArchiveManagerPanel*     archiveManagerPanel() const { return panel_archivemanager_; }
 	PaletteChooser*          paletteChooser() const { return palette_chooser_; }
 	UndoManagerHistoryPanel* undoHistoryPanel() const { return panel_undo_history_; }
-	SStartPage*              startPage() const { return start_page_; }
 
 #ifdef USE_WEBVIEW_STARTPAGE
 	void openDocs(const wxString& page_name = "");
@@ -48,11 +43,8 @@ private:
 	UndoManagerHistoryPanel* panel_undo_history_   = nullptr;
 	STabCtrl*                stc_tabs_             = nullptr;
 	wxAuiManager*            aui_mgr_              = nullptr;
-	int                      lasttipindex_         = 0;
 	PaletteChooser*          palette_chooser_      = nullptr;
 
-	// Start page
-	SStartPage* start_page_ = nullptr;
 #ifdef USE_WEBVIEW_STARTPAGE
 	DocsPage* docs_page_ = nullptr;
 #endif

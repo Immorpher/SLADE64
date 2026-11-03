@@ -17,7 +17,6 @@ private:
 	wxCheckBox* cb_size_as_string_       = nullptr;
 	wxCheckBox* cb_filter_dirs_          = nullptr;
 	wxCheckBox* cb_list_monospace_       = nullptr;
-	wxCheckBox* cb_start_page_           = nullptr;
 	wxCheckBox* cb_context_submenus_     = nullptr;
 	wxCheckBox* cb_elist_bgcol_          = nullptr;
 	wxCheckBox* cb_file_browser_         = nullptr;

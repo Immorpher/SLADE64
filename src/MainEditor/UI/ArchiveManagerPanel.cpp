@@ -1796,10 +1796,10 @@ bool ArchiveManagerPanel::handleAction(string_view id)
 	// File->New Archive
 	if (id == "aman_newarchive")
 		createNewArchive("");
-	// Start Page: Create Wad Archive (File->New Archive->wad)
+	// Create Wad Archive (File->New Archive->wad)
 	else if (id == "aman_newwad")
 		createNewArchive("wad");
-	// Start Page: Create Zip Archive (File->New Archive->zip)
+	// Create Zip Archive (File->New Archive->zip)
 	else if (id == "aman_newzip")
 		createNewArchive("zip");
 	// File->New Map

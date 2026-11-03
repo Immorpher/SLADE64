@@ -45,7 +45,6 @@ using namespace slade;
 // -----------------------------------------------------------------------------
 EXTERN_CVAR(Bool, size_as_string)
 EXTERN_CVAR(Bool, elist_filter_dirs)
-EXTERN_CVAR(Bool, show_start_page)
 EXTERN_CVAR(Bool, swap_epanel_bars)
 EXTERN_CVAR(Bool, context_submenus)
 EXTERN_CVAR(Bool, list_font_monospace)
@@ -93,7 +92,6 @@ void InterfacePrefsPanel::init()
 	cb_size_as_string_->SetValue(size_as_string);
 	cb_filter_dirs_->SetValue(!elist_filter_dirs);
 	cb_list_monospace_->SetValue(list_font_monospace);
-	cb_start_page_->SetValue(show_start_page);
 	cb_context_submenus_->SetValue(context_submenus);
 	cb_elist_bgcol_->SetValue(elist_type_bgcol);
 	cb_file_browser_->SetValue(am_file_browser_tab);
@@ -142,7 +140,6 @@ void InterfacePrefsPanel::applyPreferences()
 	size_as_string      = cb_size_as_string_->GetValue();
 	elist_filter_dirs   = !cb_filter_dirs_->GetValue();
 	list_font_monospace = cb_list_monospace_->GetValue();
-	show_start_page     = cb_start_page_->GetValue();
 	context_submenus    = cb_context_submenus_->GetValue();
 	elist_type_bgcol    = cb_elist_bgcol_->GetValue();
 	am_file_browser_tab = cb_file_browser_->GetValue();
@@ -178,9 +175,8 @@ wxPanel* InterfacePrefsPanel::setupGeneralTab(wxWindow* stc_tabs)
 	auto panel = new wxPanel(stc_tabs, -1);
 
 	// Create controls
-	cb_start_page_     = new wxCheckBox(panel, -1, "Show Start Page on Startup");
 	cb_web_dark_theme_ = new wxCheckBox(panel, -1, "Use dark theme for web content *");
-	cb_web_dark_theme_->SetToolTip("Use a dark theme for web content eg. the Start Page and Online Documentation");
+	cb_web_dark_theme_->SetToolTip("Use a dark theme for web content eg. the Online Documentation");
 	cb_file_browser_        = new wxCheckBox(panel, -1, "Show File Browser tab in the Archive Manager panel *");
 	cb_list_monospace_      = new wxCheckBox(panel, -1, "Use monospaced font for lists");
 	cb_condensed_tabs_      = new wxCheckBox(panel, -1, "Condensed tabs *");
@@ -196,7 +192,6 @@ wxPanel* InterfacePrefsPanel::setupGeneralTab(wxWindow* stc_tabs)
 	sizer->Add(gb_sizer, 1, wxALL | wxEXPAND, ui::padLarge());
 
 	int row = 0;
-	gb_sizer->Add(cb_start_page_, { row++, 0 }, { 1, 2 }, wxEXPAND);
 	gb_sizer->Add(cb_web_dark_theme_, { row++, 0 }, { 1, 2 }, wxEXPAND);
 	gb_sizer->Add(cb_file_browser_, { row++, 0 }, { 1, 2 }, wxEXPAND);
 	gb_sizer->Add(cb_list_monospace_, { row++, 0 }, { 1, 2 }, wxEXPAND);

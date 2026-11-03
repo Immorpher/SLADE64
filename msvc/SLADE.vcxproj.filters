@@ -597,9 +597,6 @@
     <ClCompile Include="..\src\UI\SBrush.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MainEditor\UI\StartPage.cpp">
-      <Filter>Main Editor\UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Game\ActionSpecial.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -1518,9 +1515,6 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\SBrush.h">
       <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MainEditor\UI\StartPage.h">
-      <Filter>Main Editor\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\ActionSpecial.h">
       <Filter>Game</Filter>

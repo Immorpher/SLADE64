@@ -261,9 +261,8 @@ void SAuiTabArt::DrawTab(
 	dc.SetFont(m_normalFont);
 	dc.GetTextExtent(caption, &normal_textx, &normal_texty);
 
-	bool bluetab = false;
-	if (page.window->GetName() == "startpage")
-		bluetab = true;
+	// (The "blue tab" style was only used by the removed Start Page)
+	const bool bluetab = false;
 
 	// figure out the size of the tab
 	wxSize tab_size = GetTabSize(dc, wnd, page.caption, page.bitmap, page.active, close_button_state, x_extent);
