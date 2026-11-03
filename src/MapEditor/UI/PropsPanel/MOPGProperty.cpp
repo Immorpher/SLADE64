@@ -549,7 +549,7 @@ const game::ArgSpec& MOPGActionSpecialProperty::argSpec()
 // -----------------------------------------------------------------------------
 // Returns the action special value as a string (contains the special name)
 // -----------------------------------------------------------------------------
-wxString MOPGActionSpecialProperty::ValueToString(wxVariant& value, int argFlags) const
+wxString MOPGActionSpecialProperty::ValueToString(wxVariant& value, MOPGFormatFlags argFlags) const
 {
 	// Get value as integer
 	int special = value.GetInteger();
@@ -600,7 +600,7 @@ const game::ArgSpec& MOPGThingTypeProperty::argSpec()
 // -----------------------------------------------------------------------------
 // Returns the thing type value as a string (contains the thing type name)
 // -----------------------------------------------------------------------------
-wxString MOPGThingTypeProperty::ValueToString(wxVariant& value, int argFlags) const
+wxString MOPGThingTypeProperty::ValueToString(wxVariant& value, MOPGFormatFlags argFlags) const
 {
 	// Get value as integer
 	int type = value.GetInteger();
@@ -884,7 +884,7 @@ void MOPGAngleProperty::applyValue()
 // -----------------------------------------------------------------------------
 // Returns the angle value as a string
 // -----------------------------------------------------------------------------
-wxString MOPGAngleProperty::ValueToString(wxVariant& value, int arg_flags) const
+wxString MOPGAngleProperty::ValueToString(wxVariant& value, MOPGFormatFlags arg_flags) const
 {
 	int angle = value.GetInteger();
 
@@ -1290,7 +1290,7 @@ void MOPGSectorSpecialProperty::openObjects(vector<MapObject*>& objects)
 // -----------------------------------------------------------------------------
 // Returns the sector special value as a string
 // -----------------------------------------------------------------------------
-wxString MOPGSectorSpecialProperty::ValueToString(wxVariant& value, int argFlags) const
+wxString MOPGSectorSpecialProperty::ValueToString(wxVariant& value, MOPGFormatFlags argFlags) const
 {
 	int type = value.GetInteger();
 

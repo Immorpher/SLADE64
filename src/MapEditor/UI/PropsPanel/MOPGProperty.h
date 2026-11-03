@@ -12,6 +12,15 @@ namespace game
 class MapObject;
 class MapObjectPropsPanel;
 
+// wxWidgets 3.3+ uses wxPGPropValFormatFlags instead of int for wxPGProperty::ValueToString flags
+#if wxCHECK_VERSION(3, 3, 0)
+using MOPGFormatFlags = wxPGPropValFormatFlags;
+constexpr MOPGFormatFlags MOPG_FORMAT_NONE = wxPGPropValFormatFlags::Null;
+#else
+using MOPGFormatFlags = int;
+constexpr MOPGFormatFlags MOPG_FORMAT_NONE = 0;
+#endif
+
 class MOPGProperty
 {
 public:
@@ -129,7 +138,7 @@ public:
 	Type type() override { return Type::ActionSpecial; }
 
 	// wxPGProperty overrides
-	wxString ValueToString(wxVariant& value, int argFlags = 0) const override;
+	wxString ValueToString(wxVariant& value, MOPGFormatFlags argFlags = MOPG_FORMAT_NONE) const override;
 	bool     OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) override;
 };
 
@@ -147,7 +156,7 @@ public:
 	Type type() override { return Type::ThingType; }
 
 	// wxPGProperty overrides
-	wxString ValueToString(wxVariant& value, int argFlags = 0) const override;
+	wxString ValueToString(wxVariant& value, MOPGFormatFlags argFlags = MOPG_FORMAT_NONE) const override;
 	bool     OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) override;
 };
 
@@ -188,7 +197,7 @@ public:
 	void applyValue() override;
 
 	// wxPGProperty overrides
-	wxString ValueToString(wxVariant& value, int arg_flags = 0) const override;
+	wxString ValueToString(wxVariant& value, MOPGFormatFlags arg_flags = MOPG_FORMAT_NONE) const override;
 };
 
 class MOPGColourProperty : public MOPGProperty, public wxColourProperty
@@ -262,7 +271,7 @@ public:
 	void openObjects(vector<MapObject*>& objects) override;
 
 	// wxPGProperty overrides
-	wxString ValueToString(wxVariant& value, int argFlags = 0) const override;
+	wxString ValueToString(wxVariant& value, MOPGFormatFlags argFlags = MOPG_FORMAT_NONE) const override;
 	bool     OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) override;
 };
 } // namespace slade
