@@ -40,10 +40,6 @@ namespace maineditor
 	void openEntry(ArchiveEntry* entry);
 
 	void setGlobalPaletteFromArchive(Archive* archive);
-
-#ifdef USE_WEBVIEW_STARTPAGE
-	void openDocs(string_view page_name = "");
-#endif
 }; // namespace maineditor
 } // namespace slade
 

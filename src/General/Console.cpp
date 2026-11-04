@@ -223,7 +223,7 @@ void ConsoleCommand::execute(const vector<string>& args) const
 	if (args.size() >= min_args_)
 		command_func_(args);
 	else
-		log::console(fmt::format("Missing command arguments, type \"cmdhelp {}\" for more information", name_));
+		log::console(fmt::format("Missing command arguments for \"{}\"", name_));
 }
 
 
@@ -274,33 +274,6 @@ CONSOLE_COMMAND(cvarlist, 0, true)
 	for (const auto& a : list)
 		log::console(a);
 }
-
-// -----------------------------------------------------------------------------
-// Opens the wiki page for a console command
-// -----------------------------------------------------------------------------
-CONSOLE_COMMAND(cmdhelp, 1, true)
-{
-	// Check command exists
-	for (int a = 0; a < app::console()->numCommands(); a++)
-	{
-		if (strutil::equalCI(app::console()->command(a).name(), args[0]))
-		{
-#ifdef USE_WEBVIEW_STARTPAGE
-			maineditor::openDocs(fmt::format("{}-Console-Command", args[0]));
-#else
-			wxString url = wxString::Format("https://github.com/sirjuddington/SLADE/wiki/%s-Console-Command", args[0]);
-			wxLaunchDefaultBrowser(url);
-#endif
-			return;
-		}
-	}
-
-	// No command found
-	log::console(fmt::format("No command \"{}\" exists", args[0]));
-}
-
-
-
 
 
 CONSOLE_COMMAND(testmatch, 2, false)

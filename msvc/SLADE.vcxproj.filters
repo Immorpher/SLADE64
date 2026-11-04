@@ -375,9 +375,6 @@
     <ClCompile Include="..\src\MainEditor\UI\ArchivePanel.cpp">
       <Filter>Main Editor\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MainEditor\UI\DocsPage.cpp">
-      <Filter>Main Editor\UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\MainEditor\UI\EntryPanel\ANSIEntryPanel.cpp">
       <Filter>Main Editor\UI\EntryPanel</Filter>
     </ClCompile>
@@ -695,9 +692,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Scripting\ScriptManager.cpp">
       <Filter>Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\General\Web.cpp">
-      <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\UI\ScriptPanel.cpp">
       <Filter>Scripting\UI</Filter>
@@ -1283,9 +1277,6 @@
     <ClInclude Include="..\src\MainEditor\UI\ArchivePanel.h">
       <Filter>Main Editor\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\MainEditor\UI\DocsPage.h">
-      <Filter>Main Editor\UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\MainEditor\UI\EntryPanel\ANSIEntryPanel.h">
       <Filter>Main Editor\UI\EntryPanel</Filter>
     </ClInclude>
@@ -1614,9 +1605,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ScriptManager.h">
       <Filter>Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\General\Web.h">
-      <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\UI\ScriptPanel.h">
       <Filter>Scripting\UI</Filter>

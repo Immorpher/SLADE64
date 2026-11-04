@@ -181,13 +181,3 @@ EntryPanel* maineditor::currentEntryPanel()
 {
 	return main_window->archiveManagerPanel()->currentArea();
 }
-
-// -----------------------------------------------------------------------------
-// Opens the documentation tab to [page_name] (if enabled)
-// -----------------------------------------------------------------------------
-#ifdef USE_WEBVIEW_STARTPAGE
-void maineditor::openDocs(string_view page_name)
-{
-	main_window->openDocs(wxutil::strFromView(page_name));
-}
-#endif

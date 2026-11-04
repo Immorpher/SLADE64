@@ -750,15 +750,6 @@ app::Platform app::platform()
 #endif
 }
 
-bool app::useWebView()
-{
-#ifdef USE_WEBVIEW_STARTPAGE
-	return true;
-#else
-	return false;
-#endif
-}
-
 bool app::useSFMLRenderWindow()
 {
 #ifdef USE_SFML_RENDERWINDOW

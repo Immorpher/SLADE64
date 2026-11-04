@@ -60,7 +60,6 @@
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/propgrid/propgrid.h>
-#include <wx/protocol/http.h>
 #include <wx/ptr_scpd.h>
 #include <wx/radiobut.h>
 #include <wx/regex.h>
@@ -93,14 +92,6 @@
 #include <wx/wrapsizer.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/zipstrm.h>
-
-#ifndef USE_WEBVIEW_STARTPAGE
-#include <wx/html/htmlwin.h>
-#endif
-
-#ifdef USE_WEBVIEW_STARTPAGE
-#include <wx/webview.h>
-#endif
 
 #ifdef __WXMSW__
 #include <wx/msw/registry.h>

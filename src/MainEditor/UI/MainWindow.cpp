@@ -53,9 +53,6 @@
 #include "UI/WxUtils.h"
 #include "Utility/StringUtils.h"
 #include "Utility/Tokenizer.h"
-#ifdef USE_WEBVIEW_STARTPAGE
-#include "DocsPage.h"
-#endif
 
 using namespace slade;
 
@@ -69,7 +66,6 @@ namespace
 {
 wxString main_window_layout = "";
 }
-CVAR(Bool, web_dark_theme, false, CVar::Flag::Save);
 CVAR(String, global_palette, "", CVar::Flag::Save);
 CVAR(Bool, mw_maximized, true, CVar::Flag::Save);
 CVAR(Bool, confirm_exit, true, CVar::Flag::Save);
@@ -308,11 +304,7 @@ void MainWindow::setupLayout()
 
 	// Help menu
 	auto help_menu = new wxMenu("");
-	SAction::fromId("main_onlinedocs")->addToMenu(help_menu);
 	SAction::fromId("main_about")->addToMenu(help_menu);
-#ifdef __WXMSW__
-	SAction::fromId("main_updatecheck")->addToMenu(help_menu);
-#endif
 	menu->Append(help_menu, "&Help");
 
 	// Set the menu
@@ -456,46 +448,6 @@ bool MainWindow::exitProgram()
 }
 
 // -----------------------------------------------------------------------------
-// Opens [entry] in its own tab
-// -----------------------------------------------------------------------------
-#ifdef USE_WEBVIEW_STARTPAGE
-void MainWindow::openDocs(const wxString& page_name)
-{
-	// Check if docs tab is already open
-	bool found = false;
-	for (unsigned a = 0; a < stc_tabs_->GetPageCount(); a++)
-	{
-		if (stc_tabs_->GetPage(a)->GetName() == "docs")
-		{
-			stc_tabs_->SetSelection(a);
-			found = true;
-			break;
-		}
-	}
-
-	// Open new docs tab if not already open
-	if (!found)
-	{
-		// Create docs page
-		docs_page_ = new DocsPage(this);
-		docs_page_->SetName("docs");
-
-		// Add tab
-		stc_tabs_->AddPage(docs_page_, "Documentation", true, -1);
-		stc_tabs_->SetPageBitmap(stc_tabs_->GetPageCount() - 1, icons::getIcon(icons::General, "wiki"));
-	}
-
-	// Load specified page, if any
-	if (!page_name.empty())
-		docs_page_->openPage(page_name);
-
-	// Refresh page
-	docs_page_->Layout();
-	docs_page_->Update();
-}
-#endif
-
-// -----------------------------------------------------------------------------
 // Handles the action [id].
 // Returns true if the action was handled, false otherwise
 // -----------------------------------------------------------------------------
@@ -605,24 +557,6 @@ bool MainWindow::handleAction(string_view id)
 
 		wxAboutBox(info);
 
-		return true;
-	}
-
-	// Help->Online Documentation
-	if (id == "main_onlinedocs")
-	{
-#ifdef USE_WEBVIEW_STARTPAGE
-		openDocs();
-#else
-		wxLaunchDefaultBrowser("http://slade.mancubus.net/wiki");
-#endif
-		return true;
-	}
-
-	// Help->Check For Updates
-	if (id == "main_updatecheck")
-	{
-		wxGetApp().checkForUpdates(true);
 		return true;
 	}
 

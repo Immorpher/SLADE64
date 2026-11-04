@@ -58,8 +58,7 @@ using namespace slade;
 // -----------------------------------------------------------------------------
 namespace
 {
-wxString docs_url       = "https://slade.readthedocs.io/en/latest";
-int      layout_version = 1;
+int layout_version = 1;
 } // namespace
 
 CVAR(Bool, sm_maximized, false, CVar::Flag::Save)
@@ -385,8 +384,6 @@ void ScriptManagerWindow::setupMenu()
 	auto view_menu = new wxMenu();
 	SAction::fromId("scrm_showscripts")->addToMenu(view_menu);
 	SAction::fromId("scrm_showconsole")->addToMenu(view_menu);
-	if (app::useWebView())
-		SAction::fromId("scrm_showdocs")->addToMenu(view_menu);
 	menu->Append(view_menu, "&View");
 
 	// Set the menu
@@ -599,59 +596,6 @@ void ScriptManagerWindow::closeScriptTab(scriptmanager::Script* script) const
 }
 
 // -----------------------------------------------------------------------------
-// Shows the scripting documentation tab or creates it if it isn't currently
-// open. If [url] is specified, navigates to <scripting docs url>/[url]
-// -----------------------------------------------------------------------------
-void ScriptManagerWindow::showDocs(const wxString& url)
-{
-#ifdef USE_WEBVIEW_STARTPAGE
-
-	// Find existing tab
-	bool found = false;
-	for (unsigned a = 0; a < tabs_scripts_->GetPageCount(); a++)
-	{
-		auto page = tabs_scripts_->GetPage(a);
-		if (page->GetName() == "docs")
-		{
-			tabs_scripts_->SetSelection(a);
-			found = true;
-			break;
-		}
-	}
-
-	if (!found)
-	{
-		// Tab not open, create it
-		webview_docs_ = wxWebView::New(this, -1, wxEmptyString);
-		webview_docs_->SetName("docs");
-
-		// Bind HTML link click event
-		webview_docs_->Bind(
-			wxEVT_WEBVIEW_NAVIGATING,
-			[&](wxEvent& e)
-			{
-				auto&    ev   = dynamic_cast<wxWebViewEvent&>(e);
-				wxString href = ev.GetURL();
-
-				// Open external links externally
-				if (!href.StartsWith(docs_url))
-				{
-					wxLaunchDefaultBrowser(href);
-					ev.Veto();
-				}
-			});
-
-		tabs_scripts_->AddPage(webview_docs_, "Scripting Documentation", true, icons::getIcon(icons::General, "wiki"));
-	}
-
-	// Load page if set
-	if (!found || !url.empty())
-		webview_docs_->LoadURL(docs_url + "/" + url);
-
-#endif
-}
-
-// -----------------------------------------------------------------------------
 // Opens the tab for [script], or creates a new tab for it if needed
 // -----------------------------------------------------------------------------
 void ScriptManagerWindow::openScriptTab(scriptmanager::Script* script) const
@@ -813,13 +757,6 @@ bool ScriptManagerWindow::handleAction(string_view id)
 		p_inf.Show(!p_inf.IsShown());
 		p_inf.MinSize(200, 128);
 		m_mgr->Update();
-		return true;
-	}
-
-	// View->Documentation
-	if (id == "scrm_showdocs")
-	{
-		showDocs();
 		return true;
 	}
 

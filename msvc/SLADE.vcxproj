@@ -156,7 +156,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -186,7 +186,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>FLUIDSYNTH_NOT_A_DLL;WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FLUIDSYNTH_NOT_A_DLL;WIN32;USE_SFML_RENDERWINDOW;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -216,7 +216,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>SFML_STATIC;WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;NOLIBMODPLUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SFML_STATIC;WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;NOLIBMODPLUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
@@ -256,7 +256,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>FLUIDSYNTH_NOT_A_DLL;SFML_STATIC;WIN32;USE_SFML_RENDERWINDOW;USE_WEBVIEW_STARTPAGE;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;NOLIBMODPLUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FLUIDSYNTH_NOT_A_DLL;SFML_STATIC;WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;NOLIBMODPLUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
@@ -400,7 +400,6 @@
     <ClCompile Include="..\src\General\SAction.cpp" />
     <ClCompile Include="..\src\General\UI.cpp" />
     <ClCompile Include="..\src\General\UndoRedo.cpp" />
-    <ClCompile Include="..\src\General\Web.cpp" />
     <ClCompile Include="..\src\Graphics\CTexture\CTexture.cpp" />
     <ClCompile Include="..\src\Graphics\CTexture\PatchTable.cpp" />
     <ClCompile Include="..\src\Graphics\CTexture\TextureXList.cpp" />
@@ -419,12 +418,6 @@
     <ClCompile Include="..\src\MainEditor\MainEditor.cpp" />
     <ClCompile Include="..\src\MainEditor\UI\ArchiveManagerPanel.cpp" />
     <ClCompile Include="..\src\MainEditor\UI\ArchivePanel.cpp" />
-    <ClCompile Include="..\src\MainEditor\UI\DocsPage.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\src\MainEditor\UI\EntryPanel\ANSIEntryPanel.cpp" />
     <ClCompile Include="..\src\MainEditor\UI\EntryPanel\AudioEntryPanel.cpp" />
     <ClCompile Include="..\src\MainEditor\UI\EntryPanel\DataEntryPanel.cpp" />
@@ -770,7 +763,6 @@
     <ClInclude Include="..\src\General\SAction.h" />
     <ClInclude Include="..\src\General\UI.h" />
     <ClInclude Include="..\src\General\UndoRedo.h" />
-    <ClInclude Include="..\src\General\Web.h" />
     <ClInclude Include="..\src\Graphics\CTexture\CTexture.h" />
     <ClInclude Include="..\src\Graphics\CTexture\PatchTable.h" />
     <ClInclude Include="..\src\Graphics\CTexture\TextureXList.h" />
@@ -798,7 +790,6 @@
     <ClInclude Include="..\src\MainEditor\MainEditor.h" />
     <ClInclude Include="..\src\MainEditor\UI\ArchiveManagerPanel.h" />
     <ClInclude Include="..\src\MainEditor\UI\ArchivePanel.h" />
-    <ClInclude Include="..\src\MainEditor\UI\DocsPage.h" />
     <ClInclude Include="..\src\MainEditor\UI\EntryPanel\ANSIEntryPanel.h" />
     <ClInclude Include="..\src\MainEditor\UI\EntryPanel\AudioEntryPanel.h" />
     <ClInclude Include="..\src\MainEditor\UI\EntryPanel\DataEntryPanel.h" />

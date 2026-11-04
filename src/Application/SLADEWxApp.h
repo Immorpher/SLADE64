@@ -19,10 +19,8 @@ public:
 #endif // __APPLE__
 
 	bool singleInstanceCheck();
-	void checkForUpdates(bool message_box);
 
 	void onMenu(wxCommandEvent& e);
-	void onVersionCheckCompleted(wxThreadEvent& e);
 	void onActivate(wxActivateEvent& event);
 
 private:
