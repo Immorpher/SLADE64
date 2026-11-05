@@ -37,6 +37,7 @@
 #include "Archive/ArchiveEntry.h"
 #include "Archive/EntryType/EntryType.h"
 #include "Graphics/N64Gfx.h"
+#include "Graphics/N64GfxEntry.h"
 #include "General/Misc.h"
 #include "Graphics/Palette/PaletteManager.h"
 
@@ -108,7 +109,10 @@ Palette* PaletteChooser::selectedPalette(ArchiveEntry* entry)
 	else if (sel > num_archive_pals)
 		return app::paletteManager()->palette(sel - 1 - num_archive_pals);
 	else if (entry)
+	{
 		misc::loadPaletteFromArchive(&pal_global_, entry->parent(), misc::detectPaletteHack(entry));
+		matchSpritePalette(entry);
+	}
 	return &pal_global_;
 }
 
@@ -210,16 +214,46 @@ void PaletteChooser::updateArchivePalettes(Archive* archive, ArchiveEntry* entry
 	else
 		archive_pals_ = std::move(pals); // Same names, palette contents may have been edited
 
-	// Use matching palette as the global palette for external-palette sprites
-	if (entry && entry->type() && entry->type()->formatId() == "img_n64_sprite" && globalSelected()
-		&& n64gfx::detect(entry->rawData(true), entry->size()) == n64gfx::Kind::Sprite8Ext)
-	{
-		vector<string> names;
-		for (auto& pal : archive_pals_)
-			names.push_back(pal.name);
+	matchSpritePalette(entry);
+}
 
-		const int match = n64gfx::findSpritePalette(entry->name(), names);
-		if (match >= 0)
-			pal_global_.copyPalette(&archive_pals_[match].palette);
+// -----------------------------------------------------------------------------
+// If 'Existing/Global' is selected and [entry] is a Doom 64 sprite (or an image
+// that's going to become one, ie. not a Doom 64 texture/graphic/palette), sets
+// the global palette to the Doom 64 palette it uses: the lump its header
+// references, or else PALxxxx0 where xxxx is the first 4 letters of its name.
+// -----------------------------------------------------------------------------
+void PaletteChooser::matchSpritePalette(ArchiveEntry* entry)
+{
+	if (!entry || !entry->type() || archive_pals_.empty() || !globalSelected())
+		return;
+
+	const auto& format = entry->type()->formatId();
+	if (format == "img_n64_tex" || format == "img_n64_gfx" || format == "img_n64_pal")
+		return;
+
+	// Palette lump referenced by the sprite itself
+	string ref_name;
+	if (format == "img_n64_sprite")
+	{
+		const auto ref = n64gfx::spritePaletteReference(entry->rawData(true), entry->size());
+		if (auto* pal_entry = n64gfx::referencedEntry(entry, ref))
+			ref_name = pal_entry->name();
 	}
+
+	for (auto& pal : archive_pals_)
+		if (!ref_name.empty() && pal.name == ref_name)
+		{
+			pal_global_.copyPalette(&pal.palette);
+			return;
+		}
+
+	// Otherwise, go by name
+	vector<string> names;
+	for (auto& pal : archive_pals_)
+		names.push_back(pal.name);
+
+	const int match = n64gfx::findSpritePalette(entry->name(), names);
+	if (match >= 0)
+		pal_global_.copyPalette(&archive_pals_[match].palette);
 }

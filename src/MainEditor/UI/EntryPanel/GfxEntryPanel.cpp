@@ -48,6 +48,7 @@
 #include "UI/Dialogs/ModifyOffsetsDialog.h"
 #include "UI/Dialogs/TranslationEditorDialog.h"
 #include "UI/SBrush.h"
+#include "Graphics/N64GfxEntry.h"
 #include "Utility/StringUtils.h"
 
 
@@ -964,7 +965,10 @@ bool GfxEntryPanel::handleEntryPanelAction(string_view id)
 			auto* format = gcd.itemFormat(0);
 
 			// Write converted image back to entry
+			const auto old_ref = n64gfx::spritePaletteReference(entry->rawData(), entry->size());
 			format->saveImage(*image, entry_data_, gcd.itemPalette(0));
+			if (!n64gfx::fixSpritePaletteReference(entry_data_, entry.get(), old_ref))
+				log::warning("Couldn't find a PAL lump for sprite {}, its palette reference needs to be set", entry->name());
 			// This makes the "save" button (and the setModified stuff) redundant and confusing!
 			// The alternative is to save to entry effectively (uncomment the importMemChunk line)
 			// but remove the setModified and image_data_modified lines, and add a call to refresh

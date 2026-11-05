@@ -75,6 +75,9 @@ public:
 	virtual bool     convertWritable(SImage& image, ConvertOptions opt) { return false; }
 	virtual bool     writeOffset(SImage& image, ArchiveEntry* entry, Vec2i offset) { return false; }
 
+	// Whether the conversion dialog should add the colour type (eg. '(Paletted)') to the format's name
+	virtual bool typeInName() const { return true; }
+
 	bool saveImage(SImage& image, MemChunk& out, Palette* pal = nullptr, int index = 0)
 	{
 		// Attempt to write image data

@@ -534,6 +534,13 @@ void SIFormat::initFormats()
 	new SIFDoom64("n64_gfx", "Doom 64 Graphic", SIFDoom64::Category::Gfx);
 	new SIFDoom64("n64_pal", "Doom 64 Palette", SIFDoom64::Category::Palette);
 
+	// Doom 64 formats for the conversion dialog (write only)
+	new SIFDoom64Writer("n64w_tex16", "Doom 64 (16 color - Texture)", SIFDoom64Writer::Variant::Texture16);
+	new SIFDoom64Writer("n64w_spr16", "Doom 64 (16 color - Sprite)", SIFDoom64Writer::Variant::Sprite16);
+	new SIFDoom64Writer("n64w_gfx256", "Doom 64 (256 color - Graphic)", SIFDoom64Writer::Variant::Graphic256);
+	new SIFDoom64Writer("n64w_texanim", "Doom 64 (256 color - Texture Animation)", SIFDoom64Writer::Variant::TextureAnim);
+	new SIFDoom64Writer("n64w_spr256", "Doom 64 (256 color - Sprite)", SIFDoom64Writer::Variant::Sprite256);
+
 	// Hexen formats
 	new SIFPlanar();
 	new SIF4BitChunk();

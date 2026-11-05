@@ -142,7 +142,7 @@ bool GfxConvDialog::nextItem()
 			{
 				// Add format
 				conv_formats_.emplace_back(format, SImage::Type::PalMask);
-				combo_target_format_->Append(format->name() + " (Paletted)");
+				combo_target_format_->Append(format->typeInName() ? wxString(format->name() + " (Paletted)") : wxString(format->name()));
 
 				// Check for match with current format
 				if (current_format_.format == format && current_format_.coltype == SImage::Type::PalMask)
@@ -443,6 +443,13 @@ void GfxConvDialog::updatePreviewGfx()
 
 	// Get the current image entry
 	auto& item = items_[current_item_];
+
+	// List the Doom 64 palettes (PAL*) of the entry's archive in both palette choosers
+	if (item.entry)
+	{
+		pal_chooser_current_->updateArchivePalettes(item.entry->parent(), item.entry);
+		pal_chooser_target_->updateArchivePalettes(item.entry->parent(), item.entry);
+	}
 
 	// Set palettes
 	if (item.image.hasPalette() && pal_chooser_current_->globalSelected())

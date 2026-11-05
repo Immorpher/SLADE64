@@ -76,6 +76,7 @@
 #include "UI/Dialogs/TranslationEditorDialog.h"
 #include "UI/Lists/ArchiveEntryTree.h"
 #include "UI/WxUtils.h"
+#include "Graphics/N64GfxEntry.h"
 #include "Utility/SFileDialog.h"
 #include "Utility/StringUtils.h"
 
@@ -2006,7 +2007,10 @@ bool ArchivePanel::gfxConvert() const
 
 		// Write converted image back to entry
 		MemChunk mc;
+		const auto old_ref = n64gfx::spritePaletteReference(selection[a]->rawData(), selection[a]->size());
 		format->saveImage(*image, mc, gcd.itemPalette(a));
+		if (!n64gfx::fixSpritePaletteReference(mc, selection[a], old_ref))
+			log::warning("Couldn't find a PAL lump for sprite {}, its palette reference needs to be set", selection[a]->name());
 		selection[a]->importMemChunk(mc);
 		EntryType::detectEntryType(*selection[a]);
 		selection[a]->setExtensionByType();

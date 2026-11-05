@@ -98,3 +98,314 @@ private:
 		return false;
 	}
 };
+
+// -----------------------------------------------------------------------------
+// SIFDoom64Writer Class
+//
+// The Doom 64 formats offered in the Graphic Format Conversion dialog. They
+// aren't used for detecting/reading anything (see SIFDoom64 for that), they just
+// convert an image to what the N64 needs and write it:
+//
+//  Texture16   16 colour texture (T_START..T_END), 1 palette. The image is
+//              reduced to 16 colours if it has more
+//  Sprite16    16 colour sprite with an embedded palette
+//  Graphic256  256 colour graphic with an embedded palette (title screens etc.)
+//  TextureAnim 16 colour texture with extra palette rows for palette animation.
+//              The source must be an 8-bit indexed image using indices 0-15;
+//              each following group of 16 palette entries is the next row
+//  Sprite256   256 colour sprite *without* a palette (enemies). Pixels are
+//              matched to the target palette (a PALxxxx lump); an indexed image
+//              that already uses that palette keeps its indices
+//
+// If the image has transparency, palette index 0 is the transparent colour.
+// -----------------------------------------------------------------------------
+class SIFDoom64Writer : public SIFormat
+{
+public:
+	enum class Variant
+	{
+		Texture16,
+		Sprite16,
+		Graphic256,
+		TextureAnim,
+		Sprite256
+	};
+
+	SIFDoom64Writer(string_view id, string_view name, Variant variant) : SIFormat(id, name, "lmp", 0), variant_{ variant }
+	{
+	}
+
+	// Never used to detect or read anything
+	bool            isThisFormat(MemChunk& mc) override { return false; }
+	SImage::Info    info(MemChunk& mc, int index) override { return {}; }
+	bool            typeInName() const override { return false; }
+
+	Writable canWrite(SImage& image) override
+	{
+		if (!image.isValid())
+			return Writable::No;
+
+		const int w = image.width();
+		const int h = image.height();
+
+		switch (variant_)
+		{
+		case Variant::Texture16:
+		case Variant::TextureAnim:
+		{
+			// Textures store their size as powers of 2
+			unsigned shift;
+			if (!n64gfx::detail::shiftOf(w, shift) || !n64gfx::detail::shiftOf(h, shift))
+				return Writable::No;
+
+			// Palette animation needs an indexed source (that's where the palette rows are)
+			if (variant_ == Variant::TextureAnim && !usesOnlyFirstRow(image))
+				return Writable::No;
+			break;
+		}
+		case Variant::Sprite16:
+			if (w > 4095 || h > 4095 || n64gfx::detail::pad16(w) / 2 * h > 0xFFFF)
+				return Writable::No;
+			break;
+		case Variant::Sprite256:
+			if (w > 2048 || h > 4095)
+				return Writable::No;
+			break;
+		case Variant::Graphic256:
+			if (w > 2048 || h > 2048)
+				return Writable::No;
+			break;
+		}
+
+		return Writable::Convert;
+	}
+
+	bool canWriteType(SImage::Type type) override { return type == SImage::Type::PalMask; }
+
+	bool convertWritable(SImage& image, ConvertOptions opt) override
+	{
+		// Do mask conversion
+		if (!opt.transparency)
+			image.fillAlpha(255);
+		else if (opt.mask_source == Mask::Colour)
+			image.maskFromColour(opt.mask_colour, opt.pal_current);
+		else if (opt.mask_source == Mask::Alpha)
+			image.cutoffMask(opt.alpha_threshold);
+		else if (opt.mask_source == Mask::Brightness)
+			image.maskFromBrightness(opt.pal_current);
+
+		// Build the N64 palette + indices
+		n64gfx::Indexed ix;
+		if (!prepare(image, opt.pal_current, opt.pal_target, ix))
+			return false;
+
+		// Update the image to show what will actually be written
+		Palette pal;
+		if (variant_ == Variant::Sprite256)
+			pal.copyPalette(opt.pal_target);
+		else
+			for (size_t i = 0; i < ix.palette.size() && i < 256; i++)
+			{
+				const unsigned v = ix.palette[i];
+				pal.setColour(
+					i,
+					ColRGBA(
+						n64gfx::detail::expand5((v >> 11) & 31),
+						n64gfx::detail::expand5((v >> 6) & 31),
+						n64gfx::detail::expand5((v >> 1) & 31),
+						255));
+			}
+
+		const auto offset = image.offset();
+		image.create(ix.width, ix.height, SImage::Type::PalMask, &pal, 0, 1);
+		image.setXOffset(offset.x);
+		image.setYOffset(offset.y);
+
+		memcpy(imageData(image), ix.index.data(), ix.index.size());
+		auto mask = imageMask(image);
+		for (size_t i = 0; i < ix.index.size(); i++)
+		{
+			if (variant_ == Variant::Sprite256)
+				mask[i] = ix.index[i] ? 255 : 0;
+			else
+				mask[i] = (ix.palette[ix.index[i]] & 1) ? 255 : 0;
+		}
+
+		return true;
+	}
+
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) override { return false; }
+
+	bool writeImage(SImage& image, MemChunk& out, Palette* pal, int index) override
+	{
+		if (!image.isValid() || image.type() != SImage::Type::PalMask)
+			return false;
+
+		// The image is normally already converted at this point (see convertWritable),
+		// in which case this just picks up the palette and indices as they are
+		Palette* image_pal = image.hasPalette() ? image.palette() : pal;
+		n64gfx::Indexed ix;
+		if (!prepare(image, image_pal, variant_ == Variant::Sprite256 ? image_pal : nullptr, ix))
+			return false;
+
+		std::vector<uint8_t> bytes;
+		bool                 ok = false;
+		switch (variant_)
+		{
+		case Variant::Texture16:
+		case Variant::TextureAnim: ok = n64gfx::encodeTexture(ix, bytes); break;
+		case Variant::Sprite16: ok = n64gfx::encodeSprite(ix, true, bytes); break;
+		case Variant::Sprite256: ok = n64gfx::encodeSprite(ix, false, bytes); break;
+		case Variant::Graphic256: ok = n64gfx::encodeGfx(ix, bytes); break;
+		}
+		if (!ok)
+		{
+			global::error = "Image can't be written in this Doom 64 format";
+			return false;
+		}
+
+		out.importMem(bytes.data(), bytes.size());
+		return true;
+	}
+
+private:
+	Variant variant_;
+
+	// Gets the image as RGBA + (if paletted) its indices and 256 colour palette
+	struct Source
+	{
+		MemChunk       rgba;
+		bool           indexed = false;
+		vector<uint8_t> index;
+		uint8_t        palette[256][4] = {};
+	};
+	bool getSource(SImage& image, Palette* pal_current, Source& src) const
+	{
+		image.putRGBAData(src.rgba, pal_current);
+		if (image.type() != SImage::Type::PalMask)
+			return true;
+
+		auto* source_pal = image.hasPalette() ? image.palette() : pal_current;
+		if (!source_pal)
+			return true;
+
+		const auto size = static_cast<size_t>(image.width()) * image.height();
+		src.index.assign(imageData(image), imageData(image) + size);
+		for (int i = 0; i < 256; i++)
+		{
+			const auto col      = source_pal->colour(i);
+			src.palette[i][0]   = col.r;
+			src.palette[i][1]   = col.g;
+			src.palette[i][2]   = col.b;
+			src.palette[i][3]   = 255;
+		}
+		src.indexed = true;
+		return true;
+	}
+
+	// True if the indexed image only uses palette indices 0-15
+	bool usesOnlyFirstRow(SImage& image)
+	{
+		if (image.type() != SImage::Type::PalMask || !image.hasPalette())
+			return false;
+
+		const auto size = static_cast<size_t>(image.width()) * image.height();
+		auto       data = imageData(image);
+		auto       mask = imageMask(image);
+		for (size_t i = 0; i < size; i++)
+			if (data[i] > 15 && mask[i] >= 128)
+				return false;
+		return true;
+	}
+
+	// Builds the palette + indices to be written for [image]
+	bool prepare(SImage& image, Palette* pal_current, Palette* pal_target, n64gfx::Indexed& ix)
+	{
+		Source src;
+		if (!getSource(image, pal_current, src))
+			return false;
+
+		const int          w    = image.width();
+		const int          h    = image.height();
+		const uint8_t*     rgba = src.rgba.data();
+		const uint8_t*     idx  = src.indexed ? src.index.data() : nullptr;
+		const uint8_t(*pal)[4]  = src.indexed ? src.palette : nullptr;
+		std::string        err;
+
+		switch (variant_)
+		{
+		case Variant::Texture16:
+		case Variant::Sprite16:
+			if (!n64gfx::buildPalettized(w, h, rgba, idx, pal, 16, ix, err))
+				return false;
+			break;
+
+		case Variant::Graphic256:
+			if (!n64gfx::buildPalettized(w, h, rgba, idx, pal, 256, ix, err))
+				return false;
+			break;
+
+		case Variant::TextureAnim:
+		{
+			if (!idx)
+				return false;
+
+			// Keep the indices and as many 16 colour palette rows as the image has
+			const size_t npix = static_cast<size_t>(w) * h;
+			const int    rows = n64gfx::animationRows(pal);
+			bool         trans = false, opaque_zero = false;
+			for (size_t i = 0; i < npix; i++)
+			{
+				if (rgba[i * 4 + 3] < 128)
+					trans = true;
+				else if (idx[i] == 0)
+					opaque_zero = true;
+			}
+			// Index 0 can only be transparent if no opaque pixel uses it
+			if (opaque_zero)
+				trans = false;
+
+			ix.width  = w;
+			ix.height = h;
+			ix.index.assign(npix, 0);
+			for (size_t i = 0; i < npix; i++)
+			{
+				const bool t = rgba[i * 4 + 3] < 128;
+				ix.index[i]  = t ? 0 : idx[i];
+				if (ix.index[i] > 15)
+					return false;
+			}
+			ix.palette.assign(rows * 16, 0);
+			for (int e = 0; e < rows * 16; e++)
+				ix.palette[e] = n64gfx::packColour(pal[e], true);
+			if (trans)
+				for (int r = 0; r < rows; r++)
+					ix.palette[r * 16] = 0;
+			break;
+		}
+
+		case Variant::Sprite256:
+		{
+			if (!pal_target)
+				return false;
+			uint8_t target[256][4];
+			for (int i = 0; i < 256; i++)
+			{
+				const auto col = pal_target->colour(i);
+				target[i][0]   = col.r;
+				target[i][1]   = col.g;
+				target[i][2]   = col.b;
+				target[i][3]   = 255;
+			}
+			n64gfx::mapToPalette(w, h, rgba, idx, pal, target, ix);
+			break;
+		}
+		}
+
+		const auto offset = image.offset();
+		ix.offset_x       = offset.x;
+		ix.offset_y       = offset.y;
+		return true;
+	}
+};

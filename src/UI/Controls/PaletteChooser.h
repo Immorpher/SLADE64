@@ -41,6 +41,8 @@ private:
 
 	Palette                 pal_global_;
 	vector<ArchivePalette>  archive_pals_; // Items 1..n of the chooser
+
+	void matchSpritePalette(ArchiveEntry* entry);
 	Signals signals_;
 };
 } // namespace slade
