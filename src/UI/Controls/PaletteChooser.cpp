@@ -34,6 +34,9 @@
 #include "PaletteChooser.h"
 #include "App.h"
 #include "Archive/Archive.h"
+#include "Archive/ArchiveEntry.h"
+#include "Archive/EntryType/EntryType.h"
+#include "Graphics/N64Gfx.h"
 #include "General/Misc.h"
 #include "Graphics/Palette/PaletteManager.h"
 
@@ -98,8 +101,12 @@ void PaletteChooser::setGlobalFromArchive(Archive* archive, int lump)
 // -----------------------------------------------------------------------------
 Palette* PaletteChooser::selectedPalette(ArchiveEntry* entry)
 {
-	if (GetSelection() > 0)
-		return app::paletteManager()->palette(GetSelection() - 1);
+	const int sel = GetSelection();
+	const int num_archive_pals = static_cast<int>(archive_pals_.size());
+	if (sel > 0 && sel <= num_archive_pals)
+		return &archive_pals_[sel - 1].palette;
+	else if (sel > num_archive_pals)
+		return app::paletteManager()->palette(sel - 1 - num_archive_pals);
 	else if (entry)
 		misc::loadPaletteFromArchive(&pal_global_, entry->parent(), misc::detectPaletteHack(entry));
 	return &pal_global_;
@@ -145,4 +152,74 @@ void PaletteChooser::addPalette(wxString name)
 	// We want it to be just before the "Greyscale" choice
 	if (GetCount() > 2)
 		Insert(name, GetCount() - 1);
+}
+
+// -----------------------------------------------------------------------------
+// Lists the Doom 64 sprite palette entries (PAL*) in [archive] after the
+// 'Existing/Global' item, so enemy sprites (which have no embedded palette) can
+// be viewed in any of them. If [entry] is a Doom 64 sprite using an external
+// palette and 'Existing/Global' is selected, its matching palette (PALxxxx0,
+// where xxxx is the first 4 letters of the sprite name) becomes the global one.
+// -----------------------------------------------------------------------------
+void PaletteChooser::updateArchivePalettes(Archive* archive, ArchiveEntry* entry)
+{
+	// Read all N64 palette entries from the archive
+	vector<ArchivePalette> pals;
+	if (archive)
+	{
+		Archive::SearchOptions opt;
+		opt.match_type     = EntryType::fromId("gfx_n64_palette");
+		opt.search_subdirs = true;
+		if (opt.match_type)
+		{
+			for (auto* pal_entry : archive->findAll(opt))
+			{
+				n64gfx::Image img;
+				if (!n64gfx::decode(pal_entry->rawData(true), pal_entry->size(), n64gfx::Kind::Palette, img))
+					continue;
+
+				pals.emplace_back();
+				pals.back().name = pal_entry->name();
+				for (int i = 0; i < 256; i++)
+					pals.back().palette.setColour(
+						i, ColRGBA(img.palette[i][0], img.palette[i][1], img.palette[i][2], 255));
+			}
+		}
+	}
+
+	// Rebuild the list items only if the set of palettes changed
+	bool changed = pals.size() != archive_pals_.size();
+	for (unsigned a = 0; !changed && a < pals.size(); a++)
+		changed = pals[a].name != archive_pals_[a].name;
+
+	if (changed)
+	{
+		const wxString selected = GetStringSelection();
+
+		for (size_t a = 0; a < archive_pals_.size(); a++)
+			Delete(1);
+		for (unsigned a = 0; a < pals.size(); a++)
+			Insert(wxString::FromUTF8("Doom 64: " + pals[a].name), 1 + a);
+
+		archive_pals_ = std::move(pals);
+
+		// Restore previous selection if possible
+		if (selected.empty() || !SetStringSelection(selected))
+			SetSelection(0);
+	}
+	else
+		archive_pals_ = std::move(pals); // Same names, palette contents may have been edited
+
+	// Use matching palette as the global palette for external-palette sprites
+	if (entry && entry->type() && entry->type()->formatId() == "img_n64_sprite" && globalSelected()
+		&& n64gfx::detect(entry->rawData(true), entry->size()) == n64gfx::Kind::Sprite8Ext)
+	{
+		vector<string> names;
+		for (auto& pal : archive_pals_)
+			names.push_back(pal.name);
+
+		const int match = n64gfx::findSpritePalette(entry->name(), names);
+		if (match >= 0)
+			pal_global_.copyPalette(&archive_pals_[match].palette);
+	}
 }

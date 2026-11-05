@@ -20,6 +20,11 @@ public:
 	void     onPaletteChanged(wxCommandEvent& e);
 	void     addPalette(wxString name);
 
+	// Doom 64: lists the sprite palette (PAL*) entries found in [archive] right
+	// after 'Existing/Global'. If [entry] is a Doom 64 sprite that uses an external
+	// palette and 'Existing/Global' is selected, the matching palette is used
+	void updateArchivePalettes(Archive* archive, ArchiveEntry* entry);
+
 	// Signals
 	struct Signals
 	{
@@ -28,7 +33,14 @@ public:
 	Signals& signals() { return signals_; }
 
 private:
-	Palette pal_global_;
+	struct ArchivePalette
+	{
+		string  name;
+		Palette palette;
+	};
+
+	Palette                 pal_global_;
+	vector<ArchivePalette>  archive_pals_; // Items 1..n of the chooser
 	Signals signals_;
 };
 } // namespace slade

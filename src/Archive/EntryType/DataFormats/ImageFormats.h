@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics/GameFormats.h"
+#include "Graphics/N64Gfx.h"
 
 class PNGDataFormat : public EntryDataFormat
 {
@@ -1650,5 +1651,48 @@ public:
 			}
 		}
 		return MATCH_FALSE;
+	}
+};
+
+// Doom 64 (N64) graphic formats. Detection is done by checking that the header
+// is sane and that the lump size matches exactly what the header describes
+// (see Graphics/N64Gfx.h)
+class Doom64TextureDataFormat : public EntryDataFormat
+{
+public:
+	Doom64TextureDataFormat() : EntryDataFormat("img_n64_tex") {}
+	int isThisFormat(MemChunk& mc) override
+	{
+		return n64gfx::isTexture(n64gfx::detect(mc.data(), mc.size())) ? MATCH_TRUE : MATCH_FALSE;
+	}
+};
+
+class Doom64SpriteDataFormat : public EntryDataFormat
+{
+public:
+	Doom64SpriteDataFormat() : EntryDataFormat("img_n64_sprite") {}
+	int isThisFormat(MemChunk& mc) override
+	{
+		return n64gfx::isSprite(n64gfx::detect(mc.data(), mc.size())) ? MATCH_TRUE : MATCH_FALSE;
+	}
+};
+
+class Doom64GfxDataFormat : public EntryDataFormat
+{
+public:
+	Doom64GfxDataFormat() : EntryDataFormat("img_n64_gfx") {}
+	int isThisFormat(MemChunk& mc) override
+	{
+		return n64gfx::isGfx(n64gfx::detect(mc.data(), mc.size())) ? MATCH_TRUE : MATCH_FALSE;
+	}
+};
+
+class Doom64PaletteDataFormat : public EntryDataFormat
+{
+public:
+	Doom64PaletteDataFormat() : EntryDataFormat("img_n64_pal") {}
+	int isThisFormat(MemChunk& mc) override
+	{
+		return n64gfx::detect(mc.data(), mc.size()) == n64gfx::Kind::Palette ? MATCH_TRUE : MATCH_FALSE;
 	}
 };

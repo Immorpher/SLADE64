@@ -69,6 +69,7 @@ EXTERN_CVAR(Bool, gfx_extraconv)
 //
 // -----------------------------------------------------------------------------
 #include "Formats/SIFDoom.h"
+#include "Formats/SIFDoom64.h"
 #include "Formats/SIFHexen.h"
 #include "Formats/SIFImages.h"
 #include "Formats/SIFJedi.h"
@@ -526,6 +527,12 @@ void SIFormat::initFormats()
 	new SIFDoomSnea();
 	new SIFDoomJaguar();
 	new SIFDoomPSX();
+
+	// Doom 64 (N64) formats
+	new SIFDoom64("n64_tex", "Doom 64 Texture", SIFDoom64::Category::Texture);
+	new SIFDoom64("n64_sprite", "Doom 64 Sprite", SIFDoom64::Category::Sprite);
+	new SIFDoom64("n64_gfx", "Doom 64 Graphic", SIFDoom64::Category::Gfx);
+	new SIFDoom64("n64_pal", "Doom 64 Palette", SIFDoom64::Category::Palette);
 
 	// Hexen formats
 	new SIFPlanar();

@@ -220,6 +220,10 @@ void EntryDataFormat::initBuiltinFormats()
 	registerDataFormat<DoomJaguarDataFormat>();
 	registerDataFormat<DoomJagTexDataFormat>();
 	registerDataFormat<DoomJagSpriteDataFormat>();
+	registerDataFormat<Doom64TextureDataFormat>();
+	registerDataFormat<Doom64SpriteDataFormat>();
+	registerDataFormat<Doom64GfxDataFormat>();
+	registerDataFormat<Doom64PaletteDataFormat>();
 	registerDataFormat<ShadowCasterSpriteFormat>();
 	registerDataFormat<ShadowCasterWallFormat>();
 	registerDataFormat<ShadowCasterGfxFormat>();

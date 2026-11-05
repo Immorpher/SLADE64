@@ -480,6 +480,7 @@ void GfxEntryPanel::refresh(ArchiveEntry* entry)
 
 	// Setup palette
 	theMainWindow->paletteChooser()->setGlobalFromArchive(entry->parent(), misc::detectPaletteHack(entry));
+	theMainWindow->paletteChooser()->updateArchivePalettes(entry->parent(), entry); // Doom 64 sprite palettes
 	updateImagePalette();
 
 	// Set offset text boxes
