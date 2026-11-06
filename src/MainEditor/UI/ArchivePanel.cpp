@@ -2064,10 +2064,14 @@ bool ArchivePanel::gfxRemap()
 				undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry));
 
 				// Write modified image data
+				const auto old_ref = n64gfx::spritePaletteReference(entry->rawData(), entry->size());
 				if (!temp.format()->saveImage(temp, mc, pal))
 					log::error(1, wxString::Format(ERROR_UNWRITABLE_IMAGE_FORMAT, entry->name()));
 				else
+				{
+					n64gfx::fixSpritePaletteReference(mc, entry, old_ref);
 					entry->importMemChunk(mc);
+				}
 			}
 		}
 
@@ -2115,10 +2119,14 @@ bool ArchivePanel::gfxColourise()
 				undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry));
 
 				// Write modified image data
+				const auto old_ref = n64gfx::spritePaletteReference(entry->rawData(), entry->size());
 				if (!temp.format()->saveImage(temp, mc, pal))
 					log::error(wxString::Format(ERROR_UNWRITABLE_IMAGE_FORMAT, entry->name()));
 				else
+				{
+					n64gfx::fixSpritePaletteReference(mc, entry, old_ref);
 					entry->importMemChunk(mc);
+				}
 			}
 		}
 		// Finish recording undo level

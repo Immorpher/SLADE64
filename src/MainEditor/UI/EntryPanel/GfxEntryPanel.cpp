@@ -270,8 +270,14 @@ bool GfxEntryPanel::writeEntry(ArchiveEntry& entry)
 				log::info("Image converted for writing");
 			}
 
+			const auto old_ref = n64gfx::spritePaletteReference(entry.rawData(), entry.size());
 			if (format->saveImage(*image, entry.data(), &gfx_canvas_->palette()))
+			{
 				ok = true;
+				if (!n64gfx::fixSpritePaletteReference(entry.data(), &entry, old_ref))
+					log::warning(
+						"Couldn't find a PAL lump for sprite {}, its palette reference needs to be set", entry.name());
+			}
 			else
 				error = "Error writing image";
 		}

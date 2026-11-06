@@ -47,7 +47,14 @@ public:
 		return info;
 	}
 
+	// Writing (eg. after flipping/rotating, or when the entry panel saves an image it just converted).
+	// Not offered as a conversion target (see SIFDoom64Writer for that)
+	Writable canWrite(SImage& image) override;
+	bool     canWriteType(SImage::Type type) override { return false; }
+
 protected:
+	bool writeImage(SImage& image, MemChunk& out, Palette* pal, int index) override;
+
 	bool readImage(SImage& image, MemChunk& data, int index) override
 	{
 		auto kind = n64gfx::detect(data.data(), data.size());
@@ -85,6 +92,9 @@ protected:
 
 private:
 	Category category_;
+
+	// The writer format that stores [image] back in the format it was read from
+	SIFormat* writerFor(SImage& image) const;
 
 	bool matches(n64gfx::Kind kind) const
 	{
@@ -245,6 +255,8 @@ protected:
 		// The image is normally already converted at this point (see convertWritable),
 		// in which case this just picks up the palette and indices as they are
 		Palette* image_pal = image.hasPalette() ? image.palette() : pal;
+		if (!image_pal)
+			return false;
 		n64gfx::Indexed ix;
 		if (!prepare(image, image_pal, variant_ == Variant::Sprite256 ? image_pal : nullptr, ix))
 			return false;
@@ -409,3 +421,67 @@ private:
 		return true;
 	}
 };
+
+
+// -----------------------------------------------------------------------------
+// SIFDoom64 writing, handled by the matching writer format
+// -----------------------------------------------------------------------------
+inline SIFormat* SIFDoom64::writerFor(SImage& image) const
+{
+	if (!image.isValid() || image.type() != SImage::Type::PalMask)
+		return nullptr;
+
+	switch (category_)
+	{
+	case Category::Texture:
+		// Textures with palette animation rows can't be written back from a single row
+		return image.size() > 1 ? nullptr : getFormat("n64w_tex16");
+
+	case Category::Gfx:
+		// FIRE sky has no palette
+		return image.hasPalette() ? getFormat("n64w_gfx256") : nullptr;
+
+	case Category::Sprite:
+	{
+		// No embedded palette = enemy sprite using a PAL lump
+		if (!image.hasPalette())
+			return getFormat("n64w_spr256");
+
+		// Embedded palette: 16 colour sprites only (256 colour weapon sprites can't be written)
+		const auto size = static_cast<size_t>(image.width()) * image.height();
+		auto       data = imageData(image);
+		auto       mask = imageMask(image);
+		for (size_t i = 0; i < size; i++)
+			if (data[i] > 15 && mask[i] >= 128)
+				return nullptr;
+		return getFormat("n64w_spr16");
+	}
+
+	default: return nullptr;
+	}
+}
+
+inline SIFormat::Writable SIFDoom64::canWrite(SImage& image)
+{
+	auto* writer = writerFor(image);
+	if (!writer || writer == unknownFormat() || writer->canWrite(image) == Writable::No)
+		return Writable::No;
+
+	return Writable::Yes;
+}
+
+inline bool SIFDoom64::writeImage(SImage& image, MemChunk& out, Palette* pal, int index)
+{
+	// FIRE and CLOUD skies look like plain graphics once loaded but are stored differently,
+	// so they can't be written. Check what's being replaced
+	const auto old_kind = n64gfx::detect(out.data(), out.size());
+	const bool special  = old_kind == n64gfx::Kind::Cloud || old_kind == n64gfx::Kind::GfxNoPal;
+	auto*      writer   = special ? nullptr : writerFor(image);
+	if (!writer || writer == unknownFormat())
+	{
+		global::error = "This Doom 64 graphic can't be written back in its original format";
+		return false;
+	}
+
+	return writer->saveImage(image, out, pal, index);
+}
