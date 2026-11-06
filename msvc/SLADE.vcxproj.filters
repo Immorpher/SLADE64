@@ -309,6 +309,9 @@
     <ClCompile Include="..\src\Archive\Formats\GrpArchive.cpp">
       <Filter>Archive\Formats</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Archive\Formats\WessArchives.cpp">
+      <Filter>Archive\Formats</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\Archive\Formats\GZipArchive.cpp">
       <Filter>Archive\Formats</Filter>
     </ClCompile>
@@ -1188,6 +1191,12 @@
       <Filter>Archive\Formats</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Archive\Formats\GrpArchive.h">
+      <Filter>Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Archive\Formats\WessArchives.h">
+      <Filter>Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Archive\Formats\WessData.h">
       <Filter>Archive\Formats</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Archive\Formats\GZipArchive.h">

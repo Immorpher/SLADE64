@@ -307,6 +307,7 @@
     <ClCompile Include="..\src\Archive\Formats\DiskArchive.cpp" />
     <ClCompile Include="..\src\Archive\Formats\GobArchive.cpp" />
     <ClCompile Include="..\src\Archive\Formats\GrpArchive.cpp" />
+    <ClCompile Include="..\src\Archive\Formats\WessArchives.cpp" />
     <ClCompile Include="..\src\Archive\Formats\GZipArchive.cpp" />
     <ClCompile Include="..\src\Archive\Formats\HogArchive.cpp" />
     <ClCompile Include="..\src\Archive\Formats\LfdArchive.cpp" />
@@ -665,6 +666,8 @@
     <ClInclude Include="..\src\Archive\Formats\DiskArchive.h" />
     <ClInclude Include="..\src\Archive\Formats\GobArchive.h" />
     <ClInclude Include="..\src\Archive\Formats\GrpArchive.h" />
+    <ClInclude Include="..\src\Archive\Formats\WessArchives.h" />
+    <ClInclude Include="..\src\Archive\Formats\WessData.h" />
     <ClInclude Include="..\src\Archive\Formats\GZipArchive.h" />
     <ClInclude Include="..\src\Archive\Formats\HogArchive.h" />
     <ClInclude Include="..\src\Archive\Formats\LfdArchive.h" />

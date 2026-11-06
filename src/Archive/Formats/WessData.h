@@ -1,0 +1,316 @@
+#pragma once
+
+// -----------------------------------------------------------------------------
+// Doom 64 WESS sound files (all big-endian), independent of SLADE's archive classes
+//
+//  WMD ("SN64"): the sound bank. 56 byte header, then (in this order)
+//      PATCHES      npatch    x 4 bytes (+4 trailing bytes)      length, offset
+//      SUBPATCHES   nsubpatch x 20 bytes (+4 trailing bytes)     instrument zones
+//      WAVTABLE     nsfx      x 24 bytes                         start, size, pad, pitch, loop id, pad
+//      LOOPS        8 byte header (nsfx, 0, nloops, nsfx) + nloops x 48 bytes
+//      PREDICTORS   nsfx      x 264 bytes                        ADPCM codebook per sample
+//    The file can have a few padding bytes after that (kept as 'tail').
+//
+//  WSD ("SSEQ"): the sequences (music + sound effects). 32 byte header, one 16 byte
+//      entry per sequence (ntracks, length, offset), then each sequence's tracks.
+//      Each track has a 20 byte header, an optional 4 byte loop id (if the track
+//      loops), then its event data. Sequences are padded to a multiple of 8 bytes.
+//
+//  WDD: raw ADPCM sample data with no header. The samples are located by the
+//      WAVTABLE of the matching WMD (start, size), and are stored back to back.
+// -----------------------------------------------------------------------------
+
+#include <algorithm>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <vector>
+
+namespace slade::wess
+{
+using Bytes = std::vector<uint8_t>;
+
+namespace detail
+{
+	inline uint16_t be16(const uint8_t* p)
+	{
+		return static_cast<uint16_t>((p[0] << 8) | p[1]);
+	}
+	inline uint32_t be32(const uint8_t* p)
+	{
+		return (static_cast<uint32_t>(p[0]) << 24) | (static_cast<uint32_t>(p[1]) << 16)
+			   | (static_cast<uint32_t>(p[2]) << 8) | p[3];
+	}
+	inline void put16(uint8_t* p, uint32_t v)
+	{
+		p[0] = static_cast<uint8_t>(v >> 8);
+		p[1] = static_cast<uint8_t>(v);
+	}
+	inline void put32(uint8_t* p, uint32_t v)
+	{
+		p[0] = static_cast<uint8_t>(v >> 24);
+		p[1] = static_cast<uint8_t>(v >> 16);
+		p[2] = static_cast<uint8_t>(v >> 8);
+		p[3] = static_cast<uint8_t>(v);
+	}
+} // namespace detail
+
+// -----------------------------------------------------------------------------
+// WMD
+// -----------------------------------------------------------------------------
+constexpr size_t wmd_header_size    = 56;
+constexpr size_t wmd_patch_size     = 4;
+constexpr size_t wmd_subpatch_size  = 20;
+constexpr size_t wmd_wavtable_size  = 24;
+constexpr size_t wmd_loop_size      = 48;
+constexpr size_t wmd_loophead_size  = 8;
+constexpr size_t wmd_predictor_size = 264;
+
+struct Wmd
+{
+	Bytes header;
+	Bytes patches;     // includes the 4 trailing bytes
+	Bytes subpatches;  // includes the 4 trailing bytes
+	Bytes wavtable;
+	Bytes loops;       // loop header + loop table
+	Bytes predictors;
+	Bytes tail;        // padding after the predictors
+
+	size_t numSamples() const { return wavtable.size() / wmd_wavtable_size; }
+
+	// Start/size of sample [i] in the WDD
+	uint32_t sampleStart(size_t i) const { return detail::be32(&wavtable[i * wmd_wavtable_size]); }
+	uint32_t sampleSize(size_t i) const { return detail::be32(&wavtable[i * wmd_wavtable_size + 4]); }
+};
+
+// Reads a WMD, returns false (and sets [err]) if it isn't one
+inline bool parseWmd(const uint8_t* data, size_t size, Wmd& out, std::string& err)
+{
+	using namespace detail;
+
+	if (size < wmd_header_size || std::memcmp(data, "SN64", 4) != 0)
+	{
+		err = "Not a WMD (SN64) file";
+		return false;
+	}
+
+	const size_t npatch   = be16(data + 36);
+	const size_t patchsz  = be16(data + 38);
+	const size_t nsub     = be16(data + 40);
+	const size_t subsz    = be16(data + 42);
+	const size_t nsfx     = be16(data + 44);
+	const size_t sfxsz    = be16(data + 46);
+	if (patchsz != wmd_patch_size || subsz != wmd_subpatch_size || sfxsz != wmd_wavtable_size)
+	{
+		err = "Unsupported WMD structure sizes";
+		return false;
+	}
+
+	size_t p = wmd_header_size;
+	auto   take = [&](Bytes& dst, size_t n) {
+        if (p + n > size)
+            return false;
+        dst.assign(data + p, data + p + n);
+        p += n;
+        return true;
+	};
+
+	out = {};
+	out.header.assign(data, data + wmd_header_size);
+	if (!take(out.patches, npatch * wmd_patch_size + 4) || !take(out.subpatches, nsub * wmd_subpatch_size + 4)
+		|| !take(out.wavtable, nsfx * wmd_wavtable_size))
+	{
+		err = "WMD is truncated";
+		return false;
+	}
+
+	if (p + wmd_loophead_size > size)
+	{
+		err = "WMD is truncated";
+		return false;
+	}
+	const size_t nloops = be16(data + p + 4);
+	if (!take(out.loops, wmd_loophead_size + nloops * wmd_loop_size) || !take(out.predictors, nsfx * wmd_predictor_size))
+	{
+		err = "WMD is truncated";
+		return false;
+	}
+
+	out.tail.assign(data + p, data + size);
+	return true;
+}
+
+// Writes [wmd] to bytes, updating the counts in the header and loop table
+inline Bytes buildWmd(const Wmd& wmd)
+{
+	using namespace detail;
+
+	const Bytes& cheader = wmd.header;
+	Bytes        header  = cheader;
+	Bytes        loops   = wmd.loops;
+
+	const size_t npatch = wmd.patches.size() >= 4 ? (wmd.patches.size() - 4) / wmd_patch_size : 0;
+	const size_t nsub   = wmd.subpatches.size() >= 4 ? (wmd.subpatches.size() - 4) / wmd_subpatch_size : 0;
+	const size_t nsfx   = wmd.wavtable.size() / wmd_wavtable_size;
+	const size_t nloops = loops.size() >= wmd_loophead_size ? (loops.size() - wmd_loophead_size) / wmd_loop_size : 0;
+
+	put16(&header[36], npatch);
+	put16(&header[40], nsub);
+	put16(&header[44], nsfx);
+	if (loops.size() >= wmd_loophead_size)
+	{
+		put16(&loops[0], nsfx);
+		put16(&loops[4], nloops);
+		put16(&loops[6], nsfx);
+	}
+
+	const size_t body = wmd.patches.size() + wmd.subpatches.size() + wmd.wavtable.size() + loops.size()
+						+ wmd.predictors.size();
+	put32(&header[24], static_cast<uint32_t>(body));
+
+	Bytes out;
+	out.reserve(wmd_header_size + body + wmd.tail.size());
+	const Bytes* parts[] = { &header, &wmd.patches, &wmd.subpatches, &wmd.wavtable, &loops, &wmd.predictors, &wmd.tail };
+	for (const Bytes* part : parts)
+		out.insert(out.end(), part->begin(), part->end());
+	return out;
+}
+
+// -----------------------------------------------------------------------------
+// WSD
+// -----------------------------------------------------------------------------
+constexpr size_t wsd_header_size = 32;
+constexpr size_t wsd_entry_size  = 16;
+constexpr size_t wsd_track_size  = 20;
+
+struct Wsd
+{
+	Bytes              header;    // 32 bytes (count and entry table size are updated when writing)
+	std::vector<Bytes> sequences; // Each sequence's tracks (including any padding)
+};
+
+// Number of tracks in a sequence's data (counts track headers until the data runs out)
+inline size_t countTracks(const Bytes& seq)
+{
+	using namespace detail;
+
+	size_t p = 0, n = 0;
+	while (p + wsd_track_size <= seq.size())
+	{
+		const size_t datalen = be16(&seq[p + 18]);
+		const bool   loops   = be16(&seq[p + 14]) != 0;
+		const size_t next    = p + wsd_track_size + datalen + (loops ? 4 : 0);
+		if (next > seq.size())
+			break;
+		p = next;
+		n++;
+	}
+	return n;
+}
+
+inline bool parseWsd(const uint8_t* data, size_t size, Wsd& out, std::string& err)
+{
+	using namespace detail;
+
+	if (size < wsd_header_size || std::memcmp(data, "SSEQ", 4) != 0)
+	{
+		err = "Not a WSD (SSEQ) file";
+		return false;
+	}
+
+	const size_t nseq      = be32(data + 12);
+	const size_t table_len = be32(data + 24);
+	if (table_len != nseq * wsd_entry_size || wsd_header_size + table_len > size)
+	{
+		err = "Invalid WSD entry table";
+		return false;
+	}
+
+	out = {};
+	out.header.assign(data, data + wsd_header_size);
+
+	const size_t base = wsd_header_size + table_len;
+	for (size_t i = 0; i < nseq; i++)
+	{
+		const uint8_t* e      = data + wsd_header_size + i * wsd_entry_size;
+		const size_t   length = be32(e + 4);
+		const size_t   offset = be32(e + 8);
+		if (base + offset + length > size)
+		{
+			err = "WSD sequence is outside the file";
+			return false;
+		}
+		out.sequences.emplace_back(data + base + offset, data + base + offset + length);
+	}
+	return true;
+}
+
+// Writes [wsd], sequences are padded to a multiple of 8 bytes and packed back to back
+inline Bytes buildWsd(const Wsd& wsd)
+{
+	using namespace detail;
+
+	Bytes header = wsd.header;
+	const size_t n = wsd.sequences.size();
+	put32(&header[12], static_cast<uint32_t>(n));
+	put32(&header[24], static_cast<uint32_t>(n * wsd_entry_size));
+
+	Bytes table(n * wsd_entry_size, 0);
+	Bytes body;
+	for (size_t i = 0; i < n; i++)
+	{
+		Bytes seq = wsd.sequences[i];
+		while (seq.size() % 8)
+			seq.push_back(0);
+
+		uint8_t* e = &table[i * wsd_entry_size];
+		put16(e, static_cast<uint32_t>(countTracks(seq)));
+		put32(e + 4, static_cast<uint32_t>(seq.size()));
+		put32(e + 8, static_cast<uint32_t>(body.size()));
+		body.insert(body.end(), seq.begin(), seq.end());
+	}
+
+	Bytes out = header;
+	out.insert(out.end(), table.begin(), table.end());
+	out.insert(out.end(), body.begin(), body.end());
+	return out;
+}
+
+// -----------------------------------------------------------------------------
+// WDD
+// -----------------------------------------------------------------------------
+
+// Splits [wdd] into samples using the WAVTABLE of [wmd]
+inline bool splitWdd(const uint8_t* data, size_t size, const Wmd& wmd, std::vector<Bytes>& out, std::string& err)
+{
+	out.clear();
+	for (size_t i = 0; i < wmd.numSamples(); i++)
+	{
+		const size_t start = wmd.sampleStart(i);
+		const size_t len   = wmd.sampleSize(i);
+		if (start + len > size)
+		{
+			err = "WDD is smaller than its WMD says";
+			return false;
+		}
+		out.emplace_back(data + start, data + start + len);
+	}
+	return true;
+}
+
+// Packs [samples] back to back as a WDD and updates their start/size in [wmd]'s WAVTABLE
+inline Bytes buildWdd(const std::vector<Bytes>& samples, Wmd& wmd)
+{
+	using namespace detail;
+
+	Bytes  out;
+	for (size_t i = 0; i < samples.size() && i < wmd.numSamples(); i++)
+	{
+		uint8_t* row = &wmd.wavtable[i * wmd_wavtable_size];
+		put32(row, static_cast<uint32_t>(out.size()));
+		put32(row + 4, static_cast<uint32_t>(samples[i].size()));
+		out.insert(out.end(), samples[i].begin(), samples[i].end());
+	}
+	return out;
+}
+} // namespace slade::wess

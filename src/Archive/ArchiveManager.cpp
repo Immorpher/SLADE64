@@ -286,7 +286,14 @@ shared_ptr<Archive> ArchiveManager::openArchive(string_view filename, bool manag
 
 	// Determine file format
 	string std_fn{ filename };
-	if (WadArchive::isWadArchive(std_fn))
+	// Doom 64 sound files (checked first, a WDD has no header to recognise it by)
+	if (WmdArchive::isWmdArchive(std_fn))
+		new_archive = std::make_shared<WmdArchive>();
+	else if (WsdArchive::isWsdArchive(std_fn))
+		new_archive = std::make_shared<WsdArchive>();
+	else if (WddArchive::isWddArchive(std_fn))
+		new_archive = std::make_shared<WddArchive>();
+	else if (WadArchive::isWadArchive(std_fn))
 		new_archive = std::make_shared<WadArchive>();
 	else if (ZipArchive::isZipArchive(std_fn))
 		new_archive = std::make_shared<ZipArchive>();
@@ -437,6 +444,10 @@ shared_ptr<Archive> ArchiveManager::openArchive(ArchiveEntry* entry, bool manage
 		new_archive = std::make_shared<ChasmBinArchive>();
 	else if (SiNArchive::isSiNArchive(entry->data()))
 		new_archive = std::make_shared<SiNArchive>();
+	else if (WmdArchive::isWmdArchive(entry->data()))
+		new_archive = std::make_shared<WmdArchive>();
+	else if (WsdArchive::isWsdArchive(entry->data()))
+		new_archive = std::make_shared<WsdArchive>();
 	else
 	{
 		// Unsupported format

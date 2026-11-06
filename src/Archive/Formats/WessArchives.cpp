@@ -1,0 +1,430 @@
+// -----------------------------------------------------------------------------
+// SLADE - It's a Doom Editor
+// Filename:    WessArchives.cpp
+// Description: WmdArchive, WsdArchive, WddArchive: Doom 64 WESS sound files
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the Free
+// Software Foundation; either version 2 of the License, or (at your option)
+// any later version.
+// -----------------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------
+//
+// Includes
+//
+// -----------------------------------------------------------------------------
+#include "Main.h"
+#include "WessArchives.h"
+#include "Archive/EntryType/EntryType.h"
+#include "General/UI.h"
+#include "WessData.h"
+#include <filesystem>
+#include <fstream>
+
+using namespace slade;
+
+
+// -----------------------------------------------------------------------------
+//
+// Local Functions
+//
+// -----------------------------------------------------------------------------
+namespace
+{
+const char* wmd_entry_names[] = { "HEADER", "PATCHES", "SUBPATCHES", "WAVTABLE", "LOOPS", "PREDICTORS" };
+
+bool fileStartsWith(const string& filename, const char* magic)
+{
+	std::ifstream file(std::filesystem::u8path(filename), std::ios::binary);
+	char          buf[4] = {};
+	return file.read(buf, 4) && std::memcmp(buf, magic, 4) == 0;
+}
+
+string lowerExt(const std::filesystem::path& path)
+{
+	auto ext = path.extension().string();
+	for (auto& c : ext)
+		c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+	return ext;
+}
+
+bool refuse(const char* what)
+{
+	global::error = what;
+	return false;
+}
+} // namespace
+
+
+// -----------------------------------------------------------------------------
+//
+// WessArchive Class Functions
+//
+// -----------------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------
+// Adds a loaded, unmodified entry with [data] to the end of the archive
+// -----------------------------------------------------------------------------
+void WessArchive::addLoadedEntry(string_view name, const vector<uint8_t>& data)
+{
+	auto entry = std::make_shared<ArchiveEntry>(name, static_cast<uint32_t>(data.size()));
+	if (!data.empty())
+		entry->importMem(data.data(), static_cast<uint32_t>(data.size()));
+
+	// These are never any of the other formats SLADE knows about
+	entry->setType(EntryType::unknownType());
+	entry->setState(ArchiveEntry::State::Unmodified);
+	rootDir()->addEntry(entry);
+}
+
+// -----------------------------------------------------------------------------
+// Returns the data of all entries in order
+// -----------------------------------------------------------------------------
+vector<vector<uint8_t>> WessArchive::entryData()
+{
+	vector<vector<uint8_t>> result;
+	for (unsigned a = 0; a < numEntries(); a++)
+	{
+		auto entry = entryAt(a);
+		auto data  = entry->rawData();
+		result.emplace_back(data, data + entry->size());
+	}
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// Marks all entries as saved
+// -----------------------------------------------------------------------------
+void WessArchive::markEntriesSaved()
+{
+	for (unsigned a = 0; a < numEntries(); a++)
+		entryAt(a)->setState(ArchiveEntry::State::Unmodified);
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// WmdArchive Class Functions
+//
+// -----------------------------------------------------------------------------
+
+
+bool WmdArchive::open(MemChunk& mc)
+{
+	wess::Wmd   wmd;
+	string      err;
+	if (!wess::parseWmd(mc.data(), mc.size(), wmd, err))
+	{
+		global::error = err;
+		return false;
+	}
+
+	ArchiveModSignalBlocker sig_blocker{ *this };
+
+	const vector<uint8_t>* sections[] = { &wmd.header, &wmd.patches, &wmd.subpatches, &wmd.wavtable, &wmd.loops, &wmd.predictors };
+	for (unsigned a = 0; a < 6; a++)
+		addLoadedEntry(wmd_entry_names[a], *sections[a]);
+	tail_ = wmd.tail;
+
+	sig_blocker.unblock();
+	setModified(false);
+	return true;
+}
+
+bool WmdArchive::write(MemChunk& mc, bool update)
+{
+	if (numEntries() != 6)
+	{
+		global::error = "A WMD needs exactly its 6 sections";
+		return false;
+	}
+
+	auto data = entryData();
+	if (data[0].size() != wess::wmd_header_size)
+	{
+		global::error = "The WMD header must be 56 bytes";
+		return false;
+	}
+
+	wess::Wmd wmd;
+	wmd.header     = data[0];
+	wmd.patches    = data[1];
+	wmd.subpatches = data[2];
+	wmd.wavtable   = data[3];
+	wmd.loops      = data[4];
+	wmd.predictors = data[5];
+	wmd.tail       = tail_;
+
+	const auto out = wess::buildWmd(wmd);
+	mc.clear();
+	mc.importMem(out.data(), static_cast<uint32_t>(out.size()));
+
+	if (update)
+		markEntriesSaved();
+	return true;
+}
+
+shared_ptr<ArchiveEntry> WmdArchive::addEntry(shared_ptr<ArchiveEntry>, unsigned, ArchiveDir*)
+{
+	refuse("A WMD has a fixed set of sections");
+	return nullptr;
+}
+shared_ptr<ArchiveEntry> WmdArchive::addNewEntry(string_view, unsigned, ArchiveDir*)
+{
+	refuse("A WMD has a fixed set of sections");
+	return nullptr;
+}
+bool WmdArchive::removeEntry(ArchiveEntry*, bool)
+{
+	return refuse("A WMD has a fixed set of sections");
+}
+bool WmdArchive::moveEntry(ArchiveEntry*, unsigned, ArchiveDir*)
+{
+	return refuse("A WMD has a fixed set of sections");
+}
+bool WmdArchive::swapEntries(unsigned, unsigned, ArchiveDir*)
+{
+	return refuse("A WMD has a fixed set of sections");
+}
+bool WmdArchive::swapEntries(ArchiveEntry*, ArchiveEntry*)
+{
+	return refuse("A WMD has a fixed set of sections");
+}
+
+bool WmdArchive::isWmdArchive(MemChunk& mc)
+{
+	wess::Wmd wmd;
+	string    err;
+	return mc.size() >= wess::wmd_header_size && wess::parseWmd(mc.data(), mc.size(), wmd, err);
+}
+
+bool WmdArchive::isWmdArchive(const string& filename)
+{
+	return fileStartsWith(filename, "SN64");
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// WsdArchive Class Functions
+//
+// -----------------------------------------------------------------------------
+
+
+bool WsdArchive::open(MemChunk& mc)
+{
+	wess::Wsd wsd;
+	string    err;
+	if (!wess::parseWsd(mc.data(), mc.size(), wsd, err))
+	{
+		global::error = err;
+		return false;
+	}
+
+	ArchiveModSignalBlocker sig_blocker{ *this };
+
+	header_ = wsd.header;
+	for (unsigned a = 0; a < wsd.sequences.size(); a++)
+		addLoadedEntry(fmt::format("SEQ{:03d}", a), wsd.sequences[a]);
+
+	sig_blocker.unblock();
+	setModified(false);
+	return true;
+}
+
+bool WsdArchive::write(MemChunk& mc, bool update)
+{
+	wess::Wsd wsd;
+	wsd.header    = header_;
+	wsd.sequences = entryData();
+
+	const auto out = wess::buildWsd(wsd);
+	mc.clear();
+	mc.importMem(out.data(), static_cast<uint32_t>(out.size()));
+
+	if (update)
+		markEntriesSaved();
+	return true;
+}
+
+bool WsdArchive::isWsdArchive(MemChunk& mc)
+{
+	wess::Wsd wsd;
+	string    err;
+	return mc.size() >= wess::wsd_header_size && wess::parseWsd(mc.data(), mc.size(), wsd, err);
+}
+
+bool WsdArchive::isWsdArchive(const string& filename)
+{
+	return fileStartsWith(filename, "SSEQ");
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// WddArchive Class Functions
+//
+// -----------------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------
+// Finds the WMD with the same name as [wdd_filename] in the same folder
+// (ignoring case), returns an empty string if there isn't one
+// -----------------------------------------------------------------------------
+string WddArchive::findWmd(const string& wdd_filename)
+{
+	namespace fs = std::filesystem;
+
+	if (wdd_filename.empty())
+		return {};
+
+	const auto path = fs::u8path(wdd_filename);
+	auto       dir  = path.parent_path();
+	if (dir.empty())
+		dir = ".";
+
+	auto lower = [](string s) {
+		for (auto& c : s)
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		return s;
+	};
+	const auto stem = lower(path.stem().string());
+
+	std::error_code ec;
+	for (const auto& item : fs::directory_iterator(dir, ec))
+		if (item.is_regular_file(ec) && lowerExt(item.path()) == ".wmd" && lower(item.path().stem().string()) == stem)
+			return item.path().u8string();
+
+	return {};
+}
+
+bool WddArchive::isWddArchive(const string& filename)
+{
+	if (lowerExt(std::filesystem::u8path(filename)) != ".wdd")
+		return false;
+
+	MemChunk  mc;
+	wess::Wmd wmd;
+	string    err;
+	const auto wmd_file = findWmd(filename);
+	return !wmd_file.empty() && mc.importFile(wmd_file) && wess::parseWmd(mc.data(), mc.size(), wmd, err);
+}
+
+bool WddArchive::open(MemChunk& mc)
+{
+	// The sample table is in the WMD
+	wmd_path_ = findWmd(filename_);
+	MemChunk wmd_mc;
+	if (wmd_path_.empty() || !wmd_mc.importFile(wmd_path_))
+	{
+		global::error = "A WDD needs the WMD with the same name in the same folder to find its samples";
+		return false;
+	}
+
+	wess::Wmd         wmd;
+	vector<wess::Bytes> samples;
+	string            err;
+	if (!wess::parseWmd(wmd_mc.data(), wmd_mc.size(), wmd, err) || !wess::splitWdd(mc.data(), mc.size(), wmd, samples, err))
+	{
+		global::error = err;
+		return false;
+	}
+	wmd_data_.assign(wmd_mc.data(), wmd_mc.data() + wmd_mc.size());
+
+	ArchiveModSignalBlocker sig_blocker{ *this };
+
+	for (unsigned a = 0; a < samples.size(); a++)
+		addLoadedEntry(fmt::format("SFX{:03d}", a), samples[a]);
+
+	sig_blocker.unblock();
+	setModified(false);
+	return true;
+}
+
+bool WddArchive::write(MemChunk& mc, bool update)
+{
+	wess::Wmd wmd;
+	string    err;
+	if (!wess::parseWmd(wmd_data_.data(), wmd_data_.size(), wmd, err))
+	{
+		global::error = err;
+		return false;
+	}
+	if (numEntries() != wmd.numSamples())
+	{
+		global::error = "The number of samples can't change";
+		return false;
+	}
+
+	const auto out = wess::buildWdd(entryData(), wmd);
+	wmd_updated_   = wess::buildWmd(wmd);
+
+	mc.clear();
+	mc.importMem(out.data(), static_cast<uint32_t>(out.size()));
+
+	if (update)
+		markEntriesSaved();
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+// Writes the WDD to [filename], and the WMD with its updated sample table
+// next to it
+// -----------------------------------------------------------------------------
+bool WddArchive::write(string_view filename, bool update)
+{
+	namespace fs = std::filesystem;
+
+	MemChunk mc;
+	if (!write(mc, update) || !mc.exportFile(filename))
+		return false;
+
+	const auto target = fs::u8path(string{ filename }).parent_path()
+						/ (fs::u8path(string{ filename }).stem() += fs::u8path(wmd_path_).extension());
+
+	MemChunk wmd_mc;
+	wmd_mc.importMem(wmd_updated_.data(), static_cast<uint32_t>(wmd_updated_.size()));
+	if (!wmd_mc.exportFile(target.u8string()))
+	{
+		global::error = "Saved the WDD, but couldn't write its WMD";
+		return false;
+	}
+
+	if (update)
+	{
+		wmd_path_ = target.u8string();
+		wmd_data_ = wmd_updated_;
+	}
+	log::info("Updated sample table in {}", target.u8string());
+	return true;
+}
+
+shared_ptr<ArchiveEntry> WddArchive::addEntry(shared_ptr<ArchiveEntry>, unsigned, ArchiveDir*)
+{
+	refuse("A WDD has a fixed set of samples (instruments refer to them by index)");
+	return nullptr;
+}
+shared_ptr<ArchiveEntry> WddArchive::addNewEntry(string_view, unsigned, ArchiveDir*)
+{
+	refuse("A WDD has a fixed set of samples (instruments refer to them by index)");
+	return nullptr;
+}
+bool WddArchive::removeEntry(ArchiveEntry*, bool)
+{
+	return refuse("A WDD has a fixed set of samples (instruments refer to them by index)");
+}
+bool WddArchive::moveEntry(ArchiveEntry*, unsigned, ArchiveDir*)
+{
+	return refuse("A WDD has a fixed set of samples (instruments refer to them by index)");
+}
+bool WddArchive::swapEntries(unsigned, unsigned, ArchiveDir*)
+{
+	return refuse("A WDD has a fixed set of samples (instruments refer to them by index)");
+}
+bool WddArchive::swapEntries(ArchiveEntry*, ArchiveEntry*)
+{
+	return refuse("A WDD has a fixed set of samples (instruments refer to them by index)");
+}

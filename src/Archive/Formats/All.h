@@ -19,6 +19,7 @@
 #include "TarArchive.h"
 #include "Wad2Archive.h"
 #include "WadArchive.h"
+#include "WessArchives.h"
 #include "WadJArchive.h"
 #include "WolfArchive.h"
 #include "ZipArchive.h"
