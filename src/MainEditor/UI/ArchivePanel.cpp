@@ -35,6 +35,7 @@
 #include "ArchivePanel.h"
 #include "App.h"
 #include "Archive/ArchiveManager.h"
+#include "Archive/Formats/WessArchives.h"
 #include "Archive/Formats/ZipArchive.h"
 #include "ArchiveManagerPanel.h"
 #include "EntryPanel/ANSIEntryPanel.h"
@@ -1758,8 +1759,9 @@ bool ArchivePanel::importEntry()
 			// Create undo step
 			undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry));
 
-			// If a file was selected, import it
-			if (!entry->importFile(info.filenames[0]))
+			// If a file was selected, import it (WESS samples take a WAV, which is encoded to ADPCM)
+			const bool wess_sample = wessaudio::isSample(entry);
+			if (wess_sample ? !wessaudio::importFile(entry, info.filenames[0]) : !entry->importFile(info.filenames[0]))
 			{
 				wxMessageBox(
 					wxString::Format("Failed to import file: %s", global::error), "Import Failed", wxICON_ERROR, this);
@@ -1767,7 +1769,8 @@ bool ArchivePanel::importEntry()
 			}
 
 			// Re-detect entry type
-			EntryType::detectEntryType(*entry);
+			if (!wess_sample)
+				EntryType::detectEntryType(*entry);
 
 			// Restore offsets if needed
 			if (entry->type()->editor() == "gfx")
@@ -1810,7 +1813,8 @@ bool ArchivePanel::importEntry()
 			}
 
 			// Set extension by type
-			entry->setExtensionByType();
+			if (!wess_sample)
+				entry->setExtensionByType();
 
 			// If the entry is currently open, refresh the entry panel
 			if (cur_area_->entry() == entry)

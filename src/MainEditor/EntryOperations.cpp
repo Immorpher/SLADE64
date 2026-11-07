@@ -35,6 +35,7 @@
 #include "Archive/ArchiveManager.h"
 #include "Archive/EntryType/EntryDataFormat.h"
 #include "Archive/Formats/WadArchive.h"
+#include "Archive/Formats/WessArchives.h"
 #include "BinaryControlLump.h"
 #include "General/Console.h"
 #include "General/Misc.h"
@@ -218,7 +219,14 @@ bool entryoperations::exportEntry(ArchiveEntry* entry)
 			"Any File (*.*)|*.*",
 			maineditor::windowWx(),
 			fn.GetFullName().ToStdString()))
-		entry->exportFile(info.filenames[0]); // Export entry if ok was clicked
+	{
+		// Export entry if ok was clicked (WESS samples are exported as WAV)
+		MemChunk wav;
+		if (wessaudio::isSample(entry) && wessaudio::toWav(entry, wav))
+			wav.exportFile(info.filenames[0]);
+		else
+			entry->exportFile(info.filenames[0]);
+	}
 
 	return true;
 }
@@ -250,8 +258,12 @@ bool entryoperations::exportEntries(const vector<ArchiveEntry*>& entries, const 
 					fn.SetEmptyExt();
 			}
 
-			// Do export
-			entry->exportFile(fn.GetFullPath().ToStdString());
+			// Do export (WESS samples are exported as WAV)
+			MemChunk wav;
+			if (wessaudio::isSample(entry) && wessaudio::toWav(entry, wav))
+				wav.exportFile(fn.GetFullPath().ToStdString());
+			else
+				entry->exportFile(fn.GetFullPath().ToStdString());
 		}
 
 		// Go through selected dirs

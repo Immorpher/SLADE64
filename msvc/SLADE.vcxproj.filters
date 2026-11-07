@@ -1196,6 +1196,9 @@
     <ClInclude Include="..\src\Archive\Formats\WessArchives.h">
       <Filter>Archive\Formats</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Archive\Formats\WessAudio.h">
+      <Filter>Archive\Formats</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Archive\Formats\WessData.h">
       <Filter>Archive\Formats</Filter>
     </ClInclude>

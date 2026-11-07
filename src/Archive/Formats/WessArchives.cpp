@@ -19,6 +19,7 @@
 #include "WessArchives.h"
 #include "Archive/EntryType/EntryType.h"
 #include "General/UI.h"
+#include "WessAudio.h"
 #include "WessData.h"
 #include <filesystem>
 #include <fstream>
@@ -336,8 +337,25 @@ bool WddArchive::open(MemChunk& mc)
 
 	ArchiveModSignalBlocker sig_blocker{ *this };
 
+	auto sample_type = EntryType::fromId("snd_wess");
 	for (unsigned a = 0; a < samples.size(); a++)
+	{
 		addLoadedEntry(fmt::format("SFX{:03d}", a), samples[a]);
+
+		// Remember the codebook for decoding the sample (hex string)
+		auto entry = entryAt(a);
+		if (sample_type)
+			entry->setType(sample_type);
+		static const char* digits = "0123456789ABCDEF";
+		string             hex;
+		for (auto byte : wmd.book(a))
+		{
+			hex.push_back(digits[byte >> 4]);
+			hex.push_back(digits[byte & 15]);
+		}
+		entry->exProp("wess_book") = hex;
+		entry->exProp("wess_rate") = wess::default_sample_rate;
+	}
 
 	sig_blocker.unblock();
 	setModified(false);
@@ -427,4 +445,91 @@ bool WddArchive::swapEntries(unsigned, unsigned, ArchiveDir*)
 bool WddArchive::swapEntries(ArchiveEntry*, ArchiveEntry*)
 {
 	return refuse("A WDD has a fixed set of samples (instruments refer to them by index)");
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// wessaudio Functions
+//
+// -----------------------------------------------------------------------------
+namespace
+{
+bool entryBook(ArchiveEntry* entry, wess::Book& book)
+{
+	const auto hex = entry->exProp<string>("wess_book");
+	vector<uint8_t> bytes;
+	for (size_t i = 0; i + 1 < hex.size(); i += 2)
+		bytes.push_back(static_cast<uint8_t>(std::stoi(hex.substr(i, 2), nullptr, 16)));
+	return wess::Book::fromBytes(bytes.data(), bytes.size(), book);
+}
+} // namespace
+
+bool wessaudio::isSample(const ArchiveEntry* entry)
+{
+	return entry && entry->type() && entry->type()->id() == "snd_wess";
+}
+
+bool wessaudio::toWav(ArchiveEntry* entry, MemChunk& wav)
+{
+	wess::Book book;
+	if (!entryBook(entry, book))
+	{
+		global::error = "This sample has no valid ADPCM codebook";
+		return false;
+	}
+
+	auto rate = entry->exProp<int>("wess_rate");
+	if (rate <= 0)
+		rate = wess::default_sample_rate;
+
+	const auto pcm = wess::decodeVadpcm(entry->rawData(), entry->size(), book);
+	const auto out = wess::makeWav(pcm, rate);
+	wav.clear();
+	return wav.importMem(out.data(), static_cast<uint32_t>(out.size()));
+}
+
+bool wessaudio::fromWav(ArchiveEntry* entry, MemChunk& wav)
+{
+	wess::Book book;
+	if (!entryBook(entry, book))
+	{
+		global::error = "This sample has no valid ADPCM codebook";
+		return false;
+	}
+
+	vector<int16_t> pcm;
+	int             rate = 0;
+	string          err;
+	if (!wess::parseWav(wav.data(), wav.size(), pcm, rate, err))
+	{
+		global::error = err;
+		return false;
+	}
+	if (pcm.empty())
+	{
+		global::error = "The WAV file has no audio";
+		return false;
+	}
+
+	pcm            = wess::resample(pcm, rate, wess::default_sample_rate);
+	auto adpcm = wess::encodeVadpcm(pcm, book);
+	if (adpcm.size() & 1)
+		adpcm.push_back(0); // Samples are an even number of bytes
+	return entry->importMem(adpcm.data(), static_cast<uint32_t>(adpcm.size()));
+}
+
+bool wessaudio::importFile(ArchiveEntry* entry, string_view filename)
+{
+	MemChunk mc;
+	if (!mc.importFile(filename))
+	{
+		global::error = "Couldn't read the file";
+		return false;
+	}
+
+	if (mc.size() >= 12 && std::memcmp(mc.data(), "RIFF", 4) == 0 && std::memcmp(mc.data() + 8, "WAVE", 4) == 0)
+		return fromWav(entry, mc);
+
+	return entry->importMem(mc.data(), mc.size());
 }

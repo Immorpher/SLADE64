@@ -30,6 +30,7 @@
 //
 // -----------------------------------------------------------------------------
 #include "Main.h"
+#include "Archive/Formats/WessArchives.h"
 #include "AudioEntryPanel.h"
 #include "App.h"
 #include "Audio/AudioTags.h"
@@ -277,7 +278,12 @@ bool AudioEntryPanel::open(ArchiveEntry* entry)
 
 	// Convert if necessary, then write to file
 	data_.clear();
-	if (entry->type()->formatId() == "snd_doom" || // Doom Sound -> WAV
+	if (wessaudio::isSample(entry)) // Doom 64 WESS sample (ADPCM) -> WAV
+	{
+		wessaudio::toWav(entry, data_);
+		path.SetExt("wav");
+	}
+	else if (entry->type()->formatId() == "snd_doom" || // Doom Sound -> WAV
 		entry->type()->formatId() == "snd_doom_mac")
 		conversion::doomSndToWav(mcdata, data_);
 	else if (entry->type()->formatId() == "snd_speaker") // Doom PC Speaker Sound -> WAV

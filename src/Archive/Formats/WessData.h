@@ -78,6 +78,12 @@ struct Wmd
 
 	size_t numSamples() const { return wavtable.size() / wmd_wavtable_size; }
 
+	// The 264 byte ADPCM codebook of sample [i]
+	Bytes book(size_t i) const
+	{
+		return Bytes(predictors.begin() + i * wmd_predictor_size, predictors.begin() + (i + 1) * wmd_predictor_size);
+	}
+
 	// Start/size of sample [i] in the WDD
 	uint32_t sampleStart(size_t i) const { return detail::be32(&wavtable[i * wmd_wavtable_size]); }
 	uint32_t sampleSize(size_t i) const { return detail::be32(&wavtable[i * wmd_wavtable_size + 4]); }
@@ -303,13 +309,18 @@ inline Bytes buildWdd(const std::vector<Bytes>& samples, Wmd& wmd)
 {
 	using namespace detail;
 
+	// Every sample in the original data starts on an even address and has an even size,
+	// so odd length samples (eg. ADPCM made of 9 byte frames) get a padding byte
 	Bytes  out;
 	for (size_t i = 0; i < samples.size() && i < wmd.numSamples(); i++)
 	{
-		uint8_t* row = &wmd.wavtable[i * wmd_wavtable_size];
+		const size_t padded = samples[i].size() + (samples[i].size() & 1);
+		uint8_t*     row    = &wmd.wavtable[i * wmd_wavtable_size];
 		put32(row, static_cast<uint32_t>(out.size()));
-		put32(row + 4, static_cast<uint32_t>(samples[i].size()));
+		put32(row + 4, static_cast<uint32_t>(padded));
 		out.insert(out.end(), samples[i].begin(), samples[i].end());
+		if (padded != samples[i].size())
+			out.push_back(0);
 	}
 	return out;
 }

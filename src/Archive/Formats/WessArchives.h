@@ -98,4 +98,25 @@ private:
 	vector<uint8_t> wmd_data_;      // Its contents (updated when saving)
 	vector<uint8_t> wmd_updated_;   // WMD with the new sample table, written alongside the WDD
 };
+
+// -----------------------------------------------------------------------------
+// WESS sample entries (the entries of a WddArchive): playback, WAV export and import.
+// The entries hold the raw ADPCM, the codebook needed to decode them is kept in
+// the entry's extra properties.
+// -----------------------------------------------------------------------------
+namespace wessaudio
+{
+	// True if [entry] is a WESS sample
+	bool isSample(const ArchiveEntry* entry);
+
+	// Decodes the sample in [entry] to a 16 bit mono WAV in [wav]
+	bool toWav(ArchiveEntry* entry, MemChunk& wav);
+
+	// Replaces the data of [entry] with [wav] encoded as ADPCM using the entry's codebook.
+	// The audio is resampled to the sample rate Doom 64 plays samples at (11025 Hz).
+	bool fromWav(ArchiveEntry* entry, MemChunk& wav);
+
+	// Imports [filename] into [entry]: a WAV is encoded, anything else is used as raw ADPCM
+	bool importFile(ArchiveEntry* entry, string_view filename);
+} // namespace wessaudio
 } // namespace slade
