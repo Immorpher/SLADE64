@@ -175,6 +175,432 @@ inline std::vector<uint8_t> encodeVadpcm(const std::vector<int16_t>& pcm, const 
 }
 
 // -----------------------------------------------------------------------------
+// Codebook design (port of the N64 SDK 'tabledesign' tool)
+//
+// Analyses the audio frame by frame (16 samples), models each frame as a linear predictor,
+// then clusters those predictors (split + refine) into [1 << bits] codebook entries.
+// -----------------------------------------------------------------------------
+namespace detail
+{
+	using Mat = std::vector<std::vector<double>>;
+
+	inline int durbin(const double* in, int n, double* k_out, double* a_out, double* err_out)
+	{
+		int    ret = 0;
+		double div = in[0];
+		a_out[0]   = 1.0;
+		for (int i = 1; i <= n; i++)
+		{
+			double sum = 0.0;
+			for (int j = 1; j <= i - 1; j++)
+				sum += a_out[j] * in[i - j];
+
+			a_out[i] = (div > 0.0 ? -(in[i] + sum) / div : 0.0);
+			k_out[i] = a_out[i];
+			if (std::fabs(k_out[i]) > 1.0)
+				ret++;
+
+			for (int j = 1; j < i; j++)
+				a_out[j] += a_out[i - j] * a_out[i];
+
+			div *= 1.0 - a_out[i] * a_out[i];
+		}
+		*err_out = div;
+		return ret;
+	}
+
+	inline void afromk(const double* in, double* out, int n)
+	{
+		out[0] = 1.0;
+		for (int i = 1; i <= n; i++)
+		{
+			out[i] = in[i];
+			for (int j = 1; j <= i - 1; j++)
+				out[j] += out[i - j] * out[i];
+		}
+	}
+
+	inline int kfroma(double* in, double* out, int n)
+	{
+		int                 ret = 0;
+		std::vector<double> next(n + 1);
+
+		out[n] = in[n];
+		for (int i = n - 1; i >= 1; i--)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				const double temp = out[i + 1];
+				const double div  = 1.0 - (temp * temp);
+				if (div == 0.0)
+					return 1;
+				next[j] = (in[j] - in[i + 1 - j] * temp) / div;
+			}
+			for (int j = 0; j <= i; j++)
+				in[j] = next[j];
+
+			out[i] = next[i];
+			if (std::fabs(out[i]) > 1.0)
+				ret++;
+		}
+		return ret;
+	}
+
+	inline void rfroma(const double* in, int n, double* out)
+	{
+		Mat mat(n + 1);
+		mat[n].assign(n + 1, 0.0);
+		mat[n][0] = 1.0;
+		for (int i = 1; i <= n; i++)
+			mat[n][i] = -in[i];
+
+		for (int i = n; i >= 1; i--)
+		{
+			mat[i - 1].assign(std::max(i, 1), 0.0);
+			const double div = 1.0 - mat[i][i] * mat[i][i];
+			for (int j = 1; j <= i - 1; j++)
+				mat[i - 1][j] = (mat[i][i - j] * mat[i][i] + mat[i][j]) / div;
+		}
+
+		out[0] = 1.0;
+		for (int i = 1; i <= n; i++)
+		{
+			out[i] = 0.0;
+			for (int j = 1; j <= i; j++)
+				out[i] += mat[i][j] * out[i - j];
+		}
+	}
+
+	inline double modelDist(const double* a, const double* b, int n)
+	{
+		std::vector<double> r(n + 1), ac(n + 1);
+		rfroma(b, n, r.data());
+		for (int i = 0; i <= n; i++)
+		{
+			ac[i] = 0.0;
+			for (int j = 0; j <= n - i; j++)
+				ac[i] += a[j] * a[i + j];
+		}
+		double ret = ac[0] * r[0];
+		for (int i = 1; i <= n; i++)
+			ret += 2 * r[i] * ac[i];
+		return ret;
+	}
+
+	// [in] points at the current frame, valid for indices [-n, m)
+	inline void acmat(const int16_t* in, int n, int m, Mat& out)
+	{
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++)
+			{
+				out[i][j] = 0.0;
+				for (int k = 0; k < m; k++)
+					out[i][j] += double(in[k - i]) * in[k - j];
+			}
+	}
+
+	inline void acvect(const int16_t* in, int n, int m, double* out)
+	{
+		for (int i = 0; i <= n; i++)
+		{
+			out[i] = 0.0;
+			for (int j = 0; j < m; j++)
+				out[i] -= double(in[j - i]) * in[j];
+		}
+	}
+
+	// LU decomposition (1-indexed), returns 1 if singular
+	inline int lud(Mat& a, int n, int* indx, int* d)
+	{
+		int                 imax = 0;
+		std::vector<double> vv(n + 1);
+		*d = 1;
+		for (int i = 1; i <= n; i++)
+		{
+			double big = 0.0;
+			for (int j = 1; j <= n; j++)
+			{
+				const double t = std::fabs(a[i][j]);
+				if (t > big)
+					big = t;
+			}
+			if (big == 0.0)
+				return 1;
+			vv[i] = 1.0 / big;
+		}
+		for (int j = 1; j <= n; j++)
+		{
+			for (int i = 1; i < j; i++)
+			{
+				double sum = a[i][j];
+				for (int k = 1; k < i; k++)
+					sum -= a[i][k] * a[k][j];
+				a[i][j] = sum;
+			}
+			double big = 0.0;
+			for (int i = j; i <= n; i++)
+			{
+				double sum = a[i][j];
+				for (int k = 1; k < j; k++)
+					sum -= a[i][k] * a[k][j];
+				a[i][j] = sum;
+				const double dum = vv[i] * std::fabs(sum);
+				if (dum >= big)
+				{
+					big  = dum;
+					imax = i;
+				}
+			}
+			if (j != imax)
+			{
+				for (int k = 1; k <= n; k++)
+					std::swap(a[imax][k], a[j][k]);
+				*d       = -(*d);
+				vv[imax] = vv[j];
+			}
+			indx[j] = imax;
+			if (a[j][j] == 0.0)
+				return 1;
+			if (j != n)
+			{
+				const double dum = 1.0 / a[j][j];
+				for (int i = j + 1; i <= n; i++)
+					a[i][j] *= dum;
+			}
+		}
+
+		double mn = 1e10, mx = 0.0;
+		for (int i = 1; i <= n; i++)
+		{
+			const double t = std::fabs(a[i][i]);
+			mn             = std::min(mn, t);
+			mx             = std::max(mx, t);
+		}
+		return mn / mx < 1e-10 ? 1 : 0;
+	}
+
+	inline void lubksb(const Mat& a, int n, const int* indx, double* b)
+	{
+		int ii = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			const int ip  = indx[i];
+			double    sum = b[ip];
+			b[ip]         = b[i];
+			if (ii)
+				for (int j = ii; j <= i - 1; j++)
+					sum -= a[i][j] * b[j];
+			else if (sum)
+				ii = i;
+			b[i] = sum;
+		}
+		for (int i = n; i >= 1; i--)
+		{
+			double sum = b[i];
+			for (int j = i + 1; j <= n; j++)
+				sum -= a[i][j] * b[j];
+			b[i] = sum / a[i][i];
+		}
+	}
+
+	inline void clampK(double* k, int n)
+	{
+		for (int i = 1; i <= n; i++)
+		{
+			if (k[i] >= 1.0)
+				k[i] = 0.9999999999;
+			if (k[i] <= -1.0)
+				k[i] = -0.9999999999;
+		}
+	}
+
+	inline void refine(Mat& table, int order, int np, const Mat& data, int iters)
+	{
+		Mat                 rsums(np, std::vector<double>(order + 1));
+		std::vector<int>    counts(np);
+		std::vector<double> tmp(order + 1);
+		double              dummy;
+
+		for (int iter = 0; iter < iters; iter++)
+		{
+			for (int i = 0; i < np; i++)
+			{
+				counts[i] = 0;
+				std::fill(rsums[i].begin(), rsums[i].end(), 0.0);
+			}
+
+			for (const auto& d : data)
+			{
+				double best      = 1e30;
+				int    bestIndex = 0;
+				for (int j = 0; j < np; j++)
+				{
+					const double dist = modelDist(table[j].data(), d.data(), order);
+					if (dist < best)
+					{
+						best      = dist;
+						bestIndex = j;
+					}
+				}
+				counts[bestIndex]++;
+				rfroma(d.data(), order, tmp.data());
+				for (int j = 0; j <= order; j++)
+					rsums[bestIndex][j] += tmp[j];
+			}
+
+			for (int i = 0; i < np; i++)
+				if (counts[i] > 0)
+					for (int j = 0; j <= order; j++)
+						rsums[i][j] /= counts[i];
+
+			for (int i = 0; i < np; i++)
+			{
+				durbin(rsums[i].data(), order, tmp.data(), table[i].data(), &dummy);
+				clampK(tmp.data(), order);
+				afromk(tmp.data(), table[i].data(), order);
+			}
+		}
+	}
+} // namespace detail
+
+// Designs a 264 byte WMD codebook (order 2, up to [1 << bits] predictors) for [pcm].
+// Returns false if the audio has too little signal to analyse.
+inline bool designBook(const std::vector<int16_t>& pcm, std::vector<uint8_t>& book_out, int bits = 3)
+{
+	using namespace detail;
+	constexpr int order = 2, frame = 16, iters = 2;
+	constexpr double thresh = 10.0;
+
+	// History of one frame (zeros) in front of the audio so negative indices work
+	std::vector<int16_t> buf(frame + (pcm.size() / frame) * frame, 0);
+	std::copy(pcm.begin(), pcm.begin() + (pcm.size() / frame) * frame, buf.begin() + frame);
+
+	Mat                 mat(order + 1, std::vector<double>(order + 1));
+	std::vector<double> vec(order + 1), k(order + 1);
+	int                 perm[order + 1], det;
+	Mat                 data;
+
+	for (size_t f = frame; f + frame <= buf.size(); f += frame)
+	{
+		const int16_t* cur = &buf[f];
+		acvect(cur, order, frame, vec.data());
+		if (std::fabs(vec[0]) <= thresh)
+			continue;
+		acmat(cur, order, frame, mat);
+		if (lud(mat, order, perm, &det) != 0)
+			continue;
+		lubksb(mat, order, perm, vec.data());
+		vec[0] = 1.0;
+		if (kfroma(vec.data(), k.data(), order) != 0)
+			continue;
+		clampK(k.data(), order);
+		std::vector<double> row(order + 1);
+		afromk(k.data(), row.data(), order);
+		data.push_back(row);
+	}
+	if (data.empty())
+		return false;
+
+	// Average autocorrelation -> first predictor
+	vec[0] = 1.0;
+	for (int j = 1; j <= order; j++)
+		vec[j] = 0.0;
+	std::vector<double> tmp(order + 1);
+	for (const auto& d : data)
+	{
+		rfroma(d.data(), order, tmp.data());
+		for (int j = 1; j <= order; j++)
+			vec[j] += tmp[j];
+	}
+	for (int j = 1; j <= order; j++)
+		vec[j] /= data.size();
+
+	Mat table((size_t(1) << bits), std::vector<double>(order + 1));
+	double dummy;
+	durbin(vec.data(), order, k.data(), table[0].data(), &dummy);
+	clampK(k.data(), order);
+	afromk(k.data(), table[0].data(), order);
+
+	int curBits = 0;
+	while (curBits < bits)
+	{
+		const int np = 1 << curBits;
+		// split: every entry gets a copy nudged by 0.01 * delta, delta = [0, -1, 0]
+		for (int i = 0; i < np; i++)
+			for (int j = 0; j <= order; j++)
+				table[i + np][j] = table[i][j] + (j == order - 1 ? -1.0 : 0.0) * 0.01;
+		curBits++;
+		refine(table, order, 1 << curBits, data, iters);
+	}
+
+	const int np = 1 << curBits;
+	book_out.assign(264, 0);
+	auto put32 = [&](size_t o, uint32_t v) {
+		for (int i = 0; i < 4; i++)
+			book_out[o + i] = static_cast<uint8_t>(v >> (24 - 8 * i));
+	};
+	put32(0, order);
+	put32(4, np);
+
+	for (int p = 0; p < np; p++)
+	{
+		// print_entry: build the 8x order matrix of the predictor
+		double t[8][order] = {};
+		const auto& row = table[p];
+		for (int i = 0; i < order; i++)
+			for (int j = i; j < order; j++)
+				t[i][j] = -row[order - j + i];
+		for (int i = 1; i < 8; i++)
+			for (int j = 1; j <= order; j++)
+				if (i - j >= 0)
+					for (int kk = 0; kk < order; kk++)
+						t[i][kk] -= row[j] * t[i - j][kk];
+
+		for (int i = 0; i < order; i++)
+			for (int j = 0; j < 8; j++)
+			{
+				const double fval = t[j][i] * 2048.0;
+				int          ival = static_cast<int>(fval < 0.0 ? fval - 0.5 : fval + 0.5);
+				ival              = std::clamp(ival, -0x8000, 0x7FFF);
+				const size_t o    = 8 + (p * 16 + i * 8 + j) * 2;
+				book_out[o]       = static_cast<uint8_t>((ival >> 8) & 0xFF);
+				book_out[o + 1]   = static_cast<uint8_t>(ival & 0xFF);
+			}
+	}
+	return true;
+}
+
+// Writes [book] as the 264 byte WMD structure
+inline std::vector<uint8_t> bookToBytes(const Book& book)
+{
+	std::vector<uint8_t> out(264, 0);
+	auto                 put32 = [&](size_t o, uint32_t v) {
+        for (int i = 0; i < 4; i++)
+            out[o + i] = static_cast<uint8_t>(v >> (24 - 8 * i));
+	};
+	put32(0, book.order);
+	put32(4, book.npredictors);
+	for (int i = 0; i < 128; i++)
+	{
+		out[8 + i * 2] = static_cast<uint8_t>((book.preds[i] >> 8) & 0xFF);
+		out[9 + i * 2] = static_cast<uint8_t>(book.preds[i] & 0xFF);
+	}
+	return out;
+}
+
+// Squared error between two sample sequences
+inline double pcmError(const std::vector<int16_t>& a, const std::vector<int16_t>& b)
+{
+	double e = 0;
+	for (size_t i = 0; i < a.size(); i++)
+	{
+		const double d = double(a[i]) - (i < b.size() ? b[i] : 0);
+		e += d * d;
+	}
+	return e;
+}
+
+// -----------------------------------------------------------------------------
 // WAV
 // -----------------------------------------------------------------------------
 

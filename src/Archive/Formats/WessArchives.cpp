@@ -56,6 +56,16 @@ bool refuse(const char* what)
 	global::error = what;
 	return false;
 }
+
+// Reads the codebook kept in the entry's wess_book property (hex string)
+bool entryBook(ArchiveEntry* entry, wess::Book& book)
+{
+	const auto      hex = entry->exProp<string>("wess_book");
+	vector<uint8_t> bytes;
+	for (size_t i = 0; i + 1 < hex.size(); i += 2)
+		bytes.push_back(static_cast<uint8_t>(std::stoi(hex.substr(i, 2), nullptr, 16)));
+	return wess::Book::fromBytes(bytes.data(), bytes.size(), book);
+}
 } // namespace
 
 
@@ -377,6 +387,17 @@ bool WddArchive::write(MemChunk& mc, bool update)
 		return false;
 	}
 
+	// Samples that were imported can have their own codebook
+	for (unsigned a = 0; a < numEntries(); a++)
+	{
+		wess::Book book;
+		if ((a + 1) * wess::wmd_predictor_size > wmd.predictors.size() || !entryBook(entryAt(a), book))
+			continue;
+		const auto hex = entryAt(a)->exProp<string>("wess_book");
+		for (size_t i = 0; i < wess::wmd_predictor_size && i * 2 + 1 < hex.size(); i++)
+			wmd.predictors[a * wess::wmd_predictor_size + i] = static_cast<uint8_t>(std::stoi(hex.substr(i * 2, 2), nullptr, 16));
+	}
+
 	const auto out = wess::buildWdd(entryData(), wmd);
 	wmd_updated_   = wess::buildWmd(wmd);
 
@@ -453,18 +474,6 @@ bool WddArchive::swapEntries(ArchiveEntry*, ArchiveEntry*)
 // wessaudio Functions
 //
 // -----------------------------------------------------------------------------
-namespace
-{
-bool entryBook(ArchiveEntry* entry, wess::Book& book)
-{
-	const auto hex = entry->exProp<string>("wess_book");
-	vector<uint8_t> bytes;
-	for (size_t i = 0; i + 1 < hex.size(); i += 2)
-		bytes.push_back(static_cast<uint8_t>(std::stoi(hex.substr(i, 2), nullptr, 16)));
-	return wess::Book::fromBytes(bytes.data(), bytes.size(), book);
-}
-} // namespace
-
 bool wessaudio::isSample(const ArchiveEntry* entry)
 {
 	return entry && entry->type() && entry->type()->id() == "snd_wess";
@@ -512,11 +521,42 @@ bool wessaudio::fromWav(ArchiveEntry* entry, MemChunk& wav)
 		return false;
 	}
 
-	pcm            = wess::resample(pcm, rate, wess::default_sample_rate);
-	auto adpcm = wess::encodeVadpcm(pcm, book);
+	pcm = wess::resample(pcm, rate, wess::default_sample_rate);
+
+	// Encode with the sample's current codebook, and with one designed for the new audio
+	// (like the N64 SDK's tabledesign tool). The one that reproduces the audio best is kept.
+	auto adpcm     = wess::encodeVadpcm(pcm, book);
+	auto book_data = wess::bookToBytes(book);
+	{
+		vector<uint8_t> designed;
+		wess::Book      new_book;
+		if (wess::designBook(pcm, designed) && wess::Book::fromBytes(designed.data(), designed.size(), new_book))
+		{
+			auto new_adpcm = wess::encodeVadpcm(pcm, new_book);
+			if (wess::pcmError(pcm, wess::decodeVadpcm(new_adpcm.data(), new_adpcm.size(), new_book))
+				< wess::pcmError(pcm, wess::decodeVadpcm(adpcm.data(), adpcm.size(), book)))
+			{
+				adpcm     = std::move(new_adpcm);
+				book_data = designed;
+				log::info("WESS: using a newly designed ADPCM codebook for the imported sample");
+			}
+		}
+	}
+
 	if (adpcm.size() & 1)
 		adpcm.push_back(0); // Samples are an even number of bytes
-	return entry->importMem(adpcm.data(), static_cast<uint32_t>(adpcm.size()));
+	if (!entry->importMem(adpcm.data(), static_cast<uint32_t>(adpcm.size())))
+		return false;
+
+	static const char* digits = "0123456789ABCDEF";
+	string             hex;
+	for (auto byte : book_data)
+	{
+		hex.push_back(digits[byte >> 4]);
+		hex.push_back(digits[byte & 15]);
+	}
+	entry->exProp("wess_book") = hex;
+	return true;
 }
 
 bool wessaudio::importFile(ArchiveEntry* entry, string_view filename)
