@@ -203,9 +203,9 @@ inline size_t countTracks(const Bytes& seq)
 	size_t p = 0, n = 0;
 	while (p + wsd_track_size <= seq.size())
 	{
-		const size_t datalen = be16(&seq[p + 18]);
-		const bool   loops   = be16(&seq[p + 14]) != 0;
-		const size_t next    = p + wsd_track_size + datalen + (loops ? 4 : 0);
+		const size_t datalen = be32(&seq[p + 16]);
+		const size_t nlabels = be16(&seq[p + 14]);
+		const size_t next    = p + wsd_track_size + datalen + nlabels * 4;
 		if (next > seq.size())
 			break;
 		p = next;

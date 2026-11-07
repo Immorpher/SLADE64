@@ -117,6 +117,22 @@ namespace wessaudio
 	bool fromWav(ArchiveEntry* entry, MemChunk& wav);
 
 	// Imports [filename] into [entry]: a WAV is encoded, anything else is used as raw ADPCM
+	// (for sequences a MIDI file is converted instead, see below)
 	bool importFile(ArchiveEntry* entry, string_view filename);
+
+	// True if [entry] is a WESS sequence (an entry of a WsdArchive)
+	bool isSequence(const ArchiveEntry* entry);
+
+	// Converts the sequence in [entry] to a Standard MIDI file in [midi]
+	bool toMidi(ArchiveEntry* entry, MemChunk& midi);
+
+	// Replaces the data of [entry] with the sequence made from the MIDI file [midi]
+	bool fromMidi(ArchiveEntry* entry, MemChunk& midi);
+
+	// True if [entry] is a sample or a sequence, ie. it is exported/imported as WAV/MIDI
+	bool isConvertible(const ArchiveEntry* entry);
+
+	// Converts [entry] to the file it is exported as (WAV for samples, MIDI for sequences)
+	bool toExportFormat(ArchiveEntry* entry, MemChunk& out);
 } // namespace wessaudio
 } // namespace slade

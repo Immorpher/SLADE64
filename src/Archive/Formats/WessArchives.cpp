@@ -21,6 +21,7 @@
 #include "General/UI.h"
 #include "WessAudio.h"
 #include "WessData.h"
+#include "WessSeq.h"
 #include <filesystem>
 #include <fstream>
 
@@ -238,8 +239,13 @@ bool WsdArchive::open(MemChunk& mc)
 	ArchiveModSignalBlocker sig_blocker{ *this };
 
 	header_ = wsd.header;
+	auto seq_type = EntryType::fromId("midi_wess");
 	for (unsigned a = 0; a < wsd.sequences.size(); a++)
+	{
 		addLoadedEntry(fmt::format("SEQ{:03d}", a), wsd.sequences[a]);
+		if (seq_type)
+			entryAt(a)->setType(seq_type);
+	}
 
 	sig_blocker.unblock();
 	setModified(false);
@@ -568,8 +574,58 @@ bool wessaudio::importFile(ArchiveEntry* entry, string_view filename)
 		return false;
 	}
 
+	if (isSequence(entry) && mc.size() >= 4 && std::memcmp(mc.data(), "MThd", 4) == 0)
+		return fromMidi(entry, mc);
+
 	if (mc.size() >= 12 && std::memcmp(mc.data(), "RIFF", 4) == 0 && std::memcmp(mc.data() + 8, "WAVE", 4) == 0)
 		return fromWav(entry, mc);
 
 	return entry->importMem(mc.data(), mc.size());
+}
+
+bool wessaudio::isSequence(const ArchiveEntry* entry)
+{
+	return entry && entry->type() && entry->type()->id() == "midi_wess";
+}
+
+bool wessaudio::toMidi(ArchiveEntry* entry, MemChunk& midi)
+{
+	const wess::Bytes seq(entry->rawData(), entry->rawData() + entry->size());
+	wess::Bytes       out;
+	string            err;
+	if (!wess::seqToMidi(seq, out, err))
+	{
+		global::error = err;
+		return false;
+	}
+
+	midi.clear();
+	return midi.importMem(out.data(), static_cast<uint32_t>(out.size()));
+}
+
+bool wessaudio::fromMidi(ArchiveEntry* entry, MemChunk& midi)
+{
+	wess::Bytes seq;
+	string      err;
+	if (!wess::midiToSeq(midi.data(), midi.size(), seq, err))
+	{
+		global::error = err;
+		return false;
+	}
+
+	return entry->importMem(seq.data(), static_cast<uint32_t>(seq.size()));
+}
+
+bool wessaudio::isConvertible(const ArchiveEntry* entry)
+{
+	return isSample(entry) || isSequence(entry);
+}
+
+bool wessaudio::toExportFormat(ArchiveEntry* entry, MemChunk& out)
+{
+	if (isSample(entry))
+		return toWav(entry, out);
+	if (isSequence(entry))
+		return toMidi(entry, out);
+	return false;
 }

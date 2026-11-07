@@ -1202,6 +1202,9 @@
     <ClInclude Include="..\src\Archive\Formats\WessData.h">
       <Filter>Archive\Formats</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Archive\Formats\WessSeq.h">
+      <Filter>Archive\Formats</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Archive\Formats\GZipArchive.h">
       <Filter>Archive\Formats</Filter>
     </ClInclude>

@@ -669,6 +669,7 @@
     <ClInclude Include="..\src\Archive\Formats\WessArchives.h" />
     <ClInclude Include="..\src\Archive\Formats\WessAudio.h" />
     <ClInclude Include="..\src\Archive\Formats\WessData.h" />
+    <ClInclude Include="..\src\Archive\Formats\WessSeq.h" />
     <ClInclude Include="..\src\Archive\Formats\GZipArchive.h" />
     <ClInclude Include="..\src\Archive\Formats\HogArchive.h" />
     <ClInclude Include="..\src\Archive\Formats\LfdArchive.h" />

@@ -283,6 +283,12 @@ bool AudioEntryPanel::open(ArchiveEntry* entry)
 		wessaudio::toWav(entry, data_);
 		path.SetExt("wav");
 	}
+	else if (wessaudio::isSequence(entry)) // Doom 64 WESS sequence -> MIDI
+	{
+		if (!wessaudio::toMidi(entry, data_))
+			return false;
+		path.SetExt("mid");
+	}
 	else if (entry->type()->formatId() == "snd_doom" || // Doom Sound -> WAV
 		entry->type()->formatId() == "snd_doom_mac")
 		conversion::doomSndToWav(mcdata, data_);
@@ -319,7 +325,7 @@ bool AudioEntryPanel::open(ArchiveEntry* entry)
 		data_.importMem(mcdata.data(), mcdata.size());
 
 	// MIDI format
-	if (strutil::startsWith(entry->type()->formatId(), "midi_"))
+	if (strutil::startsWith(entry->type()->formatId(), "midi_") || wessaudio::isSequence(entry))
 		openMidi(data_, path.GetFullPath());
 
 	// MOD format

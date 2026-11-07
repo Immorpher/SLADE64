@@ -220,9 +220,9 @@ bool entryoperations::exportEntry(ArchiveEntry* entry)
 			maineditor::windowWx(),
 			fn.GetFullName().ToStdString()))
 	{
-		// Export entry if ok was clicked (WESS samples are exported as WAV)
+		// Export entry if ok was clicked (WESS samples are exported as WAV, sequences as MIDI)
 		MemChunk wav;
-		if (wessaudio::isSample(entry) && wessaudio::toWav(entry, wav))
+		if (wessaudio::isConvertible(entry) && wessaudio::toExportFormat(entry, wav))
 			wav.exportFile(info.filenames[0]);
 		else
 			entry->exportFile(info.filenames[0]);
@@ -258,9 +258,9 @@ bool entryoperations::exportEntries(const vector<ArchiveEntry*>& entries, const 
 					fn.SetEmptyExt();
 			}
 
-			// Do export (WESS samples are exported as WAV)
+			// Do export (WESS samples are exported as WAV, sequences as MIDI)
 			MemChunk wav;
-			if (wessaudio::isSample(entry) && wessaudio::toWav(entry, wav))
+			if (wessaudio::isConvertible(entry) && wessaudio::toExportFormat(entry, wav))
 				wav.exportFile(fn.GetFullPath().ToStdString());
 			else
 				entry->exportFile(fn.GetFullPath().ToStdString());

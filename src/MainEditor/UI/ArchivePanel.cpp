@@ -1759,8 +1759,9 @@ bool ArchivePanel::importEntry()
 			// Create undo step
 			undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry));
 
-			// If a file was selected, import it (WESS samples take a WAV, which is encoded to ADPCM)
-			const bool wess_sample = wessaudio::isSample(entry);
+			// If a file was selected, import it (WESS samples take a WAV, which is encoded to ADPCM,
+			// and WESS sequences take a MIDI file)
+			const bool wess_sample = wessaudio::isConvertible(entry);
 			if (wess_sample ? !wessaudio::importFile(entry, info.filenames[0]) : !entry->importFile(info.filenames[0]))
 			{
 				wxMessageBox(
