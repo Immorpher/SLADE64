@@ -384,7 +384,7 @@ bool WddArchive::open(MemChunk& mc)
 			hex.push_back(digits[byte & 15]);
 		}
 		entry->exProp("wess_book") = hex;
-		entry->exProp("wess_rate") = wess::default_sample_rate;
+		entry->exProp("wess_rate") = wmd.sampleRate(a);
 	}
 
 	sig_blocker.unblock();
@@ -541,7 +541,11 @@ bool wessaudio::fromWav(ArchiveEntry* entry, MemChunk& wav)
 		return false;
 	}
 
-	pcm = wess::resample(pcm, rate, wess::default_sample_rate);
+	// Samples are stored at their own playback rate (same one the WAV export uses)
+	auto target_rate = entry->exProp<int>("wess_rate");
+	if (target_rate <= 0)
+		target_rate = wess::default_sample_rate;
+	pcm = wess::resample(pcm, rate, target_rate);
 
 	// Encode with the sample's current codebook, and with one designed for the new audio
 	// (like the N64 SDK's tabledesign tool). The one that reproduces the audio best is kept.

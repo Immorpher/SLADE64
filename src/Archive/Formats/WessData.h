@@ -21,6 +21,7 @@
 // -----------------------------------------------------------------------------
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <string>
@@ -82,6 +83,15 @@ struct Wmd
 	Bytes book(size_t i) const
 	{
 		return Bytes(predictors.begin() + i * wmd_predictor_size, predictors.begin() + (i + 1) * wmd_predictor_size);
+	}
+
+	// Playback rate of sample [i] at its root key. The engine plays at 22050 Hz and shifts every
+	// sample by its WAVTABLE "default pitch" (in cents): -1200 (most samples) is half speed = 11025 Hz.
+	int sampleRate(size_t i) const
+	{
+		const int32_t cents = static_cast<int32_t>(detail::be32(&wavtable[i * wmd_wavtable_size + 12]));
+		const double  rate  = 22050.0 * std::pow(2.0, cents / 1200.0);
+		return (rate >= 2000.0 && rate <= 96000.0) ? static_cast<int>(rate + 0.5) : 11025;
 	}
 
 	// Start/size of sample [i] in the WDD

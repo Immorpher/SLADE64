@@ -2680,6 +2680,90 @@ bool ArchivePanel::musMidiConvert() const
 }
 
 // -----------------------------------------------------------------------------
+// Converts any selected MIDI/MUS entries to the Doom 64 WESS sequence format
+// ([to_wess] = true), or selected WESS sequences back to standard MIDI
+// -----------------------------------------------------------------------------
+bool ArchivePanel::wessSeqConvert(bool to_wess) const
+{
+	// Get selected entries
+	auto selection = entry_tree_->selectedEntries();
+
+	// Begin recording undo level
+	undo_manager_->beginRecord(to_wess ? "Convert MIDI -> WESS Sequence" : "Convert WESS Sequence -> MIDI");
+
+	unsigned converted = 0;
+	string   problems;
+	for (auto& entry : selection)
+	{
+		const auto& format_id = entry->type()->formatId();
+		MemChunk    midi;
+
+		if (to_wess)
+		{
+			// Only MIDI-like entries (WESS sequences themselves are left alone)
+			if (!strutil::startsWith(format_id, "midi_") || wessaudio::isSequence(entry))
+				continue;
+
+			// Get a standard MIDI file out of the entry
+			bool ok = true;
+			if (format_id == "midi_smf")
+				midi.importMem(entry->rawData(), entry->size());
+			else if (format_id == "midi_mus")
+				ok = conversion::musToMidi(entry->data(), midi);
+			else if (format_id == "midi_gmid")
+				ok = conversion::gmidToMidi(entry->data(), midi);
+			else
+			{
+				problems += fmt::format("{}: {} entries can't be converted\n", entry->name(), entry->type()->name());
+				continue;
+			}
+			if (!ok)
+			{
+				problems += fmt::format("{}: couldn't be converted to MIDI first\n", entry->name());
+				continue;
+			}
+
+			undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry)); // Create undo step
+			if (!wessaudio::fromMidi(entry, midi))
+			{
+				problems += fmt::format("{}: {}\n", entry->name(), global::error);
+				continue;
+			}
+			entry->setType(EntryType::fromId("midi_wess"));
+			converted++;
+		}
+		else
+		{
+			if (!wessaudio::isSequence(entry))
+				continue;
+
+			if (!wessaudio::toMidi(entry, midi))
+			{
+				problems += fmt::format("{}: {}\n", entry->name(), global::error);
+				continue;
+			}
+
+			undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry)); // Create undo step
+			entry->importMemChunk(midi);
+			EntryType::detectEntryType(*entry);
+			entry->setExtensionByType();
+			converted++;
+		}
+	}
+
+	// Finish recording undo level
+	undo_manager_->endRecord(true);
+
+	if (!problems.empty())
+		wxMessageBox(
+			wxString::Format("%u entries were converted. These couldn't be:\n\n%s", converted, problems),
+			to_wess ? "Convert to WESS Sequence" : "Convert WESS Sequence to MIDI",
+			wxICON_WARNING);
+
+	return true;
+}
+
+// -----------------------------------------------------------------------------
 // Compiles any selected text entries as ACS scripts
 // -----------------------------------------------------------------------------
 bool ArchivePanel::compileACS(bool hexen) const
@@ -3367,6 +3451,10 @@ bool ArchivePanel::handleAction(string_view id)
 		wavDSndConvert();
 	else if (id == "arch_audio_convertmus")
 		musMidiConvert();
+	else if (id == "arch_audio_convertwess")
+		wessSeqConvert(true);
+	else if (id == "arch_audio_wessmidi")
+		wessSeqConvert(false);
 	else if (id == "arch_voxel_convertvox")
 		voxelConvert();
 	else if (id == "arch_scripts_compileacs")
@@ -3615,6 +3703,8 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 	bool wav_selected        = false;
 	bool dsnd_selected       = false;
 	bool mus_selected        = false;
+	bool midi_selected       = false; // MIDI-like entry that can become a WESS sequence
+	bool wessseq_selected    = false; // Doom 64 WESS sequence
 	bool text_selected       = false;
 	bool unknown_selected    = false;
 	bool texturex_selected   = false;
@@ -3670,6 +3760,17 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 		{
 			if (strutil::startsWith(entry->type()->formatId(), "midi_") && entry->type()->formatId() != "midi_smf")
 				mus_selected = true;
+		}
+		if (!midi_selected)
+		{
+			const auto& fid = entry->type()->formatId();
+			if (fid == "midi_smf" || fid == "midi_mus" || fid == "midi_gmid")
+				midi_selected = true;
+		}
+		if (!wessseq_selected)
+		{
+			if (wessaudio::isSequence(entry))
+				wessseq_selected = true;
 		}
 		if (!text_selected)
 		{
@@ -3861,7 +3962,7 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 	}
 
 	// Add Audio related menu items if needed
-	if (wav_selected || dsnd_selected || mus_selected)
+	if (wav_selected || dsnd_selected || mus_selected || midi_selected || wessseq_selected)
 	{
 		wxMenu* audio;
 		if (context_submenus)
@@ -3880,6 +3981,10 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 			SAction::fromId("arch_audio_convertdw")->addToMenu(audio, true);
 		if (mus_selected)
 			SAction::fromId("arch_audio_convertmus")->addToMenu(audio, true);
+		if (midi_selected)
+			SAction::fromId("arch_audio_convertwess")->addToMenu(audio, true);
+		if (wessseq_selected)
+			SAction::fromId("arch_audio_wessmidi")->addToMenu(audio, true);
 	}
 
 	// Add script related menu items if needed

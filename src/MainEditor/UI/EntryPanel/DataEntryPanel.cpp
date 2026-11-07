@@ -878,7 +878,7 @@ bool DataEntryTable::setupDataStructure(ArchiveEntry* entry)
 		columns_.emplace_back("Priority", ColType::IntUnsigned, 1, 0);
 		columns_.emplace_back("Volume", ColType::IntUnsigned, 1, 1);
 		columns_.emplace_back("Pan (64 = centre)", ColType::IntUnsigned, 1, 2);
-		columns_.emplace_back("Reverb", ColType::IntUnsigned, 1, 3);
+		columns_.emplace_back("Instrument (1 = music, 0 = sound effect)", ColType::IntUnsigned, 1, 3);
 		columns_.emplace_back("Root Key", ColType::IntUnsigned, 1, 4);
 		columns_.emplace_back("Fine Tune", ColType::IntUnsigned, 1, 5);
 		columns_.emplace_back("Note Min", ColType::IntUnsigned, 1, 6);
