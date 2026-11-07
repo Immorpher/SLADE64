@@ -146,6 +146,88 @@ inline bool parseWmd(const uint8_t* data, size_t size, Wmd& out, std::string& er
 	return true;
 }
 
+// Checks that the tables of [wmd] fit together (sizes, and that patches, patch maps and the
+// wave table only refer to things that exist). A bank that doesn't would crash the game.
+inline bool validateWmd(const Wmd& wmd, std::string& err)
+{
+	using namespace detail;
+
+	if (wmd.header.size() != wmd_header_size)
+	{
+		err = "The WMD header must be 56 bytes";
+		return false;
+	}
+	if (wmd.patches.size() < 4 || (wmd.patches.size() - 4) % wmd_patch_size)
+	{
+		err = "PATCHES: the size must be 4 bytes per patch plus 4 trailing bytes";
+		return false;
+	}
+	if (wmd.subpatches.size() < 4 || (wmd.subpatches.size() - 4) % wmd_subpatch_size)
+	{
+		err = "SUBPATCHES: the size must be 20 bytes per patch map plus 4 trailing bytes";
+		return false;
+	}
+	if (wmd.wavtable.size() % wmd_wavtable_size)
+	{
+		err = "WAVTABLE: the size must be 24 bytes per sample";
+		return false;
+	}
+	if (wmd.loops.size() < wmd_loophead_size || (wmd.loops.size() - wmd_loophead_size) % wmd_loop_size)
+	{
+		err = "LOOPS: the size must be an 8 byte header plus 48 bytes per loop";
+		return false;
+	}
+
+	const size_t npatch = (wmd.patches.size() - 4) / wmd_patch_size;
+	const size_t nsub   = (wmd.subpatches.size() - 4) / wmd_subpatch_size;
+	const size_t nsfx   = wmd.numSamples();
+	const size_t nloops = (wmd.loops.size() - wmd_loophead_size) / wmd_loop_size;
+
+	if (wmd.predictors.size() != nsfx * wmd_predictor_size)
+	{
+		err = "PREDICTORS: there must be one 264 byte codebook for each row of the WAVTABLE ("
+			  + std::to_string(nsfx) + " samples, but " + std::to_string(wmd.predictors.size() / wmd_predictor_size)
+			  + " codebooks)";
+		return false;
+	}
+
+	for (size_t i = 0; i < npatch; i++)
+	{
+		const uint8_t* row   = &wmd.patches[i * wmd_patch_size];
+		const size_t   count = row[0];
+		const size_t   first = be16(row + 2);
+		if (first + count > nsub)
+		{
+			err = "PATCHES: patch " + std::to_string(i) + " uses patch maps " + std::to_string(first) + " to "
+				  + std::to_string(first + count - 1) + ", but there are only " + std::to_string(nsub);
+			return false;
+		}
+	}
+
+	for (size_t i = 0; i < nsub; i++)
+	{
+		const size_t sample = be16(&wmd.subpatches[i * wmd_subpatch_size + 10]);
+		if (sample >= nsfx)
+		{
+			err = "SUBPATCHES: patch map " + std::to_string(i) + " uses sample " + std::to_string(sample)
+				  + ", but there are only " + std::to_string(nsfx);
+			return false;
+		}
+	}
+
+	for (size_t i = 0; i < nsfx; i++)
+	{
+		const uint32_t id = be32(&wmd.wavtable[i * wmd_wavtable_size + 16]);
+		if (id != 0xFFFFFFFFu && id >= nloops)
+		{
+			err = "WAVTABLE: sample " + std::to_string(i) + " uses loop " + std::to_string(id) + ", but there are only "
+				  + std::to_string(nloops);
+			return false;
+		}
+	}
+	return true;
+}
+
 // Writes [wmd] to bytes, updating the counts in the header and loop table
 inline Bytes buildWmd(const Wmd& wmd)
 {

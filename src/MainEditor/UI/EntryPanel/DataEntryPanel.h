@@ -79,6 +79,7 @@ private:
 	unsigned        row_stride_ = 0;
 	unsigned        data_start_ = 0;
 	unsigned        data_stop_  = 0;
+	unsigned        data_tail_  = 0; // Bytes after the last row that aren't part of any row
 	int             row_first_  = 0;
 	wxString        row_prefix_;
 	DataEntryPanel* parent_ = nullptr;

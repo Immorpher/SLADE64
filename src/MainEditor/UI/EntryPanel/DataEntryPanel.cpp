@@ -55,7 +55,10 @@ int DataEntryTable::GetNumberRows()
 	if (row_stride_ == 0)
 		return 0;
 	else
-		return ((data_stop_ ? data_stop_ : data_.size()) - data_start_) / row_stride_;
+	{
+		const unsigned stop = data_stop_ ? data_stop_ : (data_.size() > data_tail_ ? data_.size() - data_tail_ : 0);
+		return stop > data_start_ ? (stop - data_start_) / row_stride_ : 0;
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -121,23 +124,23 @@ wxString DataEntryTable::GetValue(int row, int col)
 		{
 			uint8_t val;
 			data_.read(&val, 1);
-			return wxString::Format("%hhd", val);
+			return wxString::Format("%hhu", val);
 		}
 		else if (columns_[col].size == 2)
 		{
 			uint16_t val;
 			data_.read(&val, 2);
 			if (be)
-				val = wxINT16_SWAP_ON_LE(val);
-			return wxString::Format("%hd", val);
+				val = wxUINT16_SWAP_ON_LE(val);
+			return wxString::Format("%hu", val);
 		}
 		else if (columns_[col].size == 4)
 		{
 			uint32_t val;
 			data_.read(&val, 4);
 			if (be)
-				val = wxINT32_SWAP_ON_LE(val);
-			return wxString::Format("%d", val);
+				val = wxUINT32_SWAP_ON_LE(val);
+			return wxString::Format("%u", val);
 		}
 		else if (columns_[col].size == 8)
 		{
@@ -212,9 +215,11 @@ void DataEntryTable::SetValue(int row, int col, const wxString& value)
 		return;
 
 	// Signed integer or custom value column
-	if (columns_[col].type == ColType::IntSigned || columns_[col].type == ColType::CustomValue)
+	if (columns_[col].type == ColType::IntSigned || columns_[col].type == ColType::IntBESigned
+		|| columns_[col].type == ColType::CustomValue)
 	{
-		long long longval;
+		const bool be = columns_[col].type == ColType::IntBESigned;
+		long long  longval;
 		value.ToLongLong(&longval);
 
 		if (columns_[col].size == 1)
@@ -225,24 +230,31 @@ void DataEntryTable::SetValue(int row, int col, const wxString& value)
 		else if (columns_[col].size == 2)
 		{
 			int16_t val = longval;
+			if (be)
+				val = wxINT16_SWAP_ON_LE(val);
 			data_.write(&val, 2);
 		}
 		else if (columns_[col].size == 4)
 		{
 			int32_t val = longval;
+			if (be)
+				val = wxINT32_SWAP_ON_LE(val);
 			data_.write(&val, 4);
 		}
 		else if (columns_[col].size == 8)
 		{
 			int64_t val = longval;
+			if (be)
+				val = wxINT64_SWAP_ON_LE(val);
 			data_.write(&val, 8);
 		}
 	}
 
 	// Unsigned integer column
-	else if (columns_[col].type == ColType::IntUnsigned)
+	else if (columns_[col].type == ColType::IntUnsigned || columns_[col].type == ColType::IntBEUnsigned)
 	{
-		long long longval;
+		const bool be = columns_[col].type == ColType::IntBEUnsigned;
+		long long  longval;
 		value.ToLongLong(&longval);
 		if (longval < 0)
 			longval = 0;
@@ -255,16 +267,22 @@ void DataEntryTable::SetValue(int row, int col, const wxString& value)
 		else if (columns_[col].size == 2)
 		{
 			uint16_t val = longval;
+			if (be)
+				val = wxUINT16_SWAP_ON_LE(val);
 			data_.write(&val, 2);
 		}
 		else if (columns_[col].size == 4)
 		{
 			uint32_t val = longval;
+			if (be)
+				val = wxUINT32_SWAP_ON_LE(val);
 			data_.write(&val, 4);
 		}
 		else if (columns_[col].size == 8)
 		{
 			uint64_t val = longval;
+			if (be)
+				val = wxUINT64_SWAP_ON_LE(val);
 			data_.write(&val, 8);
 		}
 	}
@@ -449,6 +467,7 @@ bool DataEntryTable::setupDataStructure(ArchiveEntry* entry)
 	row_stride_ = 0;
 	data_start_ = 0;
 	data_stop_  = 0;
+	data_tail_  = 0;
 	row_first_  = 0;
 	row_prefix_ = "";
 
@@ -839,6 +858,66 @@ bool DataEntryTable::setupDataStructure(ArchiveEntry* entry)
 		row_stride = 32;
 		data_start = 6308;
 		*/
+	}
+
+	// Doom 64 WESS sound bank (WMD) tables. Names follow the engine's patch structures;
+	// the Doom 64 Tech Bible calls patches "presets" and patch maps "instruments".
+	// PATCHES: each patch plays a range of the patch maps
+	else if (type == "wmd_patches")
+	{
+		columns_.emplace_back("Patch Map Count", ColType::IntUnsigned, 1, 0);
+		columns_.emplace_back("Padding", ColType::IntUnsigned, 1, 1);
+		columns_.emplace_back("First Patch Map", ColType::IntBEUnsigned, 2, 2);
+		row_stride_ = 4;
+		data_tail_  = 4;
+	}
+
+	// SUBPATCHES (patch maps): which sample is played, for which notes, and how
+	else if (type == "wmd_subpatches")
+	{
+		columns_.emplace_back("Priority", ColType::IntUnsigned, 1, 0);
+		columns_.emplace_back("Volume", ColType::IntUnsigned, 1, 1);
+		columns_.emplace_back("Pan (64 = centre)", ColType::IntUnsigned, 1, 2);
+		columns_.emplace_back("Reverb", ColType::IntUnsigned, 1, 3);
+		columns_.emplace_back("Root Key", ColType::IntUnsigned, 1, 4);
+		columns_.emplace_back("Fine Tune", ColType::IntUnsigned, 1, 5);
+		columns_.emplace_back("Note Min", ColType::IntUnsigned, 1, 6);
+		columns_.emplace_back("Note Max", ColType::IntUnsigned, 1, 7);
+		columns_.emplace_back("Pitch Bend Down (semitones)", ColType::IntUnsigned, 1, 8);
+		columns_.emplace_back("Pitch Bend Up (semitones)", ColType::IntUnsigned, 1, 9);
+		columns_.emplace_back("Sample", ColType::IntBEUnsigned, 2, 10);
+		columns_.emplace_back("Attack Time (ms)", ColType::IntBEUnsigned, 2, 12);
+		columns_.emplace_back("Decay Time (ms)", ColType::IntBEUnsigned, 2, 14);
+		columns_.emplace_back("Release Time (ms)", ColType::IntBEUnsigned, 2, 16);
+		columns_.emplace_back("Attack Level", ColType::IntUnsigned, 1, 18);
+		columns_.emplace_back("Decay Level", ColType::IntUnsigned, 1, 19);
+		row_stride_ = 20;
+		data_tail_  = 4;
+	}
+
+	// WAVTABLE: where each sample is in the WDD, and how it is played back
+	else if (type == "wmd_wavtable")
+	{
+		columns_.emplace_back("Start Offset", ColType::IntBEUnsigned, 4, 0);
+		columns_.emplace_back("Size", ColType::IntBEUnsigned, 4, 4);
+		columns_.emplace_back("Padding", ColType::IntBEUnsigned, 4, 8);
+		columns_.emplace_back("Default Pitch (cents)", ColType::IntBESigned, 4, 12);
+		columns_.emplace_back("Loop ID (-1 = none)", ColType::IntBESigned, 4, 16);
+		columns_.emplace_back("Padding 2", ColType::IntBEUnsigned, 4, 20);
+		row_stride_ = 24;
+	}
+
+	// LOOPS: loop points of the samples (after an 8 byte header)
+	else if (type == "wmd_loops")
+	{
+		columns_.emplace_back("Loop Start", ColType::IntBEUnsigned, 4, 0);
+		columns_.emplace_back("Loop End", ColType::IntBEUnsigned, 4, 4);
+		columns_.emplace_back("Loop Count (-1 = forever)", ColType::IntBESigned, 4, 8);
+		for (unsigned i = 0; i < 16; i++)
+			columns_.emplace_back(wxString::Format("ADPCM State %u", i), ColType::IntBESigned, 2, 12 + i * 2);
+		columns_.emplace_back("Padding", ColType::IntBEUnsigned, 4, 44);
+		row_stride_ = 48;
+		data_start_ = 8;
 	}
 
 	if (columns_.empty())

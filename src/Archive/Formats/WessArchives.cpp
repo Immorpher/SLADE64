@@ -137,8 +137,15 @@ bool WmdArchive::open(MemChunk& mc)
 	ArchiveModSignalBlocker sig_blocker{ *this };
 
 	const vector<uint8_t>* sections[] = { &wmd.header, &wmd.patches, &wmd.subpatches, &wmd.wavtable, &wmd.loops, &wmd.predictors };
+	// PATCHES, SUBPATCHES, WAVTABLE and LOOPS are shown as editable tables
+	static const char* table_types[] = { nullptr, "wmd_patches", "wmd_subpatches", "wmd_wavtable", "wmd_loops", nullptr };
 	for (unsigned a = 0; a < 6; a++)
+	{
 		addLoadedEntry(wmd_entry_names[a], *sections[a]);
+		if (table_types[a])
+			if (auto type = EntryType::fromId(table_types[a]))
+				entryAt(a)->setType(type);
+	}
 	tail_ = wmd.tail;
 
 	sig_blocker.unblock();
@@ -169,6 +176,13 @@ bool WmdArchive::write(MemChunk& mc, bool update)
 	wmd.loops      = data[4];
 	wmd.predictors = data[5];
 	wmd.tail       = tail_;
+
+	string err;
+	if (!wess::validateWmd(wmd, err))
+	{
+		global::error = err;
+		return false;
+	}
 
 	const auto out = wess::buildWmd(wmd);
 	mc.clear();
