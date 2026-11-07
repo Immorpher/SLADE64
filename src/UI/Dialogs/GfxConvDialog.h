@@ -97,6 +97,7 @@ private:
 	ConvFormat         current_format_;
 
 	wxStaticText*   label_current_format_     = nullptr;
+	wxStaticText*   label_problem_            = nullptr;
 	GfxCanvas*      gfx_current_              = nullptr;
 	GfxCanvas*      gfx_target_               = nullptr;
 	wxButton*       btn_convert_              = nullptr;
@@ -121,6 +122,7 @@ private:
 
 	bool nextItem();
 	void updateButtons() const;
+	string currentProblem() const;
 
 	// Static
 	static wxString current_palette_name_;

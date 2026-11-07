@@ -152,8 +152,16 @@ public:
 
 	Writable canWrite(SImage& image) override
 	{
+		return unwritableReason(image).empty() ? Writable::Convert : Writable::No;
+	}
+
+	bool listWhenUnwritable() const override { return true; }
+
+	// Explains why [image] doesn't fit this format (empty if it does), recommending a size where possible
+	string unwritableReason(SImage& image) override
+	{
 		if (!image.isValid())
-			return Writable::No;
+			return "There is no valid image to convert.";
 
 		const int w = image.width();
 		const int h = image.height();
@@ -165,29 +173,62 @@ public:
 		{
 			// Textures store their size as powers of 2
 			unsigned shift;
-			if (!n64gfx::detail::shiftOf(w, shift) || !n64gfx::detail::shiftOf(h, shift))
-				return Writable::No;
+			const bool wok = n64gfx::detail::shiftOf(w, shift);
+			const bool hok = n64gfx::detail::shiftOf(h, shift);
+			if (!wok || !hok)
+			{
+				return fmt::format(
+					"Doom 64 textures need a width and height that are powers of 2 (4, 8, 16, ... 1024). "
+					"This image is {}x{}. Resize it to {}x{} (or another power of 2) and try again.",
+					w,
+					h,
+					nearestPow2(w),
+					nearestPow2(h));
+			}
 
 			// Palette animation needs an indexed source (that's where the palette rows are)
 			if (variant_ == Variant::TextureAnim && !usesOnlyFirstRow(image))
-				return Writable::No;
+				return "Texture animation needs a paletted image whose visible pixels only use palette "
+					   "indices 0-15 (the first palette row).";
 			break;
 		}
 		case Variant::Sprite16:
+		{
+			// Sprites can be any size (rows are padded internally), within limits
+			const int maxw = std::min(4095, 0xFFFF * 2 / std::max(h, 1) / 16 * 16);
 			if (w > 4095 || h > 4095 || n64gfx::detail::pad16(w) / 2 * h > 0xFFFF)
-				return Writable::No;
+				return fmt::format(
+					"This image is {}x{}, which is too large for a 16 colour sprite (maximum 4095x4095, and "
+					"the padded pixel data must fit in 64 KB). Resize it to {}x{} or smaller.",
+					w,
+					h,
+					std::min(w, std::max(maxw, 16)),
+					std::min(h, 4095));
 			break;
+		}
 		case Variant::Sprite256:
 			if (w > 2048 || h > 4095)
-				return Writable::No;
+				return fmt::format(
+					"This image is {}x{}, which is too large for a 256 colour sprite (maximum 2048x4095). "
+					"Resize it to {}x{} or smaller.",
+					w,
+					h,
+					std::min(w, 2048),
+					std::min(h, 4095));
 			break;
 		case Variant::Graphic256:
 			if (w > 2048 || h > 2048)
-				return Writable::No;
+				return fmt::format(
+					"This image is {}x{}, which is too large for a 256 colour graphic (maximum 2048x2048). "
+					"Resize it to {}x{} or smaller.",
+					w,
+					h,
+					std::min(w, 2048),
+					std::min(h, 2048));
 			break;
 		}
 
-		return Writable::Convert;
+		return {};
 	}
 
 	bool canWriteType(SImage::Type type) override { return type == SImage::Type::PalMask; }
@@ -314,6 +355,16 @@ private:
 		}
 		src.indexed = true;
 		return true;
+	}
+
+	// Nearest power of 2 in the texture range (4..1024)
+	static int nearestPow2(int n)
+	{
+		int best = 4;
+		for (int p = 4; p <= 1024; p *= 2)
+			if (std::abs(p - n) < std::abs(best - n))
+				best = p;
+		return best;
 	}
 
 	// True if the indexed image only uses palette indices 0-15

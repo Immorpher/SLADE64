@@ -72,6 +72,14 @@ public:
 	};
 	virtual Writable canWrite(SImage& image) { return Writable::No; }
 	virtual bool     canWriteType(SImage::Type type) { return false; }
+
+	// Whether the conversion dialog should always list this format, even when canWrite returns No
+	// (the reason is then shown to the user instead of hiding the format)
+	virtual bool listWhenUnwritable() const { return false; }
+
+	// If [image] doesn't fit this format, returns a user-facing explanation (with a resize
+	// recommendation where applicable). Empty if the image fits.
+	virtual string unwritableReason(SImage& image) { return {}; }
 	virtual bool     convertWritable(SImage& image, ConvertOptions opt) { return false; }
 	virtual bool     writeOffset(SImage& image, ArchiveEntry* entry, Vec2i offset) { return false; }
 

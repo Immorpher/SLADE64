@@ -135,7 +135,7 @@ bool GfxConvDialog::nextItem()
 	for (auto& format : all_formats)
 	{
 		// Check if the image can be written to this format
-		if (format->canWrite(items_[current_item_].image) != SIFormat::Writable::No)
+		if (format->canWrite(items_[current_item_].image) != SIFormat::Writable::No || format->listWhenUnwritable())
 		{
 			// Add conversion formats depending on what colour types this image format can handle
 			if (format->canWriteType(SImage::Type::PalMask))
@@ -224,6 +224,18 @@ bool GfxConvDialog::nextItem()
 }
 
 // -----------------------------------------------------------------------------
+// Returns an explanation of why the current item doesn't fit the selected target
+// format (empty if it does)
+// -----------------------------------------------------------------------------
+string GfxConvDialog::currentProblem() const
+{
+	if (items_.size() <= current_item_ || !current_format_.format)
+		return {};
+
+	return current_format_.format->unwritableReason(const_cast<SImage&>(items_[current_item_].image));
+}
+
+// -----------------------------------------------------------------------------
 // Updates the convert/skip buttons depending on the number of items
 // -----------------------------------------------------------------------------
 void GfxConvDialog::updateButtons() const
@@ -268,6 +280,11 @@ void GfxConvDialog::setupLayout()
 	hbox->Add(new wxStaticText(this, -1, "Convert to:"), 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, px_pad);
 	combo_target_format_ = new wxChoice(this, -1);
 	hbox->Add(combo_target_format_, 1, wxEXPAND);
+
+	// Message shown when the image doesn't fit the selected format
+	label_problem_ = new wxStaticText(this, -1, "");
+	label_problem_->SetForegroundColour(wxColour(200, 0, 0));
+	m_vbox->Add(label_problem_, 0, wxEXPAND | wxBOTTOM, px_outer);
 
 
 	// Add Gfx previews
@@ -475,8 +492,16 @@ void GfxConvDialog::updatePreviewGfx()
 	SIFormat::ConvertOptions opt;
 	convertOptions(opt);
 
-	// Do conversion
-	current_format_.format->convertWritable(gfx_target_->image(), opt);
+	// Do conversion (unless the image doesn't fit the chosen format)
+	const auto problem = currentProblem();
+	if (problem.empty())
+		current_format_.format->convertWritable(gfx_target_->image(), opt);
+	btn_convert_->Enable(problem.empty());
+	label_problem_->SetLabel(problem.empty() ? wxString() : wxString::FromUTF8(problem));
+	label_problem_->Show(!problem.empty());
+	if (!problem.empty())
+		label_problem_->Wrap(GetClientSize().GetWidth() - ui::padLarge() * 2);
+	Layout();
 
 
 	// Refresh
@@ -643,6 +668,9 @@ void GfxConvDialog::onResize(wxSizeEvent& e)
 // -----------------------------------------------------------------------------
 void GfxConvDialog::onBtnConvert(wxCommandEvent& e)
 {
+	if (!currentProblem().empty())
+		return;
+
 	applyConversion();
 	nextItem();
 }
@@ -655,16 +683,38 @@ void GfxConvDialog::onBtnConvertAll(wxCommandEvent& e)
 	// Show splash window
 	ui::showSplash("Converting Gfx...", true);
 
-	// Convert all images
+	// Convert all images (skipping any that don't fit the target format)
+	wxString skipped;
+	int      num_skipped = 0;
 	for (size_t a = current_item_; a < items_.size(); a++)
 	{
-		applyConversion();
+		const auto problem = currentProblem();
+		if (problem.empty())
+			applyConversion();
+		else
+		{
+			const auto& item = items_[current_item_];
+			const auto  name = item.entry ? item.entry->name() : (item.texture ? item.texture->name() : string{ "?" });
+			if (++num_skipped <= 10)
+				skipped += wxString::FromUTF8(fmt::format("\n- {}: {}", name, problem));
+		}
 		if (!nextItem())
 			break;
 	}
 
 	// Hide splash window
 	ui::hideSplash();
+
+	if (num_skipped > 0)
+	{
+		if (num_skipped > 10)
+			skipped += wxString::Format("\n... and %d more", num_skipped - 10);
+		wxMessageBox(
+			wxString::Format("%d image(s) did not fit the selected format and were not converted:\n%s", num_skipped, skipped),
+			"Graphic Conversion",
+			wxOK | wxICON_WARNING,
+			this);
+	}
 }
 
 // -----------------------------------------------------------------------------
