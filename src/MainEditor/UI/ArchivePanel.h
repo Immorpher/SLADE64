@@ -76,6 +76,7 @@ public:
 	bool dSndWavConvert() const;
 	bool musMidiConvert() const;
 	bool wessSeqConvert(bool to_wess) const;
+	bool wessAddFullLoop() const;
 	bool optimizePNG() const;
 	bool compileACS(bool hexen = false) const;
 	bool convertTextures() const;

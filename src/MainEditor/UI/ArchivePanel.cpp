@@ -36,6 +36,7 @@
 #include "App.h"
 #include "Archive/ArchiveManager.h"
 #include "Archive/Formats/WessArchives.h"
+#include "Archive/Formats/WessSeq.h"
 #include "Archive/Formats/ZipArchive.h"
 #include "ArchiveManagerPanel.h"
 #include "EntryPanel/ANSIEntryPanel.h"
@@ -2764,6 +2765,75 @@ bool ArchivePanel::wessSeqConvert(bool to_wess) const
 }
 
 // -----------------------------------------------------------------------------
+// Makes any selected MIDI / WESS sequence entries loop completely: existing loop
+// markers are removed, 'loopStart' is added before the first note and 'loopEnd'
+// at the end of every track, just before the end of track event
+// -----------------------------------------------------------------------------
+bool ArchivePanel::wessAddFullLoop() const
+{
+	// Get selected entries
+	auto selection = entry_tree_->selectedEntries();
+
+	undo_manager_->beginRecord("Add Full Loop");
+
+	unsigned looped = 0;
+	string   problems;
+	for (auto& entry : selection)
+	{
+		const bool wess = wessaudio::isSequence(entry);
+		if (!wess && entry->type()->formatId() != "midi_smf")
+			continue;
+
+		// Get a standard MIDI file out of the entry
+		MemChunk midi;
+		if (wess)
+		{
+			if (!wessaudio::toMidi(entry, midi))
+			{
+				problems += fmt::format("{}: {}\n", entry->name(), global::error);
+				continue;
+			}
+		}
+		else
+			midi.importMem(entry->rawData(), entry->size());
+
+		// Add the loop
+		wess::Bytes looped_midi;
+		string      err;
+		if (!wess::addFullLoop(midi.data(), midi.size(), looped_midi, err))
+		{
+			problems += fmt::format("{}: {}\n", entry->name(), err);
+			continue;
+		}
+		MemChunk result(looped_midi.data(), looped_midi.size());
+
+		undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry)); // Create undo step
+		if (wess)
+		{
+			if (!wessaudio::fromMidi(entry, result))
+			{
+				problems += fmt::format("{}: {}\n", entry->name(), global::error);
+				continue;
+			}
+			entry->setType(EntryType::fromId("midi_wess"));
+		}
+		else
+			entry->importMemChunk(result);
+		looped++;
+	}
+
+	undo_manager_->endRecord(true);
+
+	if (!problems.empty())
+		wxMessageBox(
+			wxString::Format("%u entries were looped. These couldn't be:\n\n%s", looped, problems),
+			"Add Full Loop",
+			wxICON_WARNING);
+
+	return true;
+}
+
+// -----------------------------------------------------------------------------
 // Compiles any selected text entries as ACS scripts
 // -----------------------------------------------------------------------------
 bool ArchivePanel::compileACS(bool hexen) const
@@ -3455,6 +3525,8 @@ bool ArchivePanel::handleAction(string_view id)
 		wessSeqConvert(true);
 	else if (id == "arch_audio_wessmidi")
 		wessSeqConvert(false);
+	else if (id == "arch_audio_fullloop")
+		wessAddFullLoop();
 	else if (id == "arch_voxel_convertvox")
 		voxelConvert();
 	else if (id == "arch_scripts_compileacs")
@@ -3705,6 +3777,7 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 	bool mus_selected        = false;
 	bool midi_selected       = false; // MIDI-like entry that can become a WESS sequence
 	bool wessseq_selected    = false; // Doom 64 WESS sequence
+	bool loopable_selected   = false; // Standard MIDI or WESS sequence that can get a full loop
 	bool text_selected       = false;
 	bool unknown_selected    = false;
 	bool texturex_selected   = false;
@@ -3771,6 +3844,11 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 		{
 			if (wessaudio::isSequence(entry))
 				wessseq_selected = true;
+		}
+		if (!loopable_selected)
+		{
+			if (entry->type()->formatId() == "midi_smf" || wessaudio::isSequence(entry))
+				loopable_selected = true;
 		}
 		if (!text_selected)
 		{
@@ -3962,7 +4040,7 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 	}
 
 	// Add Audio related menu items if needed
-	if (wav_selected || dsnd_selected || mus_selected || midi_selected || wessseq_selected)
+	if (wav_selected || dsnd_selected || mus_selected || midi_selected || wessseq_selected || loopable_selected)
 	{
 		wxMenu* audio;
 		if (context_submenus)
@@ -3985,6 +4063,8 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 			SAction::fromId("arch_audio_convertwess")->addToMenu(audio, true);
 		if (wessseq_selected)
 			SAction::fromId("arch_audio_wessmidi")->addToMenu(audio, true);
+		if (loopable_selected)
+			SAction::fromId("arch_audio_fullloop")->addToMenu(audio, true);
 	}
 
 	// Add script related menu items if needed

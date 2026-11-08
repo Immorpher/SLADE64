@@ -28,6 +28,7 @@
 #include "WessData.h"
 #include <algorithm>
 #include <cmath>
+#include <cctype>
 #include <map>
 
 namespace slade::wess
@@ -770,6 +771,208 @@ inline bool midiToSeq(const uint8_t* midi, size_t size, Bytes& seq, std::string&
 	}
 
 	seq = buildSeq(out, trailing);
+	return true;
+}
+// -----------------------------------------------------------------------------
+// Full loop
+//
+// Rewrites a Standard MIDI file so every track that has channel events loops
+// completely: any existing loopStart/loopEnd markers are removed, then a
+// "loopStart" marker is put at tick 0 (after the initial setup events, before the
+// first note) and a "loopEnd" marker at the very end, right before the end of
+// track event. All tracks end on the same tick, so they can't drift apart.
+// Events keep their absolute ticks, so nothing gets out of sync.
+// -----------------------------------------------------------------------------
+namespace seqdetail
+{
+	struct RawEv
+	{
+		uint32_t tick = 0;
+		Bytes    raw;           // the event without its delta time
+		bool     note    = false; // note on/off
+		bool     channel = false; // any channel message
+		bool     eot     = false; // end of track
+		bool     loop    = false; // loopStart/loopEnd marker
+	};
+} // namespace seqdetail
+
+inline bool addFullLoop(const uint8_t* midi, size_t size, Bytes& out, std::string& err)
+{
+	using namespace seqdetail;
+	using namespace detail;
+
+	if (size < 14 || std::memcmp(midi, "MThd", 4) != 0)
+	{
+		err = "Not a MIDI file";
+		return false;
+	}
+
+	const size_t hlen = be32(midi + 4);
+	size_t       p    = 8 + hlen;
+	if (p > size)
+	{
+		err = "The MIDI file is truncated";
+		return false;
+	}
+
+	struct Trk
+	{
+		std::vector<RawEv> ev;
+		uint32_t           end         = 0;
+		bool               has_channel = false;
+	};
+	std::vector<Trk> tracks;
+
+	while (p + 8 <= size)
+	{
+		const size_t len = be32(midi + p + 4);
+		if (std::memcmp(midi + p, "MTrk", 4) != 0)
+		{
+			p += 8 + len;
+			continue;
+		}
+		const size_t end = std::min(size, p + 8 + len);
+		size_t       q   = p + 8;
+
+		Trk      tr;
+		uint32_t tick   = 0;
+		uint8_t  status = 0;
+		while (q < end)
+		{
+			uint32_t delta;
+			if (!getVlq(midi, end, q, delta) || q >= end)
+				break;
+			tick += delta;
+
+			RawEv ev;
+			ev.tick = tick;
+			if (midi[q] == 0xFF)
+			{
+				if (q + 2 > end)
+					break;
+				const uint8_t type = midi[q + 1];
+				size_t        r    = q + 2;
+				uint32_t      mlen;
+				if (!getVlq(midi, end, r, mlen) || r + mlen > end)
+					break;
+				ev.raw.assign(midi + q, midi + r + mlen);
+				if (type == 0x2F)
+					ev.eot = true;
+				else if (type == 0x06 || type == 0x01)
+				{
+					const std::string text(reinterpret_cast<const char*>(midi + r), mlen);
+					if (type == 0x06 && (markerNumber(text, "loopStart") >= 0 || markerNumber(text, "loopEnd") >= 0))
+						ev.loop = true;
+				}
+				q = r + mlen;
+				status = 0;
+			}
+			else if (midi[q] == 0xF0 || midi[q] == 0xF7)
+			{
+				size_t   r = q + 1;
+				uint32_t slen;
+				if (!getVlq(midi, end, r, slen) || r + slen > end)
+					break;
+				ev.raw.assign(midi + q, midi + r + slen);
+				q      = r + slen;
+				status = 0;
+			}
+			else
+			{
+				if (midi[q] & 0x80)
+					status = midi[q++];
+				else if (!status)
+					break;
+				const uint8_t hi = status & 0xF0;
+				const int     n  = (hi == 0xC0 || hi == 0xD0) ? 1 : 2;
+				if (q + n > end)
+					break;
+				ev.raw.push_back(status);
+				ev.raw.insert(ev.raw.end(), midi + q, midi + q + n);
+				ev.channel = true;
+				ev.note    = hi == 0x80 || hi == 0x90;
+				q += n;
+			}
+
+			tr.end = std::max(tr.end, tick);
+			if (ev.channel)
+				tr.has_channel = true;
+			if (!ev.eot && !ev.loop)
+				tr.ev.push_back(std::move(ev));
+			else if (ev.eot)
+			{
+				tr.end = std::max(tr.end, tick);
+				break; // nothing follows the end of track
+			}
+		}
+		tracks.push_back(std::move(tr));
+		p = end;
+	}
+
+	if (tracks.empty())
+	{
+		err = "The MIDI file has no tracks";
+		return false;
+	}
+
+	// All tracks that will loop end on the same tick
+	uint32_t loop_end = 0;
+	bool     any      = false;
+	for (auto& t : tracks)
+		loop_end = std::max(loop_end, t.end);
+	for (auto& t : tracks)
+		any = any || t.has_channel;
+	if (!any)
+	{
+		err = "The MIDI file has no notes or channel events";
+		return false;
+	}
+
+	auto text_event = [](uint32_t tick, const char* text) {
+		RawEv e;
+		e.tick = tick;
+		e.raw  = { 0xFF, 0x06, static_cast<uint8_t>(std::strlen(text)) };
+		e.raw.insert(e.raw.end(), text, text + std::strlen(text));
+		return e;
+	};
+
+	// Write the file back
+	out.clear();
+	out.insert(out.end(), midi, midi + 8 + hlen);
+	// Fix the track count (tracks that aren't MTrk chunks are dropped)
+	out[10] = static_cast<uint8_t>(tracks.size() >> 8);
+	out[11] = static_cast<uint8_t>(tracks.size());
+
+	for (auto& t : tracks)
+	{
+		if (t.has_channel)
+		{
+			// loopStart: tick 0, after the setup events and before the first note
+			size_t at = 0;
+			while (at < t.ev.size() && t.ev[at].tick == 0 && !t.ev[at].note)
+				at++;
+			t.ev.insert(t.ev.begin() + at, text_event(0, "loopStart"));
+			t.ev.push_back(text_event(loop_end, "loopEnd"));
+		}
+
+		Bytes body;
+		uint32_t last = 0;
+		for (auto& e : t.ev)
+		{
+			putVlq(body, e.tick - last);
+			last = e.tick;
+			body.insert(body.end(), e.raw.begin(), e.raw.end());
+		}
+		const uint32_t eot_tick = t.has_channel ? loop_end : std::max(last, t.end);
+		putVlq(body, eot_tick - last);
+		body.push_back(0xFF);
+		body.push_back(0x2F);
+		body.push_back(0x00);
+
+		out.insert(out.end(), { 'M', 'T', 'r', 'k' });
+		put32be(out, static_cast<uint32_t>(body.size()));
+		out.insert(out.end(), body.begin(), body.end());
+	}
 	return true;
 }
 } // namespace slade::wess
