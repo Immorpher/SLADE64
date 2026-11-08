@@ -181,6 +181,7 @@ public:
 	EntryDataUS(ArchiveEntry* entry) : path_{ entry->path() }, index_{ entry->index() }, archive_{ entry->parent() }
 	{
 		data_.importMem(entry->rawData(), entry->size());
+		type_ = entry->type();
 	}
 
 	bool swapData();
@@ -189,6 +190,7 @@ public:
 
 private:
 	MemChunk data_;
+	EntryType* type_ = nullptr; // Type that goes with the stored data
 	wxString path_;
 	int      index_   = -1;
 	Archive* archive_ = nullptr;

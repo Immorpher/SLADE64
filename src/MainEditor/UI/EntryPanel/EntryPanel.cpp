@@ -266,10 +266,13 @@ bool EntryPanel::revertEntry(bool confirm)
 				undo_manager_->recordUndoStep(std::make_unique<EntryDataUS>(entry.get()));
 			}
 
-			auto state = entry->state();
+			auto  state    = entry->state();
+			auto* old_type = entry->type();
 			entry->importMemChunk(entry_data_);
 			entry->setState(state);
 			EntryType::detectEntryType(*entry);
+			if (entry->type() == EntryType::unknownType() && old_type)
+				entry->setType(old_type); // Types that can't be detected (WESS) are kept
 			loadEntry(entry.get());
 
 			if (undo_manager_)

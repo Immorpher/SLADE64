@@ -1067,7 +1067,11 @@ bool DataEntryPanel::writeEntry(ArchiveEntry& entry)
 			return false;
 	}
 
+	// importMemChunk resets the entry type, WESS tables can't be detected again
+	auto* entry_type = entry.type();
 	entry.importMemChunk(table_data_->data());
+	if (entry_type)
+		entry.setType(entry_type);
 
 	return true;
 }

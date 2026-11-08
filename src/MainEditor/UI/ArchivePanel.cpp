@@ -4427,6 +4427,8 @@ bool EntryDataUS::swapData()
 		temp_data.importMem(entry->rawData(), entry->size());
 		// log::info(1, "Backup current data, size %d", entry->getSize());
 
+		auto* current_type = entry->type();
+
 		// Restore entry data
 		if (data_.size() == 0)
 		{
@@ -4438,6 +4440,12 @@ bool EntryDataUS::swapData()
 			entry->importMemChunk(data_);
 			// log::info(1, "Restored entry data, size %d", data.getSize());
 		}
+
+		// importMem resets the type to unknown, so put back the type that goes with the restored data
+		// (and keep the other one for redo/undo). Types that can't be detected, like WESS ones, are lost otherwise.
+		if (type_)
+			entry->setType(type_);
+		type_ = current_type;
 
 		// Store previous entry data
 		if (temp_data.size() > 0)

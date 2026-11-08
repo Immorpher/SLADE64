@@ -67,6 +67,17 @@ bool entryBook(ArchiveEntry* entry, wess::Book& book)
 		bytes.push_back(static_cast<uint8_t>(std::stoi(hex.substr(i, 2), nullptr, 16)));
 	return wess::Book::fromBytes(bytes.data(), bytes.size(), book);
 }
+
+// ArchiveEntry::importMem resets the entry type to unknown, WESS entries must keep theirs
+bool importKeepType(ArchiveEntry* entry, const uint8_t* data, uint32_t size)
+{
+	auto* type = entry->type();
+	if (!entry->importMem(data, size))
+		return false;
+	if (type)
+		entry->setType(type);
+	return true;
+}
 } // namespace
 
 
@@ -569,7 +580,7 @@ bool wessaudio::fromWav(ArchiveEntry* entry, MemChunk& wav)
 
 	if (adpcm.size() & 1)
 		adpcm.push_back(0); // Samples are an even number of bytes
-	if (!entry->importMem(adpcm.data(), static_cast<uint32_t>(adpcm.size())))
+	if (!importKeepType(entry, adpcm.data(), static_cast<uint32_t>(adpcm.size())))
 		return false;
 
 	static const char* digits = "0123456789ABCDEF";
@@ -598,7 +609,7 @@ bool wessaudio::importFile(ArchiveEntry* entry, string_view filename)
 	if (mc.size() >= 12 && std::memcmp(mc.data(), "RIFF", 4) == 0 && std::memcmp(mc.data() + 8, "WAVE", 4) == 0)
 		return fromWav(entry, mc);
 
-	return entry->importMem(mc.data(), mc.size());
+	return importKeepType(entry, mc.data(), mc.size());
 }
 
 bool wessaudio::isSequence(const ArchiveEntry* entry)
@@ -631,7 +642,7 @@ bool wessaudio::fromMidi(ArchiveEntry* entry, MemChunk& midi)
 		return false;
 	}
 
-	return entry->importMem(seq.data(), static_cast<uint32_t>(seq.size()));
+	return importKeepType(entry, seq.data(), static_cast<uint32_t>(seq.size()));
 }
 
 bool wessaudio::isConvertible(const ArchiveEntry* entry)
