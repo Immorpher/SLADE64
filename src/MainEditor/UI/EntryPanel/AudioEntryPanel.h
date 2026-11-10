@@ -7,7 +7,6 @@ namespace slade::audio
 {
 class Music;
 class ModMusic;
-class Mp3Music;
 } // namespace slade::audio
 namespace sf
 {
@@ -37,7 +36,6 @@ private:
 		Music,
 		MIDI,
 		Mod,
-		Mp3,
 		Emu,
 		OPL,
 	};
@@ -66,13 +64,11 @@ private:
 	unique_ptr<sf::Sound>       sound_;
 	unique_ptr<audio::Music>    music_;
 	unique_ptr<audio::ModMusic> mod_;
-	unique_ptr<audio::Mp3Music> mp3_;
 
 	bool open(ArchiveEntry* entry);
 	bool openAudio(MemChunk& audio, const wxString& filename);
 	bool openMidi(MemChunk& data, const wxString& filename);
 	bool openMod(MemChunk& data);
-	bool openMp3(MemChunk& data);
 	bool updateInfo(ArchiveEntry& entry) const;
 	void startStream();
 	void stopStream() const;

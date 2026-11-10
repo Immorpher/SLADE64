@@ -7,7 +7,6 @@
 * FreeImage
 * ftgl, an OpenGL font managing library
 * GTK 2.x/3.x
-* mpg123 library
 * OpenGL
 * SFML
 * wxWidgets 3.x
@@ -31,7 +30,6 @@ SLADE can be built on Windows using [Visual Studio](https://visualstudio.microso
 
 * freeimage
 * lua
-* mpg123
 * opengl
 * sfml
 * wxwidgets

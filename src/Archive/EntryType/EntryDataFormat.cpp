@@ -316,7 +316,6 @@ void EntryDataFormat::initBuiltinFormats()
 	registerDataFormat<OggDataFormat>();
 	registerDataFormat<FLACDataFormat>();
 	registerDataFormat<MP2DataFormat>();
-	registerDataFormat<MP3DataFormat>();
 	registerDataFormat<TextureXDataFormat>();
 	registerDataFormat<PNamesDataFormat>();
 	registerDataFormat<ACS0DataFormat>();

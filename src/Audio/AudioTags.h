@@ -2,7 +2,6 @@
 
 namespace slade::audio
 {
-wxString getID3Tag(MemChunk& mc);
 wxString getOggComments(MemChunk& mc);
 wxString getFlacComments(MemChunk& mc);
 wxString getITComments(MemChunk& mc);

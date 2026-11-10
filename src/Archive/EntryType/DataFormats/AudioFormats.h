@@ -534,7 +534,6 @@ public:
 #define WAVE_FMT_ADPCM 0x0002
 #define WAVE_FMT_ALAW 0x0006
 #define WAVE_FMT_MULAW 0x0007
-#define WAVE_FMT_MP3 0x0055
 #define WAVE_FMT_XTNSBL 0xFFFE
 
 int RiffWavFormat(MemChunk& mc)
@@ -589,7 +588,7 @@ public:
 	int isThisFormat(MemChunk& mc) override
 	{
 		int fmt = RiffWavFormat(mc);
-		if (fmt == WAVE_FMT_UNK || fmt == WAVE_FMT_MP3)
+		if (fmt == WAVE_FMT_UNK)
 			return MATCH_FALSE;
 		if (fmt <= WAVE_FMT_MULAW || fmt == WAVE_FMT_XTNSBL)
 			return MATCH_TRUE;
@@ -683,26 +682,6 @@ public:
 	}
 
 	int isThisFormat(MemChunk& mc) override { return validMPEG(mc, 2, audio::checkForTags(mc)); }
-};
-
-class MP3DataFormat : public EntryDataFormat
-{
-public:
-	MP3DataFormat() : EntryDataFormat("snd_mp3") {}
-	~MP3DataFormat() = default;
-
-	int isThisFormat(MemChunk& mc) override
-	{
-		// MP3 data might be contained in RIFF-WAV files.
-		// Officially, they are legit .WAV files, just using MP3 instead of PCM.
-		// In practice, a simple PCM WAV player will abort, while MP3 players will
-		// usually work; so it's probably better to identify them as MP3.
-		int rwfmt = RiffWavFormat(mc);
-		if (rwfmt == WAVE_FMT_MP3)
-			return MATCH_TRUE;
-
-		return MP2DataFormat::validMPEG(mc, 3, audio::checkForTags(mc));
-	}
 };
 
 class VocDataFormat : public EntryDataFormat

@@ -101,14 +101,12 @@ find_package(OpenGL REQUIRED)
 if (NOT NO_LUA)
 	find_package(Lua REQUIRED)
 endif()
-find_package(MPG123 REQUIRED)
 include_directories(
 	${FREEIMAGE_INCLUDE_DIR}
 	${SFML_INCLUDE_DIR}
 	${FREETYPE_INCLUDE_DIRS}
 	${FTGL_INCLUDE_DIR}
 	${LUA_INCLUDE_DIR}
-	${MPG123_INCLUDE_DIR}
 	.
 	..
 	../thirdparty/glad/include
@@ -194,7 +192,6 @@ target_link_libraries(slade
 	${FTGL_LIBRARIES}
 	${OPENGL_LIBRARIES}
 	${LUA_LIBRARIES}
-	${MPG123_LIBRARIES}
 )
 
 if(LINUX)

@@ -858,9 +858,6 @@
     <ClCompile Include="..\src\Archive\ArchiveDir.cpp">
       <Filter>Archive</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Audio\Mp3Music.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\General\Console.cpp">
       <Filter>General</Filter>
     </ClCompile>
@@ -1812,9 +1809,6 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\MapReplaceDialog.h">
       <Filter>UI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Audio\Mp3Music.h">
-      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\ModifyOffsetsDialog.h">
       <Filter>UI\Dialogs</Filter>
