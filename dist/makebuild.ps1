@@ -5,7 +5,7 @@ $rev_short = Invoke-Expression "git.exe rev-parse --short HEAD"
 $7zpath = "$env:ProgramFiles\7-Zip\7z.exe"
 if (-not (Test-Path $7zpath))
 {
-	Write-Host "7-zip is required to make slade.pk3 and the release binaries archive" -foregroundcolor red
+	Write-Host "7-zip is required to make slade64.pk3 and the release binaries archive" -foregroundcolor red
 }
 
 # Prompt to use git revision
@@ -17,11 +17,11 @@ if ($userev.ToLower() -eq "y")
 	$version = "${version}_$rev_short"
 }
 
-# Prompt to build SLADE
-Write-Host "`nRebuild SLADE? (y/n) " -foregroundcolor cyan -nonewline
+# Prompt to build SLADE64
+Write-Host "`nRebuild SLADE64? (y/n) " -foregroundcolor cyan -nonewline
 $buildbinaries = Read-Host
 
-# Build SLADE
+# Build SLADE64
 if ($buildbinaries.ToLower() -eq "y")
 {
 	# Find devenv path (community or professional)
@@ -43,14 +43,14 @@ if ($buildbinaries.ToLower() -eq "y")
 		$build64 = Read-Host
 		if ($build64.ToLower() -eq "y")
 		{
-			& $devenvpath (resolve-path ..\msvc\SLADE.sln).Path /rebuild "Release|x64" /project SLADE.vcxproj
+			& $devenvpath (resolve-path ..\msvc\SLADE64.sln).Path /rebuild "Release|x64" /project SLADE64.vcxproj
 		}
 		
 		Write-Host "`nProceed with 32bit build? (y/n) " -foregroundcolor cyan -nonewline
 		$build32 = Read-Host
 		if ($build32.ToLower() -eq "y")
 		{
-			& $devenvpath (resolve-path ..\msvc\SLADE.sln).Path /rebuild "Release|Win32" /project SLADE.vcxproj
+			& $devenvpath (resolve-path ..\msvc\SLADE64.sln).Path /rebuild "Release|Win32" /project SLADE64.vcxproj
 		}
 	}
 }
@@ -66,10 +66,10 @@ New-Item -ItemType directory -Force -Path "$releasedir32" | out-null
 New-Item -ItemType directory -Force -Path "$releasedir64" | out-null
 
 # Remove existing pk3 if it exists
-$pk3path = ".\slade.pk3"
+$pk3path = ".\slade64.pk3"
 if (Test-Path "$pk3path")
 {
-	Write-Host "`nRemoving existing slade.pk3" -foregroundcolor yellow
+	Write-Host "`nRemoving existing slade64.pk3" -foregroundcolor yellow
 	Remove-Item "$pk3path"
 }
 
@@ -79,21 +79,21 @@ $resdir = (resolve-path ".\res").path
 Get-ChildItem -Path . -Include Thumbs.db -Recurse -Name -Force | Remove-Item -Force
 
 # Build pk3
-Write-Host "`nBuilding slade.pk3..." -foregroundcolor yellow
+Write-Host "`nBuilding slade64.pk3..." -foregroundcolor yellow
 & $7zpath a -tzip $pk3path "$resdir\*" | out-null
 Write-Host "Done" -foregroundcolor green
 
 # Copy Files
-Write-Host "`nCopying SLADE files..." -foregroundcolor yellow
+Write-Host "`nCopying SLADE64 files..." -foregroundcolor yellow
 # Common
-Copy-Item (resolve-path ".\slade.pk3") "$releasedir" -Force
+Copy-Item (resolve-path ".\slade64.pk3") "$releasedir" -Force
 # Win32
-Copy-Item (resolve-path ".\SLADE.exe")               "$releasedir32" -Force
-Copy-Item (resolve-path ".\SLADE.pdb")               "$releasedir32" -Force
+Copy-Item (resolve-path ".\SLADE64.exe")               "$releasedir32" -Force
+Copy-Item (resolve-path ".\SLADE64.pdb")               "$releasedir32" -Force
 Copy-Item (resolve-path ".\dll32\libfluidsynth.dll") "$releasedir32" -Force
 # x64
-Copy-Item (resolve-path ".\SLADE-x64.exe")       "$releasedir64\SLADE.exe" -Force
-Copy-Item (resolve-path ".\SLADE-x64.pdb")       "$releasedir64\SLADE.pdb" -Force
+Copy-Item (resolve-path ".\SLADE64-x64.exe")       "$releasedir64\SLADE64.exe" -Force
+Copy-Item (resolve-path ".\SLADE64-x64.pdb")       "$releasedir64\SLADE64.pdb" -Force
 Write-Host "Done" -foregroundcolor green
 
 # Prompt to build binaries 7z
@@ -115,16 +115,16 @@ if ($buildbinaries.ToLower() -eq "y")
 	Write-Host "`nBuiling win32 binaries 7z..." -foregroundcolor yellow
 	& $7zpath a -t7z "$releasedir\slade_${version}${timestamp}.7z" `
 	"$releasedir32\libfluidsynth.dll" `
-	"$releasedir32\SLADE.exe" `
-	"$releasedir32\SLADE.pdb" `
-	"$releasedir\slade.pk3"
+	"$releasedir32\SLADE64.exe" `
+	"$releasedir32\SLADE64.pdb" `
+	"$releasedir\slade64.pk3"
 	Write-Host "Done" -foregroundcolor green
 
 	Write-Host "`nBuiling x64 binaries 7z..." -foregroundcolor yellow
 	& $7zpath a -t7z "$releasedir\slade_${version}_x64${timestamp}.7z" `
-	"$releasedir64\SLADE.exe" `
-	"$releasedir64\SLADE.pdb" `
-	"$releasedir\slade.pk3"
+	"$releasedir64\SLADE64.exe" `
+	"$releasedir64\SLADE64.pdb" `
+	"$releasedir\slade64.pk3"
 	Write-Host "Done" -foregroundcolor green
 }
 
@@ -143,7 +143,7 @@ if ($buildinstaller.ToLower() -eq "y")
 	if (Test-Path $innocompiler)
 	{
 		Write-Host "`nBuiling installer..." -foregroundcolor yellow
-		& $innocompiler "/Q" "/O$releasedir" "/F`"Setup_SLADE_$version`"" (resolve-path "..\win_installer\SLADE.iss").Path
+		& $innocompiler "/Q" "/O$releasedir" "/F`"Setup_SLADE64_$version`"" (resolve-path "..\win_installer\SLADE64.iss").Path
 		Write-Host "Done" -foregroundcolor green
 	}
 }

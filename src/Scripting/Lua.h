@@ -8,7 +8,7 @@ namespace slade
 {
 class Archive;
 class ArchiveEntry;
-class SLADEMap;
+class SLADE64Map;
 
 namespace lua
 {
@@ -31,7 +31,7 @@ namespace lua
 	bool runFile(const string& filename);
 	bool runArchiveScript(const string& script, Archive* archive);
 	bool runEntryScript(const string& script, vector<ArchiveEntry*>& entries);
-	bool runMapScript(const string& script, SLADEMap* map);
+	bool runMapScript(const string& script, SLADE64Map* map);
 
 	sol::state& state();
 

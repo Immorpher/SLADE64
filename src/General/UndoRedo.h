@@ -37,14 +37,14 @@ private:
 	wxDateTime                   timestamp_;
 };
 
-class SLADEMap;
+class SLADE64Map;
 class UndoManager
 {
 public:
-	UndoManager(SLADEMap* map = nullptr) : map_{ map } {}
+	UndoManager(SLADE64Map* map = nullptr) : map_{ map } {}
 	~UndoManager() = default;
 
-	SLADEMap*  map() const { return map_; }
+	SLADE64Map*  map() const { return map_; }
 	void       putAllLevels(vector<string>& list);
 	int        currentIndex() const { return current_level_index_; }
 	unsigned   nUndoLevels() const { return undo_levels_.size(); }
@@ -77,7 +77,7 @@ private:
 	int                           current_level_index_ = -1;
 	int                           reset_point_         = -1;
 	bool                          undo_running_        = false;
-	SLADEMap*                     map_                 = nullptr;
+	SLADE64Map*                     map_                 = nullptr;
 	Signals                       signals_;
 };
 
@@ -85,6 +85,6 @@ namespace undoredo
 {
 	bool         currentlyRecording();
 	UndoManager* currentManager();
-	SLADEMap*    currentMap();
+	SLADE64Map*    currentMap();
 } // namespace undoredo
 } // namespace slade

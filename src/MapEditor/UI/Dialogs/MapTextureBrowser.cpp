@@ -36,7 +36,7 @@
 #include "General/ResourceManager.h"
 #include "MapEditor/MapEditor.h"
 #include "MapEditor/MapTextureManager.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "Utility/StringUtils.h"
 
 using namespace slade;
@@ -140,7 +140,7 @@ wxString MapTexBrowserItem::itemInfo()
 // -----------------------------------------------------------------------------
 // MapTextureBrowser class constructor
 // -----------------------------------------------------------------------------
-MapTextureBrowser::MapTextureBrowser(wxWindow* parent, TextureType type, const wxString& texture, SLADEMap* map) :
+MapTextureBrowser::MapTextureBrowser(wxWindow* parent, TextureType type, const wxString& texture, SLADE64Map* map) :
 	BrowserWindow(parent, true),
 	type_{ type },
 	map_{ map }

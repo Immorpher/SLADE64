@@ -2,7 +2,7 @@
 
 #include "MOPGProperty.h"
 #include "PropsPanelBase.h"
-#include "SLADEMap/MapObject/MapObject.h"
+#include "SLADE64Map/MapObject/MapObject.h"
 #include "UI/Controls/STabCtrl.h"
 
 class wxPropertyGrid;

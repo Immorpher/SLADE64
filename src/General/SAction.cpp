@@ -296,7 +296,7 @@ bool SAction::parse(const ParseTreeNode* node)
 // -----------------------------------------------------------------------------
 bool SAction::initActions()
 {
-	// Get actions.cfg from slade.pk3
+	// Get actions.cfg from slade64.pk3
 	auto cfg_entry = app::archiveManager().programResourceArchive()->entryAtPath("actions.cfg");
 	if (!cfg_entry)
 		return false;

@@ -4,7 +4,7 @@
 #include "Game.h"
 #include "General/Defs.h"
 #include "MapInfo.h"
-#include "SLADEMap/MapObject/MapObject.h"
+#include "SLADE64Map/MapObject/MapObject.h"
 #include "SpecialPreset.h"
 #include "ThingType.h"
 #include "UDMFProperty.h"

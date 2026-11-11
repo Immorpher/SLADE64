@@ -11,7 +11,7 @@ class MapObject;
 class MapSector;
 class MapThing;
 class MapVertex;
-class SLADEMap;
+class SLADE64Map;
 
 class ItemSelection
 {
@@ -65,10 +65,10 @@ public:
 	void deSelect(const mapeditor::Item& item, bool new_change = true) { select(item, false, new_change); }
 	void selectAll();
 	bool toggleCurrent(bool clear_none = true);
-	void selectVerticesWithin(const SLADEMap& map, const Rectd& rect);
-	void selectLinesWithin(const SLADEMap& map, const Rectd& rect);
-	void selectSectorsWithin(const SLADEMap& map, const Rectd& rect);
-	void selectThingsWithin(const SLADEMap& map, const Rectd& rect);
+	void selectVerticesWithin(const SLADE64Map& map, const Rectd& rect);
+	void selectLinesWithin(const SLADE64Map& map, const Rectd& rect);
+	void selectSectorsWithin(const SLADE64Map& map, const Rectd& rect);
+	void selectThingsWithin(const SLADE64Map& map, const Rectd& rect);
 	bool selectWithin(const Rectd& rect, bool add);
 
 	MapVertex* hilightedVertex() const;

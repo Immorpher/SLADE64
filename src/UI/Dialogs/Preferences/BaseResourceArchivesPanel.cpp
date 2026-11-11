@@ -146,7 +146,7 @@ void BaseResourceArchivesPanel::autodetect() const
 	if (!iwadlist)
 		return;
 	Parser p;
-	p.parseText(iwadlist->data(), "slade.pk3:config/iwads.cfg");
+	p.parseText(iwadlist->data(), "slade64.pk3:config/iwads.cfg");
 
 
 	// Find IWADs from DOOMWADDIR and DOOMWADPATH

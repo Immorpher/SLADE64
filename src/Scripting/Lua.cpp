@@ -35,7 +35,7 @@
 #include "General/Console.h"
 #include "General/Misc.h"
 #include "Lua.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "UI/Dialogs/ExtMessageDialog.h"
 #include "UI/WxUtils.h"
 #include "Utility/StringUtils.h"
@@ -305,9 +305,9 @@ bool lua::runEntryScript(const string& script, vector<ArchiveEntry*>& entries)
 // Runs the 'Execute(map)' function in the given [script], passing [map] as the
 // parameter
 // -----------------------------------------------------------------------------
-bool lua::runMapScript(const string& script, SLADEMap* map)
+bool lua::runMapScript(const string& script, SLADE64Map* map)
 {
-	return runEditorScript<SLADEMap*>(script, map);
+	return runEditorScript<SLADE64Map*>(script, map);
 }
 
 // -----------------------------------------------------------------------------

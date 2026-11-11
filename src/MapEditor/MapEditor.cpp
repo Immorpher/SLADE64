@@ -75,7 +75,7 @@ MapBackupManager           backup_manager;
 // Returns the vertex in [map] matching this item, or null if the item isn't a
 // vertex
 // -----------------------------------------------------------------------------
-MapVertex* mapeditor::Item::asVertex(const SLADEMap& map) const
+MapVertex* mapeditor::Item::asVertex(const SLADE64Map& map) const
 {
 	if (type == ItemType::Vertex)
 		return map.vertex(index);
@@ -87,7 +87,7 @@ MapVertex* mapeditor::Item::asVertex(const SLADEMap& map) const
 // Returns the line in [map] matching this item, or null if the item isn't a
 // line
 // -----------------------------------------------------------------------------
-MapLine* mapeditor::Item::asLine(const SLADEMap& map) const
+MapLine* mapeditor::Item::asLine(const SLADE64Map& map) const
 {
 	if (type == ItemType::Line)
 		return map.line(index);
@@ -99,7 +99,7 @@ MapLine* mapeditor::Item::asLine(const SLADEMap& map) const
 // Returns the side in [map] matching this item, or null if the item isn't a
 // side
 // -----------------------------------------------------------------------------
-MapSide* mapeditor::Item::asSide(const SLADEMap& map) const
+MapSide* mapeditor::Item::asSide(const SLADE64Map& map) const
 {
 	if (type == ItemType::Side || type == ItemType::WallBottom || type == ItemType::WallMiddle
 		|| type == ItemType::WallTop)
@@ -112,7 +112,7 @@ MapSide* mapeditor::Item::asSide(const SLADEMap& map) const
 // Returns the sector in [map] matching this item, or null if the item isn't a
 // sector
 // -----------------------------------------------------------------------------
-MapSector* mapeditor::Item::asSector(const SLADEMap& map) const
+MapSector* mapeditor::Item::asSector(const SLADE64Map& map) const
 {
 	if (type == ItemType::Sector || type == ItemType::Ceiling || type == ItemType::Floor)
 		return map.sector(index);
@@ -124,7 +124,7 @@ MapSector* mapeditor::Item::asSector(const SLADEMap& map) const
 // Returns the thing in [map] matching this item, or null if the item isn't a
 // thing
 // -----------------------------------------------------------------------------
-MapThing* mapeditor::Item::asThing(const SLADEMap& map) const
+MapThing* mapeditor::Item::asThing(const SLADE64Map& map) const
 {
 	if (type == ItemType::Thing)
 		return map.thing(index);
@@ -135,7 +135,7 @@ MapThing* mapeditor::Item::asThing(const SLADEMap& map) const
 // -----------------------------------------------------------------------------
 // Returns the object in [map] matching this item
 // -----------------------------------------------------------------------------
-MapObject* mapeditor::Item::asObject(const SLADEMap& map) const
+MapObject* mapeditor::Item::asObject(const SLADE64Map& map) const
 {
 	switch (type)
 	{
@@ -379,7 +379,7 @@ void mapeditor::showObjectEditPanel(bool show, ObjectEditGroup* group)
 // Opens the texture browser for [tex_type] textures, with [init_texture]
 // initially selected. Returns the selected texture
 // -----------------------------------------------------------------------------
-string mapeditor::browseTexture(string_view init_texture, TextureType tex_type, SLADEMap& map, string_view title)
+string mapeditor::browseTexture(string_view init_texture, TextureType tex_type, SLADE64Map& map, string_view title)
 {
 	// Unlock cursor if locked
 	bool cursor_locked = edit_context->mouseLocked();
@@ -406,7 +406,7 @@ string mapeditor::browseTexture(string_view init_texture, TextureType tex_type, 
 // Opens the thing type browser with [init_type] initially selected.
 // Returns the selected type
 // -----------------------------------------------------------------------------
-int mapeditor::browseThingType(int init_type, SLADEMap& map)
+int mapeditor::browseThingType(int init_type, SLADE64Map& map)
 {
 	// Unlock cursor if locked
 	bool cursor_locked = edit_context->mouseLocked();

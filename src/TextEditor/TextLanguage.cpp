@@ -567,7 +567,7 @@ void TextLanguage::clearCustomDefs()
 
 
 // -----------------------------------------------------------------------------
-// Reads in a text definition of a language. See slade.pk3 for
+// Reads in a text definition of a language. See slade64.pk3 for
 // formatting examples
 // -----------------------------------------------------------------------------
 bool TextLanguage::readLanguageDefinition(MemChunk& mc, string_view source)
@@ -884,7 +884,7 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc, string_view source)
 }
 
 // -----------------------------------------------------------------------------
-// Loads all text language definitions from slade.pk3
+// Loads all text language definitions from slade64.pk3
 // -----------------------------------------------------------------------------
 bool TextLanguage::loadLanguages()
 {
@@ -916,7 +916,7 @@ bool TextLanguage::loadLanguages()
 		}
 		else
 			log::warning(
-				1, "Warning: 'config/languages' not found in slade.pk3, no builtin text language definitions loaded");
+				1, "Warning: 'config/languages' not found in slade64.pk3, no builtin text language definitions loaded");
 	}
 
 	return true;

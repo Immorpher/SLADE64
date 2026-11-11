@@ -38,7 +38,7 @@
 #include "General/UI.h"
 #include "MapEditor/MapEditContext.h"
 #include "MapEditor/MapEditor.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "Utility/MathStuff.h"
 
 using namespace slade;
@@ -559,7 +559,7 @@ void ObjectEditGroup::doAll(
 void ObjectEditGroup::applyEdit()
 {
 	// Get map
-	SLADEMap* map;
+	SLADE64Map* map;
 	if (!vertices_.empty())
 		map = vertices_[0]->map_vertex->parentMap();
 	else if (!things_.empty())

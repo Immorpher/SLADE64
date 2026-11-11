@@ -35,7 +35,7 @@
 #include "Main.h"
 #include "SectorBuilder.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "Utility/MathStuff.h"
 
 using namespace slade;
@@ -596,7 +596,7 @@ bool SectorBuilder::isValidSector()
 // -----------------------------------------------------------------------------
 // Traces all edges to build a closed sector starting from [line]
 // -----------------------------------------------------------------------------
-bool SectorBuilder::traceSector(SLADEMap* map, MapLine* line, bool front)
+bool SectorBuilder::traceSector(SLADE64Map* map, MapLine* line, bool front)
 {
 	// Check info was given
 	if (!line || !map)

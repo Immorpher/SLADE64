@@ -54,7 +54,7 @@ SetupWizardDialog::SetupWizardDialog(wxWindow* parent) :
 	wxDialog(
 		parent,
 		-1,
-		"First Time SLADE Setup",
+		"First Time SLADE64 Setup",
 		wxDefaultPosition,
 		wxDefaultSize,
 		wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)

@@ -40,11 +40,11 @@
 #include "Graphics/CTexture/TextureXList.h"
 #include "MainEditor/MainEditor.h"
 #include "MainEditor/UI/MainWindow.h"
-#include "SLADEMap/MapFormat/Doom64MapFormat.h"
-#include "SLADEMap/MapFormat/DoomMapFormat.h"
-#include "SLADEMap/MapFormat/HexenMapFormat.h"
-#include "SLADEMap/MapFormat/Doom32XMapFormat.h"
-#include "SLADEMap/MapObject/MapSector.h"
+#include "SLADE64Map/MapFormat/Doom64MapFormat.h"
+#include "SLADE64Map/MapFormat/DoomMapFormat.h"
+#include "SLADE64Map/MapFormat/HexenMapFormat.h"
+#include "SLADE64Map/MapFormat/Doom32XMapFormat.h"
+#include "SLADE64Map/MapObject/MapSector.h"
 #include "UI/Dialogs/ExtMessageDialog.h"
 #include "UI/WxUtils.h"
 #include "Utility/FileUtils.h"
@@ -1375,7 +1375,7 @@ void archiveoperations::removeUnusedZDoomTextures(Archive* archive)
 	// removedEntry signal is what takes long, but having the archive open in a minimal unmanaged state seems to help
 
 	int dialog_answer = wxMessageBox(
-		"This operation is extremely slow if the archive has many entries and is open in SLADE with a tab. This tool "
+		"This operation is extremely slow if the archive has many entries and is open in SLADE64 with a tab. This tool "
 		"will close the archive and reopen it in the background to process it, and save changes when done. You should "
 		"make sure to save any changes now if you have any. Also, keep in mind this tool won't find any textures you "
 		"reference in scripts. There is currently limited support for animated and switch textures so the tool will "
@@ -1929,7 +1929,7 @@ void archiveoperations::removeUnusedZDoomTextures(Archive* archive)
 	archive->save();
 
 	wxMessageBox(
-		wxString::Format("Archive %s has been saved to disk. You can reopen it in SLADE now.", archive->filename()));
+		wxString::Format("Archive %s has been saved to disk. You can reopen it in SLADE64 now.", archive->filename()));
 	app::archiveManager().closeArchive(archive);
 }
 

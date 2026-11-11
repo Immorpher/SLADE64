@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MapEditor/MapEditor.h"
-#include "SLADEMap/MapObject/MapObject.h"
+#include "SLADE64Map/MapObject/MapObject.h"
 #include "Utility/Colour.h"
 
 namespace slade
@@ -12,7 +12,7 @@ class MapLine;
 class MapSector;
 class MapThing;
 class ObjectEditGroup;
-class SLADEMap;
+class SLADE64Map;
 namespace game
 {
 	class ThingType;
@@ -21,7 +21,7 @@ namespace game
 class MapRenderer2D
 {
 public:
-	MapRenderer2D(SLADEMap* map) : map_{ map } {}
+	MapRenderer2D(SLADE64Map* map) : map_{ map } {}
 	~MapRenderer2D();
 
 	double viewScaleInv() const { return view_scale_inv_; }
@@ -135,7 +135,7 @@ public:
 	void   clearTextureCache() { tex_flats_.clear(); }
 
 private:
-	SLADEMap* map_ = nullptr;
+	SLADE64Map* map_ = nullptr;
 	// unsigned  tex_last_         = 0;
 	long vertices_updated_ = 0;
 	long lines_updated_    = 0;

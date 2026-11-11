@@ -569,18 +569,18 @@ void MapEditContext::updateTagged()
 		int type = 0, tag = 0, ttype = 0;
 		if (edit_mode_ == Mode::Lines)
 		{
-			type = SLADEMap::LINEDEFS;
+			type = SLADE64Map::LINEDEFS;
 			tag  = map_.line(hilight_item)->id();
 		}
 		else if (edit_mode_ == Mode::Things)
 		{
-			type  = SLADEMap::THINGS;
+			type  = SLADE64Map::THINGS;
 			tag   = map_.thing(hilight_item)->id();
 			ttype = map_.thing(hilight_item)->type();
 		}
 		else if (edit_mode_ == Mode::Sectors)
 		{
-			type = SLADEMap::SECTORS;
+			type = SLADE64Map::SECTORS;
 			tag  = map_.sector(hilight_item)->tag();
 		}
 		if (tag)
@@ -2208,7 +2208,7 @@ string MapArchClipboardItem::info() const
 // -----------------------------------------------------------------------------
 // Pastes copied architecture to [map] at [position]
 // -----------------------------------------------------------------------------
-vector<MapVertex*> MapArchClipboardItem::pasteToMap(SLADEMap* map, Vec2d position)
+vector<MapVertex*> MapArchClipboardItem::pasteToMap(SLADE64Map* map, Vec2d position)
 {
 	std::map<MapVertex*, MapVertex*> vertMap;
 	std::map<MapSector*, MapSector*> sectMap;
@@ -2366,7 +2366,7 @@ string MapThingsClipboardItem::info() const
 // -----------------------------------------------------------------------------
 // Pastes copied things to [map] at [position]
 // -----------------------------------------------------------------------------
-void MapThingsClipboardItem::pasteToMap(SLADEMap* map, Vec2d position)
+void MapThingsClipboardItem::pasteToMap(SLADE64Map* map, Vec2d position)
 {
 	for (auto& thing : things_)
 	{
@@ -2473,7 +2473,7 @@ CONSOLE_COMMAND(m_check, 0, true)
 CONSOLE_COMMAND(m_test_sector, 0, false)
 {
 	sf::Clock clock;
-	SLADEMap& map = mapeditor::editContext().map();
+	SLADE64Map& map = mapeditor::editContext().map();
 	for (unsigned a = 0; a < map.nThings(); a++)
 		map.sectors().atPos(map.thing(a)->position());
 	long ms = clock.getElapsedTime().asMilliseconds();
@@ -2484,7 +2484,7 @@ CONSOLE_COMMAND(m_test_mobj_backup, 0, false)
 {
 	sf::Clock clock;
 	sf::Clock totalClock;
-	SLADEMap& map    = mapeditor::editContext().map();
+	SLADE64Map& map    = mapeditor::editContext().map();
 	auto      backup = new MapObject::Backup();
 
 	// Vertices
@@ -2532,7 +2532,7 @@ CONSOLE_COMMAND(m_vertex_attached, 1, false)
 
 CONSOLE_COMMAND(m_n_polys, 0, false)
 {
-	SLADEMap& map   = mapeditor::editContext().map();
+	SLADE64Map& map   = mapeditor::editContext().map();
 	int       npoly = 0;
 	for (unsigned a = 0; a < map.nSectors(); a++)
 		npoly += map.sector(a)->polygon()->nSubPolys();

@@ -346,14 +346,14 @@ bool TextEntryPanel::handleEntryPanelAction(string_view id)
 	// Light colour scheme
 	else if (id == "ptxt_theme_light")
 	{
-		StyleSet::loadSet("SLADE (Light)");
+		StyleSet::loadSet("SLADE64 (Light)");
 		StyleSet::applyCurrent(text_area_);
 	}
 
 	// Dark colour scheme
 	else if (id == "ptxt_theme_dark")
 	{
-		StyleSet::loadSet("SLADE (Dark)");
+		StyleSet::loadSet("SLADE64 (Dark)");
 		StyleSet::applyCurrent(text_area_);
 	}
 

@@ -12,7 +12,7 @@ public:
 
 	bool     canGoNext() override;
 	void     applyChanges() override;
-	wxString title() override { return "SLADE Temp Folder"; }
+	wxString title() override { return "SLADE64 Temp Folder"; }
 	wxString description() override;
 
 private:

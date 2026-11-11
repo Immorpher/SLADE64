@@ -306,7 +306,7 @@ bool ItemSelection::toggleCurrent(bool clear_none)
 // -----------------------------------------------------------------------------
 // Selects all vertices in [map] that are within [rect]
 // -----------------------------------------------------------------------------
-void ItemSelection::selectVerticesWithin(const SLADEMap& map, const Rectd& rect)
+void ItemSelection::selectVerticesWithin(const SLADE64Map& map, const Rectd& rect)
 {
 	// Start new change set
 	last_change_.clear();
@@ -320,7 +320,7 @@ void ItemSelection::selectVerticesWithin(const SLADEMap& map, const Rectd& rect)
 // -----------------------------------------------------------------------------
 // Selects all lines in [map] that are within [rect]
 // -----------------------------------------------------------------------------
-void ItemSelection::selectLinesWithin(const SLADEMap& map, const Rectd& rect)
+void ItemSelection::selectLinesWithin(const SLADE64Map& map, const Rectd& rect)
 {
 	// Start new change set
 	last_change_.clear();
@@ -334,7 +334,7 @@ void ItemSelection::selectLinesWithin(const SLADEMap& map, const Rectd& rect)
 // -----------------------------------------------------------------------------
 // Selects all sectors in [map] that are within [rect]
 // -----------------------------------------------------------------------------
-void ItemSelection::selectSectorsWithin(const SLADEMap& map, const Rectd& rect)
+void ItemSelection::selectSectorsWithin(const SLADE64Map& map, const Rectd& rect)
 {
 	// Start new change set
 	last_change_.clear();
@@ -348,7 +348,7 @@ void ItemSelection::selectSectorsWithin(const SLADEMap& map, const Rectd& rect)
 // -----------------------------------------------------------------------------
 // Selects all things in [map] that are within [rect]
 // -----------------------------------------------------------------------------
-void ItemSelection::selectThingsWithin(const SLADEMap& map, const Rectd& rect)
+void ItemSelection::selectThingsWithin(const SLADE64Map& map, const Rectd& rect)
 {
 	// Start new change set
 	last_change_.clear();

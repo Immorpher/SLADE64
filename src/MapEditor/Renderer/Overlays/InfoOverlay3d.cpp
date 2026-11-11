@@ -42,7 +42,7 @@
 #include "MapEditor/UI/MapEditorWindow.h"
 #include "OpenGL/Drawing.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "Utility/StringUtils.h"
 
 using namespace slade;
@@ -66,7 +66,7 @@ EXTERN_CVAR(Bool, use_zeth_icons)
 // -----------------------------------------------------------------------------
 // Updates the info text for the object of [item_type] at [item_index] in [map]
 // -----------------------------------------------------------------------------
-void InfoOverlay3D::update(int item_index, mapeditor::ItemType item_type, SLADEMap* map)
+void InfoOverlay3D::update(int item_index, mapeditor::ItemType item_type, SLADE64Map* map)
 {
 	using game::Feature;
 	using game::UDMFFeature;

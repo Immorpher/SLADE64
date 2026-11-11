@@ -39,7 +39,7 @@
 #include "MapEditor/MapTextureManager.h"
 #include "OpenGL/Drawing.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/MapObject/MapThing.h"
+#include "SLADE64Map/MapObject/MapThing.h"
 
 using namespace slade;
 

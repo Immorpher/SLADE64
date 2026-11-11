@@ -24,7 +24,7 @@
 
 ## Windows
 
-SLADE can be built on Windows using [Visual Studio](https://visualstudio.microsoft.com/) 2019+ (a free 'community' edition is available which works fine) and [vcpkg](https://docs.microsoft.com/en-us/cpp/build/vcpkg?view=vs-2019) for handling the required external libraries.
+SLADE64 can be built on Windows using [Visual Studio](https://visualstudio.microsoft.com/) 2019+ (a free 'community' edition is available which works fine) and [vcpkg](https://docs.microsoft.com/en-us/cpp/build/vcpkg?view=vs-2019) for handling the required external libraries.
 
 ### Required vcpkg libraries
 
@@ -34,7 +34,7 @@ SLADE can be built on Windows using [Visual Studio](https://visualstudio.microso
 * sfml
 * wxwidgets
 
-The above libraries are required for building SLADE on windows. Note that you'll most likely want to use the `x64-windows-static` triplet when installing them, eg.
+The above libraries are required for building SLADE64 on windows. Note that you'll most likely want to use the `x64-windows-static` triplet when installing them, eg.
 
 ```
 .\vcpkg install <libraries> --triplet x64-windows-static

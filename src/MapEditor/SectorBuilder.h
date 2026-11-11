@@ -7,7 +7,7 @@ class MapLine;
 class MapVertex;
 class MapSector;
 class MapSide;
-class SLADEMap;
+class SLADE64Map;
 
 class SectorBuilder
 {
@@ -40,7 +40,7 @@ public:
 	MapSector* findExistingSector(vector<MapSide*>& sides_ignore);
 	bool       isValidSector();
 
-	bool traceSector(SLADEMap* map, MapLine* line, bool front = true);
+	bool traceSector(SLADE64Map* map, MapLine* line, bool front = true);
 	void createSector(MapSector* sector = nullptr, MapSector* sector_copy = nullptr);
 
 	// Testing
@@ -48,7 +48,7 @@ public:
 
 private:
 	vector<bool> vertex_valid_;
-	SLADEMap*    map_ = nullptr;
+	SLADE64Map*    map_ = nullptr;
 	vector<Edge> sector_edges_;
 	string       error_;
 

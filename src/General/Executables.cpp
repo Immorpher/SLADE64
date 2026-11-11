@@ -100,7 +100,7 @@ void executables::setGameExePath(string_view id, string_view path)
 }
 
 // -----------------------------------------------------------------------------
-// Writes all game executable paths as a string (for slade3.cfg)
+// Writes all game executable paths as a string (for slade64.cfg)
 // -----------------------------------------------------------------------------
 string executables::writePaths()
 {
@@ -179,7 +179,7 @@ void executables::init()
 
 	// Parse base executables config
 	Parser p;
-	p.parseText(entry->data(), "slade.pk3 - executables.cfg");
+	p.parseText(entry->data(), "slade64.pk3 - executables.cfg");
 	parse(&p, false);
 
 	// Parse user executables config

@@ -56,7 +56,7 @@ CVAR(Int, tab_style, 1, CVar::Flag::Save)
 
 // -----------------------------------------------------------------------------
 // Creates a wxMenuItem from the given parameters, including giving it an icon
-// from slade.pk3 if specified
+// from slade64.pk3 if specified
 // -----------------------------------------------------------------------------
 wxMenuItem* wxutil::createMenuItem(
 	wxMenu*         menu,

@@ -41,7 +41,7 @@
 #include "MapEditor/MapEditContext.h"
 #include "MapEditor/MapTextureManager.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "UI/Controls/PaletteChooser.h"
 #include "Utility/MathStuff.h"
 #include "Utility/StringUtils.h"
@@ -93,7 +93,7 @@ EXTERN_CVAR(Bool, use_zeth_icons)
 // -----------------------------------------------------------------------------
 // MapRenderer3D class constructor
 // -----------------------------------------------------------------------------
-MapRenderer3D::MapRenderer3D(SLADEMap* map) : map_{ map }
+MapRenderer3D::MapRenderer3D(SLADE64Map* map) : map_{ map }
 {
 	// Build skybox circle
 	buildSkyCircle();

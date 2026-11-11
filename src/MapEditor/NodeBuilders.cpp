@@ -73,7 +73,7 @@ void nodebuilders::init()
 	none.name  = "Don't Build Nodes";
 	builders.push_back(none);
 
-	// Get nodebuilders configuration from slade.pk3
+	// Get nodebuilders configuration from slade64.pk3
 	auto archive = app::archiveManager().programResourceArchive();
 	auto config  = archive->entryAtPath("config/nodebuilders.cfg");
 	if (!config)

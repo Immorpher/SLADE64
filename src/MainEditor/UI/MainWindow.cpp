@@ -6,7 +6,7 @@
 // Email:       sirjuddington@gmail.com
 // Web:         http://slade.mancubus.net
 // Filename:    MainWindow.cpp
-// Description: MainWindow class, ie the main SLADE window
+// Description: MainWindow class, ie the main SLADE64 window
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,7 +40,7 @@
 #include "Graphics/Icons.h"
 #include "MapEditor/MapEditor.h"
 #include "Scripting/ScriptManager.h"
-#include "SLADEWxApp.h"
+#include "SLADE64WxApp.h"
 #include "UI/Controls/BaseResourceChooser.h"
 #include "UI/Controls/ConsolePanel.h"
 #include "UI/Controls/PaletteChooser.h"
@@ -110,7 +110,7 @@ public:
 // -----------------------------------------------------------------------------
 // MainWindow class constructor
 // -----------------------------------------------------------------------------
-MainWindow::MainWindow() : STopWindow("SLADE", "main")
+MainWindow::MainWindow() : STopWindow("SLADE64", "main")
 {
 	custom_menus_begin_ = 2;
 
@@ -416,7 +416,7 @@ bool MainWindow::exitProgram()
 	// Confirm exit
 	if (confirm_exit && !panel_archivemanager_->askedSaveUnchanged())
 	{
-		if (wxMessageBox("Are you sure you want to exit SLADE?", "SLADE", wxICON_QUESTION | wxYES_NO, this) != wxYES)
+		if (wxMessageBox("Are you sure you want to exit SLADE64?", "SLADE64", wxICON_QUESTION | wxYES_NO, this) != wxYES)
 			return false;
 	}
 
@@ -538,7 +538,7 @@ bool MainWindow::handleAction(string_view id)
 	if (id == "main_about")
 	{
 		wxAboutDialogInfo info;
-		info.SetName("SLADE");
+		info.SetName("SLADE64");
 		wxString version = "v" + app::version().toString();
 		if (!global::sc_rev.empty())
 			version = version + " (Git Rev " + global::sc_rev + ")";

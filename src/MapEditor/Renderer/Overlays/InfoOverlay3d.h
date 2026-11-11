@@ -4,7 +4,7 @@
 
 namespace slade
 {
-class SLADEMap;
+class SLADE64Map;
 class MapObject;
 
 class InfoOverlay3D
@@ -13,7 +13,7 @@ public:
 	InfoOverlay3D()  = default;
 	~InfoOverlay3D() = default;
 
-	void update(int item_index, mapeditor::ItemType item_type, SLADEMap* map);
+	void update(int item_index, mapeditor::ItemType item_type, SLADE64Map* map);
 	void draw(int bottom, int right, int middle, float alpha = 1.0f);
 	void drawTexture(float alpha, int x, int y) const;
 	void reset()

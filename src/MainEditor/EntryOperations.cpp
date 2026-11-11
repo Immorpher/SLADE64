@@ -42,7 +42,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/SImage/SIFormat.h"
 #include "MainEditor/MainEditor.h"
-#include "SLADEWxApp.h"
+#include "SLADE64WxApp.h"
 #include "UI/Dialogs/ExtMessageDialog.h"
 #include "UI/Dialogs/Preferences/PreferencesDialog.h"
 #include "UI/TextureXEditor/TextureXEditor.h"
@@ -987,7 +987,7 @@ bool entryoperations::compileACS(ArchiveEntry* entry, bool hexen, ArchiveEntry* 
 	if (accpath.IsEmpty() || !wxFileExists(accpath))
 	{
 		wxMessageBox(
-			"Error: ACC path not defined, please configure in SLADE preferences",
+			"Error: ACC path not defined, please configure in SLADE64 preferences",
 			"Error",
 			wxOK | wxCENTRE | wxICON_ERROR);
 		PreferencesDialog::openPreferences(parent, "ACS");

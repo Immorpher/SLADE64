@@ -6,7 +6,7 @@
 // Email:       sirjuddington@gmail.com
 // Web:         https://slade.mancubus.net
 // Filename:    Icons.cpp
-// Description: Functions to do with loading program icons from slade.pk3
+// Description: Functions to do with loading program icons from slade64.pk3
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -165,7 +165,7 @@ IconDef parseIconDefinition(const ParseTreeNode& node, const Archive& res_archiv
 		if (entry)
 			idef.svg_data = entry->data().asString();
 		else
-			log::error("Icon entry \"{}\" does not exist in slade.pk3", node.stringValue());
+			log::error("Icon entry \"{}\" does not exist in slade64.pk3", node.stringValue());
 	}
 
 	// PNG icon
@@ -179,13 +179,13 @@ IconDef parseIconDefinition(const ParseTreeNode& node, const Archive& res_archiv
 			{
 				idef.entry_png16 = res_archive.entryAtPath(child->stringValue());
 				if (!idef.entry_png16)
-					log::error("Icon entry \"{}\" does not exist in slade.pk3", child->stringValue());
+					log::error("Icon entry \"{}\" does not exist in slade64.pk3", child->stringValue());
 			}
 			else if (child->nameIs("s32"))
 			{
 				idef.entry_png32 = res_archive.entryAtPath(child->stringValue());
 				if (!idef.entry_png32)
-					log::error("Icon entry \"{}\" does not exist in slade.pk3", child->stringValue());
+					log::error("Icon entry \"{}\" does not exist in slade64.pk3", child->stringValue());
 			}
 		}
 	}
@@ -368,7 +368,7 @@ wxBitmap loadPNGIcon(const IconDef& icon, int size, Point2i padding)
 } // namespace slade::icons
 
 // -----------------------------------------------------------------------------
-// Loads all icon definitions from slade.pk3 (icons.cfg)
+// Loads all icon definitions from slade64.pk3 (icons.cfg)
 // -----------------------------------------------------------------------------
 bool icons::loadIcons()
 {
@@ -392,7 +392,7 @@ bool icons::loadIcons()
 	ui_icons_dark = fg_r > bg_r;
 #endif
 
-	// Get slade.pk3
+	// Get slade64.pk3
 	auto* res_archive = app::archiveManager().programResourceArchive();
 	if (!res_archive)
 		return false;
@@ -401,7 +401,7 @@ bool icons::loadIcons()
 	auto* icons_entry = res_archive->entryAtPath("icons.cfg");
 	if (!icons_entry)
 	{
-		log::error("Could not find icons.cfg in slade.pk3");
+		log::error("Could not find icons.cfg in slade64.pk3");
 		return false;
 	}
 

@@ -38,7 +38,7 @@
 #include "General/KeyBind.h"
 #include "Graphics/Icons.h"
 #include "SCallTip.h"
-#include "SLADEWxApp.h"
+#include "SLADE64WxApp.h"
 #include "UI/WxUtils.h"
 #include "Utility/StringUtils.h"
 #include "Utility/Tokenizer.h"

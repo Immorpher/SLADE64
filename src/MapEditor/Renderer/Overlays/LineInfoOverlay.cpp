@@ -41,8 +41,8 @@
 #include "OpenGL/Drawing.h"
 #include "OpenGL/GLTexture.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/MapObject/MapLine.h"
-#include "SLADEMap/MapObject/MapSide.h"
+#include "SLADE64Map/MapObject/MapLine.h"
+#include "SLADE64Map/MapObject/MapSide.h"
 #include "Utility/MathStuff.h"
 #include "Utility/StringUtils.h"
 

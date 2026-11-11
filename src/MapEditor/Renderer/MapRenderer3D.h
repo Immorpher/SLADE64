@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MapEditor/Edit/Edit3D.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 
 namespace slade
 {
@@ -87,7 +87,7 @@ public:
 		long       updated_time = 0;
 	};
 
-	MapRenderer3D(SLADEMap* map = nullptr);
+	MapRenderer3D(SLADE64Map* map = nullptr);
 	~MapRenderer3D();
 
 	bool fullbrightEnabled() const { return fullbright_; }
@@ -184,7 +184,7 @@ public:
 	void            renderHilight(mapeditor::Item hilight, float alpha = 1.0f);
 
 private:
-	SLADEMap* map_;
+	SLADE64Map* map_;
 	bool      fullbright_       = false;
 	bool      fog_              = true;
 	unsigned  n_quads_          = 0;

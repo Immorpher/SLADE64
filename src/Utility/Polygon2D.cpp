@@ -36,7 +36,7 @@
 #include "MathStuff.h"
 #include "OpenGL/GLTexture.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 
 using namespace slade;
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SLADEMap/MapObject/MapLine.h"
-#include "SLADEMap/MapObject/MapSector.h"
-#include "SLADEMap/MapObject/MapSide.h"
-#include "SLADEMap/MapObject/MapThing.h"
+#include "SLADE64Map/MapObject/MapLine.h"
+#include "SLADE64Map/MapObject/MapSector.h"
+#include "SLADE64Map/MapObject/MapSide.h"
+#include "SLADE64Map/MapObject/MapThing.h"
 
 namespace slade
 {

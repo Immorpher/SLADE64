@@ -50,7 +50,7 @@
 #include "MapEditor/NodeBuilders.h"
 #include "OpenGL/Drawing.h"
 #include "OpenGL/GLTexture.h"
-#include "SLADEWxApp.h"
+#include "SLADE64WxApp.h"
 #include "Scripting/Lua.h"
 #include "Scripting/ScriptManager.h"
 #include "TextEditor/TextLanguage.h"
@@ -196,6 +196,37 @@ bool initDirectories()
 		dir_res  = wxStandardPaths::Get().GetResourcesDir();
 	}
 
+	// One-time migration of settings from the old SLADE3 user directory
+	if (!wxDirExists(dir_user))
+	{
+		string legacy_dir;
+		for (const auto& names : { std::pair<string, string>{ "SLADE64", "SLADE3" }, { "slade64", "slade3" } })
+		{
+			if (dir_user.size() > names.first.size()
+				&& dir_user.compare(dir_user.size() - names.first.size(), names.first.size(), names.first) == 0)
+			{
+				legacy_dir = dir_user.substr(0, dir_user.size() - names.first.size()) + names.second;
+				break;
+			}
+		}
+
+		if (!legacy_dir.empty() && wxDirExists(legacy_dir))
+		{
+			try
+			{
+				std::filesystem::copy(
+					std::filesystem::u8path(legacy_dir),
+					std::filesystem::u8path(dir_user),
+					std::filesystem::copy_options::recursive | std::filesystem::copy_options::skip_existing);
+				log::info("Copied settings from {}", legacy_dir);
+			}
+			catch (const std::exception& ex)
+			{
+				log::warning("Unable to copy settings from {}: {}", legacy_dir, ex.what());
+			}
+		}
+	}
+
 	// Create user dir if necessary
 	if (!wxDirExists(dir_user))
 	{
@@ -233,9 +264,9 @@ bool initDirectories()
 // -----------------------------------------------------------------------------
 void readConfigFile()
 {
-	// Open SLADE.cfg
+	// Open SLADE64.cfg
 	Tokenizer tz;
-	if (!tz.openFile(path("slade3.cfg", Dir::User)))
+	if (!tz.openFile(path("slade64.cfg", Dir::User)) && !tz.openFile(path("slade3.cfg", Dir::User)))
 		return;
 
 	// Go through the file with the tokenizer
@@ -461,14 +492,14 @@ bool app::init(const vector<string>& args, double ui_scale)
 	EntryDataFormat::initBuiltinFormats();
 	EntryType::initTypes();
 
-	// Check that SLADE.pk3 can be found
+	// Check that SLADE64.pk3 can be found
 	log::info("Loading resources");
 	archive_manager.init();
 	if (!archive_manager.resArchiveOK())
 	{
 		wxMessageBox(
-			"Unable to find slade.pk3, make sure it exists in the same directory as the "
-			"SLADE executable",
+			"Unable to find slade64.pk3, make sure it exists in the same directory as the "
+			"SLADE64 executable",
 			"Error",
 			wxICON_ERROR);
 		return false;
@@ -562,7 +593,7 @@ bool app::init(const vector<string>& args, double ui_scale)
 	ui::hideSplash();
 
 	init_ok = true;
-	log::info("SLADE Initialisation OK");
+	log::info("SLADE64 Initialisation OK");
 
 	// Show Setup Wizard if needed
 	if (!setup_wizard_run)
@@ -582,8 +613,8 @@ bool app::init(const vector<string>& args, double ui_scale)
 // -----------------------------------------------------------------------------
 void app::saveConfigFile()
 {
-	// Open SLADE.cfg for writing text
-	wxFile file(app::path("slade3.cfg", app::Dir::User), wxFile::write);
+	// Open SLADE64.cfg for writing text
+	wxFile file(app::path("slade64.cfg", app::Dir::User), wxFile::write);
 
 	// Do nothing if it didn't open correctly
 	if (!file.IsOpened())
@@ -591,7 +622,7 @@ void app::saveConfigFile()
 
 	// Write cfg header
 	file.Write("/*****************************************************\n");
-	file.Write(" * SLADE Configuration File\n");
+	file.Write(" * SLADE64 Configuration File\n");
 	file.Write(" * Don't edit this unless you know what you're doing\n");
 	file.Write(" *****************************************************/\n\n");
 
@@ -719,7 +750,7 @@ const app::Version& app::version()
 // -----------------------------------------------------------------------------
 // Prepends an application-related path to a [filename]
 //
-// app::Dir::Data: SLADE application data directory (for SLADE.pk3)
+// app::Dir::Data: SLADE application data directory (for SLADE64.pk3)
 // app::Dir::User: User configuration and resources directory
 // app::Dir::Executable: Directory of the SLADE executable
 // app::Dir::Temp: Temporary files directory

@@ -161,7 +161,7 @@ Gets the program resource archive.
 
 #### Returns
 
-* <type>[Archive](../Types/Archive/Archive.md)</type>: the program resource archive (either `slade.pk3` or the `res` folder if you are running a dev build)
+* <type>[Archive](../Types/Archive/Archive.md)</type>: the program resource archive (either `slade64.pk3` or the `res` folder if you are running a dev build)
 
 ---
 ### Bookmarks

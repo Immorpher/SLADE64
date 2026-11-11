@@ -546,7 +546,7 @@ bool EntryType::loadEntryTypes()
 	// Check it exists
 	if (!etypes_cfg)
 	{
-		log::error("config/entry_types.cfg does not exist in slade.pk3");
+		log::error("config/entry_types.cfg does not exist in slade64.pk3");
 		return false;
 	}
 
@@ -559,7 +559,7 @@ bool EntryType::loadEntryTypes()
 
 	// Warn if no types were read (this shouldn't happen unless the resource archive is corrupted)
 	if (!etypes_read)
-		log::warning("No built-in entry types could be loaded from slade.pk3");
+		log::warning("No built-in entry types could be loaded from slade64.pk3");
 
 	// -------- READ CUSTOM TYPES ---------
 

@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>slade</string>
+	<string>slade64</string>
 	<key>CFBundleGetInfoString</key>
-	<string>SLADE</string>
+	<string>SLADE64</string>
 	<key>CFBundleIconFile</key>
 	<string>SLADE-osx.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.slade</string>
+	<string>com.slade64</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>

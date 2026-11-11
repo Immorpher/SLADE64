@@ -1,7 +1,7 @@
 #pragma once
 
 #include "General/UndoRedo.h"
-#include "SLADEMap/MapObject/MapObject.h"
+#include "SLADE64Map/MapObject/MapObject.h"
 
 namespace slade::mapeditor
 {

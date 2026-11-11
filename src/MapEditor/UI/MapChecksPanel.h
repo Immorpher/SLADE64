@@ -6,13 +6,13 @@ class wxListBox;
 
 namespace slade
 {
-class SLADEMap;
+class SLADE64Map;
 class MapCheck;
 
 class MapChecksPanel : public DockPanel
 {
 public:
-	MapChecksPanel(wxWindow* parent, SLADEMap* map);
+	MapChecksPanel(wxWindow* parent, SLADE64Map* map);
 	~MapChecksPanel();
 
 	void updateStatusText(const wxString& text);
@@ -26,7 +26,7 @@ public:
 	void layoutHorizontal() override;
 
 private:
-	SLADEMap*                    map_ = nullptr;
+	SLADE64Map*                    map_ = nullptr;
 	vector<unique_ptr<MapCheck>> active_checks_;
 
 	wxCheckListBox* clb_active_checks_ = nullptr;

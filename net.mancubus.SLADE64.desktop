@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=SLADE64
+Exec=slade64
+Type=Application
+Categories=Development
+Comment=It's a Doom editor
+Icon=net.mancubus.SLADE64
+Terminal=false

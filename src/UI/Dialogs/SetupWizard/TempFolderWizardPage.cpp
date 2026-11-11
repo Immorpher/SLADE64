@@ -71,7 +71,7 @@ TempFolderWizardPage::TempFolderWizardPage(wxWindow* parent) : WizardPageBase(pa
 		this, -1, "Use system temp folder (Recommended)", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	sizer->Add(rb_use_system_, 0, wxEXPAND | wxBOTTOM, pad_xl);
 
-	rb_use_slade_dir_ = new wxRadioButton(this, -1, "Use SLADE installation folder");
+	rb_use_slade_dir_ = new wxRadioButton(this, -1, "Use SLADE64 installation folder");
 	sizer->Add(rb_use_slade_dir_, 0, wxEXPAND | wxBOTTOM, pad_xl);
 
 	rb_use_custom_dir_ = new wxRadioButton(this, -1, "Use custom folder:");
@@ -107,7 +107,7 @@ bool TempFolderWizardPage::canGoNext()
 
 	wxString testfilename;
 	if (rb_use_system_->GetValue())
-		testfilename = wxStandardPaths::Get().GetTempDir().Append(sep).Append("SLADE3").Append(sep).Append("test.txt");
+		testfilename = wxStandardPaths::Get().GetTempDir().Append(sep).Append("SLADE64").Append(sep).Append("test.txt");
 	else if (rb_use_slade_dir_->GetValue())
 		testfilename = app::path("test.txt", app::Dir::Executable);
 	else
@@ -149,7 +149,7 @@ void TempFolderWizardPage::applyChanges()
 // -----------------------------------------------------------------------------
 wxString TempFolderWizardPage::description()
 {
-	return "Select the temp folder for SLADE to use during various operations. "
+	return "Select the temp folder for SLADE64 to use during various operations. "
 		   "Usually the system temp folder will be fine to use, however sometimes "
 		   "it will not be write accessable, which can cause problems.";
 }
@@ -196,7 +196,7 @@ void TempFolderWizardPage::onBtnBrowse(wxCommandEvent& e)
 			{
 				if (wxMessageBox(
 						"The selected folder is not empty.\r\n\r\n"
-						"All files in this folder will be DELETED when SLADE exits.\r\n"
+						"All files in this folder will be DELETED when SLADE64 exits.\r\n"
 						"Please make sure there are no important files in the folder.",
 						"Warning",
 						wxOK | wxCANCEL | wxICON_WARNING)

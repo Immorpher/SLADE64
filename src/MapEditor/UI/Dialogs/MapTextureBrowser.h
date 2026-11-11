@@ -6,7 +6,7 @@
 
 namespace slade
 {
-class SLADEMap;
+class SLADE64Map;
 class Archive;
 
 class MapTexBrowserItem : public BrowserItem
@@ -35,7 +35,7 @@ public:
 		wxWindow*              parent,
 		mapeditor::TextureType type    = mapeditor::TextureType::Texture,
 		const wxString&        texture = "",
-		SLADEMap*              map     = nullptr);
+		SLADE64Map*              map     = nullptr);
 	~MapTextureBrowser() = default;
 
 	wxString determineTexturePath(
@@ -48,6 +48,6 @@ public:
 
 private:
 	mapeditor::TextureType type_ = mapeditor::TextureType::Texture;
-	SLADEMap*              map_  = nullptr;
+	SLADE64Map*              map_  = nullptr;
 };
 } // namespace slade

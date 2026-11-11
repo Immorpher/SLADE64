@@ -39,11 +39,11 @@
 #include "Graphics/SImage/SIFormat.h"
 #include "Graphics/SImage/SImage.h"
 #include "OpenGL/GLTexture.h"
-#include "SLADEMap/MapFormat/Doom64MapFormat.h"
-#include "SLADEMap/MapFormat/DoomMapFormat.h"
-#include "SLADEMap/MapFormat/HexenMapFormat.h"
-#include "SLADEMap/MapFormat/Doom32XMapFormat.h"
-#include "SLADEMap/MapObject/MapThing.h"
+#include "SLADE64Map/MapFormat/Doom64MapFormat.h"
+#include "SLADE64Map/MapFormat/DoomMapFormat.h"
+#include "SLADE64Map/MapFormat/HexenMapFormat.h"
+#include "SLADE64Map/MapFormat/Doom32XMapFormat.h"
+#include "SLADE64Map/MapObject/MapThing.h"
 #include "Utility/Tokenizer.h"
 
 using namespace slade;

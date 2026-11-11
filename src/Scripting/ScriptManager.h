@@ -4,7 +4,7 @@
 
 namespace slade
 {
-class SLADEMap;
+class SLADE64Map;
 
 namespace scriptmanager
 {
@@ -46,6 +46,6 @@ namespace scriptmanager
 
 	void runArchiveScript(Archive* archive, int index, wxWindow* parent = nullptr);
 	void runEntryScript(vector<ArchiveEntry*> entries, int index, wxWindow* parent = nullptr);
-	void runMapScript(SLADEMap* map, int index, wxWindow* parent = nullptr);
+	void runMapScript(SLADE64Map* map, int index, wxWindow* parent = nullptr);
 } // namespace scriptmanager
 } // namespace slade

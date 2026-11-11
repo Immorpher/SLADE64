@@ -2,7 +2,7 @@
 
 namespace slade
 {
-class SLADEMap;
+class SLADE64Map;
 class MapTextureManager;
 class MapObject;
 class MapEditContext;
@@ -31,7 +31,7 @@ public:
 		NumStandardChecks
 	};
 
-	MapCheck(SLADEMap* map) : map_{ map } {}
+	MapCheck(SLADE64Map* map) : map_{ map } {}
 	virtual ~MapCheck() = default;
 
 	virtual void       doCheck()                                                             = 0;
@@ -42,12 +42,12 @@ public:
 	virtual string     progressText() { return "Checking..."; }
 	virtual string     fixText(unsigned fix_type, unsigned index) { return ""; }
 
-	static unique_ptr<MapCheck> standardCheck(StandardCheck type, SLADEMap* map, MapTextureManager* texman = nullptr);
-	static unique_ptr<MapCheck> standardCheck(string_view type_id, SLADEMap* map, MapTextureManager* texman = nullptr);
+	static unique_ptr<MapCheck> standardCheck(StandardCheck type, SLADE64Map* map, MapTextureManager* texman = nullptr);
+	static unique_ptr<MapCheck> standardCheck(string_view type_id, SLADE64Map* map, MapTextureManager* texman = nullptr);
 	static string               standardCheckDesc(StandardCheck type);
 	static string               standardCheckId(StandardCheck type);
 
 protected:
-	SLADEMap* map_;
+	SLADE64Map* map_;
 };
 } // namespace slade

@@ -38,8 +38,8 @@
 #include "MapRenderer2D.h"
 #include "MapRenderer3D.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/MapObject/MapLine.h"
-#include "SLADEMap/MapObject/MapVertex.h"
+#include "SLADE64Map/MapObject/MapLine.h"
+#include "SLADE64Map/MapObject/MapVertex.h"
 
 using namespace slade;
 

@@ -49,7 +49,7 @@
 #include "MapEditor/UI/PropsPanel/MapObjectPropsPanel.h"
 #include "MapEditor/UI/ScriptEditorPanel.h"
 #include "MapEditor/UI/ShapeDrawPanel.h"
-#include "SLADEWxApp.h"
+#include "SLADE64WxApp.h"
 #include "Scripting/ScriptManager.h"
 #include "UI/Controls/ConsolePanel.h"
 #include "UI/Controls/UndoManagerHistoryPanel.h"
@@ -99,7 +99,7 @@ EXTERN_CVAR(Int, flat_drawtype);
 // -----------------------------------------------------------------------------
 // MapEditorWindow class constructor
 // -----------------------------------------------------------------------------
-MapEditorWindow::MapEditorWindow() : STopWindow{ "SLADE", "map" }
+MapEditorWindow::MapEditorWindow() : STopWindow{ "SLADE64", "map" }
 {
 	if (mew_maximized)
 		wxTopLevelWindow::Maximize();
@@ -652,9 +652,9 @@ bool MapEditorWindow::openMap(const Archive::MapDesc& map)
 
 		// Set window title
 		if (archive)
-			SetTitle(wxString::Format("SLADE - %s of %s", map.name, archive->filename(false)));
+			SetTitle(wxString::Format("SLADE64 - %s of %s", map.name, archive->filename(false)));
 		else
-			SetTitle(wxString::Format("SLADE - %s (UNSAVED)", map.name));
+			SetTitle(wxString::Format("SLADE64 - %s (UNSAVED)", map.name));
 
 		// Create backup
 		auto head = map.head.lock();
@@ -981,7 +981,7 @@ bool MapEditorWindow::saveMapAs()
 	}
 
 	// Set window title
-	SetTitle(wxString::Format("SLADE - %s of %s", mdesc_current.name, wad.filename(false)));
+	SetTitle(wxString::Format("SLADE64 - %s of %s", mdesc_current.name, wad.filename(false)));
 
 	return true;
 }

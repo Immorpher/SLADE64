@@ -56,7 +56,7 @@ using namespace slade;
 // -----------------------------------------------------------------------------
 bool PaletteManager::init()
 {
-	// Load palettes from SLADE.pk3
+	// Load palettes from SLADE64.pk3
 	if (!loadResourcePalettes())
 		return false;
 
@@ -154,12 +154,12 @@ string PaletteManager::palName(Palette* pal)
 }
 
 // -----------------------------------------------------------------------------
-// Loads any entries in the 'palettes' directory of SLADE.pk3 as palettes, with
+// Loads any entries in the 'palettes' directory of SLADE64.pk3 as palettes, with
 // names from the entries (minus the entry extension)
 // -----------------------------------------------------------------------------
 bool PaletteManager::loadResourcePalettes()
 {
-	// Get the 'palettes' directory of SLADE.pk3
+	// Get the 'palettes' directory of SLADE64.pk3
 	auto res_archive  = app::archiveManager().programResourceArchive();
 	auto dir_palettes = res_archive->dirAtPath("palettes");
 

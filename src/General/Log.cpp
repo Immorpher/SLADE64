@@ -126,13 +126,13 @@ string log::Message::formattedMessageLine() const
 void log::init()
 {
 	// Redirect sf::err output to the log file
-	log_file.open(app::path("slade3.log", app::Dir::User));
+	log_file.open(app::path("slade64.log", app::Dir::User));
 	sf::err().rdbuf(log_file.rdbuf());
 
 	// Write logfile header
 	auto t  = std::time(nullptr);
 	auto tm = std::localtime(&t);
-	info("SLADE - It's a Doom Editor");
+	info("SLADE64 - It's a Doom Editor");
 	info(fmt::format("Version {}", app::version().toString()));
 	if (!global::sc_rev.empty())
 		info(fmt::format("Git Revision {}", global::sc_rev));

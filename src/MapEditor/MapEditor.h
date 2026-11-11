@@ -14,7 +14,7 @@ class MapSector;
 class MapThing;
 class MapTextureManager;
 class ObjectEditGroup;
-class SLADEMap;
+class SLADE64Map;
 class UndoManager;
 
 namespace mapeditor
@@ -84,12 +84,12 @@ namespace mapeditor
 		// Conversion operators
 		explicit operator int() const { return index; }
 
-		MapVertex* asVertex(const SLADEMap& map) const;
-		MapLine*   asLine(const SLADEMap& map) const;
-		MapSide*   asSide(const SLADEMap& map) const;
-		MapSector* asSector(const SLADEMap& map) const;
-		MapThing*  asThing(const SLADEMap& map) const;
-		MapObject* asObject(const SLADEMap& map) const;
+		MapVertex* asVertex(const SLADE64Map& map) const;
+		MapLine*   asLine(const SLADE64Map& map) const;
+		MapSide*   asSide(const SLADE64Map& map) const;
+		MapSector* asSector(const SLADE64Map& map) const;
+		MapThing*  asThing(const SLADE64Map& map) const;
+		MapObject* asObject(const SLADE64Map& map) const;
 	};
 
 	MapEditContext&    editContext();
@@ -123,9 +123,9 @@ namespace mapeditor
 	string browseTexture(
 		string_view init_texture,
 		TextureType tex_type,
-		SLADEMap&   map,
+		SLADE64Map&   map,
 		string_view title = "Browse Texture");
-	int browseThingType(int init_type, SLADEMap& map);
+	int browseThingType(int init_type, SLADE64Map& map);
 
 	// Misc
 	ItemType baseItemType(const ItemType& type);

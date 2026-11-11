@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(Slade3 VERSION 3.2.0)
+project(Slade64 VERSION 3.2.0)
 
 if(COMMAND cmake_policy)
 	cmake_policy( SET CMP0012 NEW )
@@ -17,7 +17,7 @@ if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-set(SLADE_OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory where slade will be created.")
+set(SLADE64_OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory where slade will be created.")
 
 OPTION(USE_SFML_RENDERWINDOW "Use SFML RenderWindow for OpenGL displays" OFF)
 if(NOT APPLE)

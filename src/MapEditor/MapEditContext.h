@@ -20,7 +20,7 @@
 #include "Renderer/Overlays/ThingInfoOverlay.h"
 #include "Renderer/Overlays/VertexInfoOverlay.h"
 #include "Renderer/Renderer.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 
 namespace slade
 {
@@ -45,7 +45,7 @@ public:
 	MapEditContext();
 	~MapEditContext() = default;
 
-	SLADEMap&             map() { return map_; }
+	SLADE64Map&             map() { return map_; }
 	mapeditor::Mode       editMode() const { return edit_mode_; }
 	mapeditor::SectorMode sectorEditMode() const { return sector_mode_; }
 	double                gridSize() const;
@@ -151,7 +151,7 @@ public:
 	bool handleAction(string_view id) override;
 
 private:
-	SLADEMap         map_;
+	SLADE64Map         map_;
 	MapCanvas*       canvas_ = nullptr;
 	Archive::MapDesc map_desc_;
 	long             next_frame_length_ = 0;
@@ -238,7 +238,7 @@ public:
 
 	void               addLines(const vector<MapLine*>& lines);
 	string             info() const;
-	vector<MapVertex*> pasteToMap(SLADEMap* map, Vec2d position);
+	vector<MapVertex*> pasteToMap(SLADE64Map* map, Vec2d position);
 	void               putLines(vector<MapLine*>& list);
 	Vec2d              midpoint() const { return midpoint_; }
 
@@ -258,7 +258,7 @@ public:
 
 	void   addThings(vector<MapThing*>& things);
 	string info() const;
-	void   pasteToMap(SLADEMap* map, Vec2d position);
+	void   pasteToMap(SLADE64Map* map, Vec2d position);
 	void   putThings(vector<MapThing*>& list);
 	Vec2d  midpoint() const { return midpoint_; }
 

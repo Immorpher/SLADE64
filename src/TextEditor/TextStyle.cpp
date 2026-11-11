@@ -640,6 +640,12 @@ StyleSet* StyleSet::currentSet()
 // -----------------------------------------------------------------------------
 bool StyleSet::loadSet(string_view name)
 {
+	// Saved preferences from before the SLADE64 rename
+	if (strutil::equalCI(name, "SLADE (Light)"))
+		name = "SLADE64 (Light)";
+	else if (strutil::equalCI(name, "SLADE (Dark)"))
+		name = "SLADE64 (Dark)";
+
 	// Search for set matching name
 	for (auto& style_set : style_sets)
 	{
@@ -763,17 +769,17 @@ void StyleSet::addSet(StyleSet* set)
 }
 
 // -----------------------------------------------------------------------------
-// Loads all text styles from the slade resource archive (slade.pk3)
+// Loads all text styles from the slade resource archive (slade64.pk3)
 // -----------------------------------------------------------------------------
 bool StyleSet::loadResourceStyles()
 {
-	// Get 'config/text_styles' directory in slade.pk3
+	// Get 'config/text_styles' directory in slade64.pk3
 	auto dir = app::archiveManager().programResourceArchive()->dirAtPath("config/text_styles");
 
 	// Check it exists
 	if (!dir)
 	{
-		log::warning("No 'config/text_styles' directory exists in slade.pk3");
+		log::warning("No 'config/text_styles' directory exists in slade64.pk3");
 		return false;
 	}
 

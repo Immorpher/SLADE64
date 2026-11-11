@@ -36,8 +36,8 @@
 #include "General/ColourConfiguration.h"
 #include "OpenGL/Drawing.h"
 #include "OpenGL/OpenGL.h"
-#include "SLADEMap/MapObject/MapVertex.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/MapObject/MapVertex.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "Utility/MathStuff.h"
 
 using namespace slade;

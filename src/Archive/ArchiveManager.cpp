@@ -94,7 +94,7 @@ bool ArchiveManager::validResDir(string_view dir) const
 			log::warning(
 				"Resource {} was not found in dir {}!\n"
 				"This resource folder cannot be used. "
-				"(Did you install SLADE 3 in a SLumpEd folder?)",
+				"(Did you install SLADE64 in a SLumpEd folder?)",
 				path,
 				dir);
 			return false;
@@ -127,21 +127,27 @@ bool ArchiveManager::init()
 		return res_archive_open_;
 	}
 
-	// Find slade3.pk3 directory
-	auto dir_slade_pk3 = app::path("slade.pk3", app::Dir::Resources);
-	if (!fileutil::fileExists(dir_slade_pk3))
-		dir_slade_pk3 = app::path("slade.pk3", app::Dir::Data);
-	if (!fileutil::fileExists(dir_slade_pk3))
-		dir_slade_pk3 = app::path("slade.pk3", app::Dir::Executable);
-	if (!fileutil::fileExists(dir_slade_pk3))
-		dir_slade_pk3 = app::path("slade.pk3", app::Dir::User);
-	if (!fileutil::fileExists(dir_slade_pk3))
-		dir_slade_pk3 = "slade.pk3";
+	// Find slade64.pk3 (or the old slade64.pk3 name)
+	string dir_slade_pk3;
+	for (const auto* name : { "slade64.pk3", "slade64.pk3" })
+	{
+		for (auto dir : { app::Dir::Resources, app::Dir::Data, app::Dir::Executable, app::Dir::User })
+		{
+			dir_slade_pk3 = app::path(name, dir);
+			if (fileutil::fileExists(dir_slade_pk3))
+				break;
+			dir_slade_pk3.clear();
+		}
+		if (!dir_slade_pk3.empty())
+			break;
+	}
+	if (dir_slade_pk3.empty())
+		dir_slade_pk3 = "slade64.pk3";
 
-	// Open slade.pk3
+	// Open slade64.pk3
 	if (!program_resource_archive_->open(dir_slade_pk3))
 	{
-		log::error("Unable to find slade.pk3!");
+		log::error("Unable to find slade64.pk3!");
 		res_archive_open_ = false;
 	}
 	else

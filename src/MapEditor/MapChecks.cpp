@@ -37,7 +37,7 @@
 #include "MapEditor/MapEditContext.h"
 #include "MapEditor/MapEditor.h"
 #include "MapTextureManager.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "UI/Dialogs/MapTextureBrowser.h"
 #include "UI/Dialogs/ThingTypeBrowser.h"
 #include "Utility/MathStuff.h"
@@ -86,7 +86,7 @@ std::map<MapCheck::StandardCheck, StandardCheckInfo> std_checks = {
 class MissingTextureCheck : public MapCheck
 {
 public:
-	MissingTextureCheck(SLADEMap* map) : MapCheck(map) {}
+	MissingTextureCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -259,7 +259,7 @@ private:
 class SpecialTagsCheck : public MapCheck
 {
 public:
-	SpecialTagsCheck(SLADEMap* map) : MapCheck(map) {}
+	SpecialTagsCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -362,7 +362,7 @@ private:
 class MissingTaggedCheck : public MapCheck
 {
 public:
-	MissingTaggedCheck(SLADEMap* map) : MapCheck(map) {}
+	MissingTaggedCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -491,7 +491,7 @@ private:
 class LinesIntersectCheck : public MapCheck
 {
 public:
-	LinesIntersectCheck(SLADEMap* map) : MapCheck(map) {}
+	LinesIntersectCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void checkIntersections(vector<MapLine*> lines)
 	{
@@ -638,7 +638,7 @@ private:
 class LinesOverlapCheck : public MapCheck
 {
 public:
-	LinesOverlapCheck(SLADEMap* map) : MapCheck(map) {}
+	LinesOverlapCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -743,7 +743,7 @@ private:
 class ThingsOverlapCheck : public MapCheck
 {
 public:
-	ThingsOverlapCheck(SLADEMap* map) : MapCheck(map) {}
+	ThingsOverlapCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -983,7 +983,7 @@ private:
 class UnknownTexturesCheck : public MapCheck
 {
 public:
-	UnknownTexturesCheck(SLADEMap* map, MapTextureManager* texman) : MapCheck(map), texman_{ texman } {}
+	UnknownTexturesCheck(SLADE64Map* map, MapTextureManager* texman) : MapCheck(map), texman_{ texman } {}
 
 	void doCheck() override
 	{
@@ -1164,7 +1164,7 @@ private:
 class UnknownFlatsCheck : public MapCheck
 {
 public:
-	UnknownFlatsCheck(SLADEMap* map, MapTextureManager* texman) : MapCheck(map), texman_{ texman } {}
+	UnknownFlatsCheck(SLADE64Map* map, MapTextureManager* texman) : MapCheck(map), texman_{ texman } {}
 
 	void doCheck() override
 	{
@@ -1270,7 +1270,7 @@ private:
 class UnknownThingTypesCheck : public MapCheck
 {
 public:
-	UnknownThingTypesCheck(SLADEMap* map) : MapCheck(map) {}
+	UnknownThingTypesCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -1345,7 +1345,7 @@ private:
 class StuckThingsCheck : public MapCheck
 {
 public:
-	StuckThingsCheck(SLADEMap* map) : MapCheck(map) {}
+	StuckThingsCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -1466,7 +1466,7 @@ private:
 class SectorReferenceCheck : public MapCheck
 {
 public:
-	SectorReferenceCheck(SLADEMap* map) : MapCheck(map) {}
+	SectorReferenceCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void checkLine(MapLine* line)
 	{
@@ -1611,7 +1611,7 @@ private:
 class InvalidLineCheck : public MapCheck
 {
 public:
-	InvalidLineCheck(SLADEMap* map) : MapCheck(map) {}
+	InvalidLineCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -1727,7 +1727,7 @@ private:
 class UnknownSectorCheck : public MapCheck
 {
 public:
-	UnknownSectorCheck(SLADEMap* map) : MapCheck(map) {}
+	UnknownSectorCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -1800,7 +1800,7 @@ private:
 class UnknownSpecialCheck : public MapCheck
 {
 public:
-	UnknownSpecialCheck(SLADEMap* map) : MapCheck(map) {}
+	UnknownSpecialCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -1890,7 +1890,7 @@ private:
 class ObsoleteThingCheck : public MapCheck
 {
 public:
-	ObsoleteThingCheck(SLADEMap* map) : MapCheck(map) {}
+	ObsoleteThingCheck(SLADE64Map* map) : MapCheck(map) {}
 
 	void doCheck() override
 	{
@@ -1967,7 +1967,7 @@ private:
 // Creates a standard MapCheck of [type], passing [map] and [texman] to the
 // constructor where necessary
 // -----------------------------------------------------------------------------
-unique_ptr<MapCheck> MapCheck::standardCheck(StandardCheck type, SLADEMap* map, MapTextureManager* texman)
+unique_ptr<MapCheck> MapCheck::standardCheck(StandardCheck type, SLADE64Map* map, MapTextureManager* texman)
 {
 	switch (type)
 	{
@@ -1993,7 +1993,7 @@ unique_ptr<MapCheck> MapCheck::standardCheck(StandardCheck type, SLADEMap* map, 
 // -----------------------------------------------------------------------------
 // Same as above, but taking a string MapCheck type id instead of an enum value
 // -----------------------------------------------------------------------------
-unique_ptr<MapCheck> MapCheck::standardCheck(string_view type_id, SLADEMap* map, MapTextureManager* texman)
+unique_ptr<MapCheck> MapCheck::standardCheck(string_view type_id, SLADE64Map* map, MapTextureManager* texman)
 {
 	for (auto& check : std_checks)
 		if (check.second.id == type_id)

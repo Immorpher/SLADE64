@@ -123,11 +123,11 @@ if (NOT NO_FLUIDSYNTH)
 	include_directories(${FLUIDSYNTH_INCLUDE_DIR})
 endif()
 
-set(SLADE_SOURCES
+set(SLADE64_SOURCES
 )
-set(SLADE_SCRIPTING_SOURCES)
+set(SLADE64_SCRIPTING_SOURCES)
 # Don't include external libraries here as they should be compiled separately
-file(GLOB_RECURSE SLADE_SOURCES
+file(GLOB_RECURSE SLADE64_SOURCES
 	Application/*.cpp
 	Archive/*.cpp
 	Audio/*.cpp
@@ -138,26 +138,26 @@ file(GLOB_RECURSE SLADE_SOURCES
 	MainEditor/*.cpp
 	MapEditor/*.cpp
 	OpenGL/*.cpp
-	SLADEMap/*.cpp
+	SLADE64Map/*.cpp
 	TextEditor/*.cpp
 	UI/*.cpp
 	Utility/*.cpp
 	)
 if (NOT NO_LUA)
-	file(GLOB_RECURSE SLADE_SCRIPTING_SOURCES Scripting/*.cpp)
-	set(SLADE_SOURCES ${SLADE_SOURCES} ${SLADE_SCRIPTING_SOURCES})
+	file(GLOB_RECURSE SLADE64_SCRIPTING_SOURCES Scripting/*.cpp)
+	set(SLADE64_SOURCES ${SLADE64_SOURCES} ${SLADE64_SCRIPTING_SOURCES})
 else ()
 	ADD_DEFINITIONS(-DNO_LUA)
 endif ()
-set(SLADE_HEADERS
+set(SLADE64_HEADERS
 )
-file(GLOB_RECURSE SLADE_HEADERS *.h *.hpp)
+file(GLOB_RECURSE SLADE64_HEADERS *.h *.hpp)
 
 if(APPLE)
 	set(OSX_ICON "${CMAKE_SOURCE_DIR}/SLADE-osx.icns")
 	set(OSX_PLIST "${CMAKE_SOURCE_DIR}/Info.plist")
 
-	set(SLADE_SOURCES ${SLADE_SOURCES} ${OSX_ICON} ${OSX_PLIST})
+	set(SLADE64_SOURCES ${SLADE64_SOURCES} ${OSX_ICON} ${OSX_PLIST})
 
 	set_source_files_properties(${OSX_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif(APPLE)
@@ -176,12 +176,12 @@ endif(USE_SANITIZER)
 # External libraries are compiled separately to enable unity builds
 add_subdirectory(../thirdparty external)
 
-add_executable(slade WIN32 MACOSX_BUNDLE
-	${SLADE_SOURCES}
-	${SLADE_HEADERS}
+add_executable(slade64 WIN32 MACOSX_BUNDLE
+	${SLADE64_SOURCES}
+	${SLADE64_HEADERS}
 )
 
-target_link_libraries(slade
+target_link_libraries(slade64
 	${ZLIB_LIBRARY}
 	${BZIP2_LIBRARIES}
 	${EXTERNAL_LIBRARIES}
@@ -195,48 +195,48 @@ target_link_libraries(slade
 )
 
 if(LINUX)
-	target_link_libraries(slade -lstdc++fs)
+	target_link_libraries(slade64 -lstdc++fs)
 endif()
 
 if (WX_GTK3)
-	target_link_libraries(slade ${GTK3_LIBRARIES})
+	target_link_libraries(slade64 ${GTK3_LIBRARIES})
 else(WX_GTK3)
-	target_link_libraries(slade ${GTK2_LIBRARIES})
+	target_link_libraries(slade64 ${GTK2_LIBRARIES})
 endif(WX_GTK3)
 
 if (NOT NO_FLUIDSYNTH)
-	target_link_libraries(slade ${FLUIDSYNTH_LIBRARIES})
+	target_link_libraries(slade64 ${FLUIDSYNTH_LIBRARIES})
 endif()
 
-set_target_properties(slade PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SLADE_OUTPUT_DIR})
+set_target_properties(slade64 PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SLADE64_OUTPUT_DIR})
 
 # TODO: Installation targets for APPLE
 if(APPLE)
-	set_target_properties(slade PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${OSX_PLIST})
+	set_target_properties(slade64 PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${OSX_PLIST})
 
-	add_custom_command(TARGET slade POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SLADE_OUTPUT_DIR}/slade.pk3" "$<TARGET_FILE_DIR:slade>/slade.pk3"
+	add_custom_command(TARGET slade64 POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SLADE64_OUTPUT_DIR}/slade64.pk3" "$<TARGET_FILE_DIR:slade64>/slade64.pk3"
 	)
 else(APPLE)
 	if(UNIX)
-		install(TARGETS slade
+		install(TARGETS slade64
 			RUNTIME DESTINATION bin
 			)
 
-		install(FILES "${SLADE_OUTPUT_DIR}/slade.pk3"
-			DESTINATION share/slade3
+		install(FILES "${SLADE64_OUTPUT_DIR}/slade64.pk3"
+			DESTINATION share/slade64
 			)
 
 		install(FILES "${PROJECT_SOURCE_DIR}/dist/res/logo_icon.png"
 			DESTINATION share/icons/
-			RENAME net.mancubus.SLADE.png
+			RENAME net.mancubus.SLADE64.png
 			)
 
-		install(FILES "${PROJECT_SOURCE_DIR}/net.mancubus.SLADE.desktop"
+		install(FILES "${PROJECT_SOURCE_DIR}/net.mancubus.SLADE64.desktop"
 			DESTINATION share/applications/
 			)
 
-		install(FILES "${PROJECT_SOURCE_DIR}/net.mancubus.SLADE.metainfo.xml"
+		install(FILES "${PROJECT_SOURCE_DIR}/net.mancubus.SLADE64.metainfo.xml"
 			DESTINATION share/metainfo/
 			)
 	endif(UNIX)
@@ -254,7 +254,7 @@ if(NOT TARGET uninstall)
 endif()
 
 if (NOT NO_COTIRE)
-	set_target_properties(slade PROPERTIES
+	set_target_properties(slade64 PROPERTIES
 		COTIRE_CXX_PREFIX_HEADER_INIT "common.h"
 		# Enable multithreaded unity builds by default
 		# because otherwise probably no one would realize how
@@ -262,5 +262,5 @@ if (NOT NO_COTIRE)
 		# Fixes macro definition bleedout
 		COTIRE_UNITY_SOURCE_PRE_UNDEFS "Bool"
 		)
-	cotire(slade)
+	cotire(slade64)
 endif()

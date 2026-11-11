@@ -372,7 +372,7 @@ UndoManager* undoredo::currentManager()
 // -----------------------------------------------------------------------------
 // Returns the 'current' map, associated with the current undo manager
 // -----------------------------------------------------------------------------
-SLADEMap* undoredo::currentMap()
+SLADE64Map* undoredo::currentMap()
 {
 	if (current_undo_manager)
 		return current_undo_manager->map();

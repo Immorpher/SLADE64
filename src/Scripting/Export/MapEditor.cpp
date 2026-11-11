@@ -33,7 +33,7 @@
 #include "Main.h"
 #include "Game/Configuration.h"
 #include "MapEditor/MapEditContext.h"
-#include "SLADEMap/MapObject/MapObject.h"
+#include "SLADE64Map/MapObject/MapObject.h"
 #include "Scripting/Lua.h"
 #include "thirdparty/sol/sol.hpp"
 
@@ -98,20 +98,20 @@ void objectSetStringProperty(MapObject& self, string_view key, string_view value
 // -----------------------------------------------------------------------------
 // Registers the Map type with lua
 // -----------------------------------------------------------------------------
-void registerSLADEMap(sol::state& lua)
+void registerSLADE64Map(sol::state& lua)
 {
 	// Create ArchiveFormat type, no constructor
-	auto lua_map = lua.new_usertype<SLADEMap>("Map", "new", sol::no_constructor);
+	auto lua_map = lua.new_usertype<SLADE64Map>("Map", "new", sol::no_constructor);
 
 	// Properties
 	// -------------------------------------------------------------------------
-	lua_map["name"]          = sol::property(&SLADEMap::mapName);
-	lua_map["udmfNamespace"] = sol::property(&SLADEMap::udmfNamespace);
-	lua_map["vertices"]      = sol::property([](SLADEMap& self) { return self.vertices().all(); });
-	lua_map["linedefs"]      = sol::property([](SLADEMap& self) { return self.lines().all(); });
-	lua_map["sidedefs"]      = sol::property([](SLADEMap& self) { return self.sides().all(); });
-	lua_map["sectors"]       = sol::property([](SLADEMap& self) { return self.sectors().all(); });
-	lua_map["things"]        = sol::property([](SLADEMap& self) { return self.things().all(); });
+	lua_map["name"]          = sol::property(&SLADE64Map::mapName);
+	lua_map["udmfNamespace"] = sol::property(&SLADE64Map::udmfNamespace);
+	lua_map["vertices"]      = sol::property([](SLADE64Map& self) { return self.vertices().all(); });
+	lua_map["linedefs"]      = sol::property([](SLADE64Map& self) { return self.lines().all(); });
+	lua_map["sidedefs"]      = sol::property([](SLADE64Map& self) { return self.sides().all(); });
+	lua_map["sectors"]       = sol::property([](SLADE64Map& self) { return self.sectors().all(); });
+	lua_map["things"]        = sol::property([](SLADE64Map& self) { return self.things().all(); });
 }
 
 // -----------------------------------------------------------------------------
@@ -389,7 +389,7 @@ void registerMapObject(sol::state& lua)
 void registerMapEditorTypes(sol::state& lua)
 {
 	registerMapEditor(lua);
-	registerSLADEMap(lua);
+	registerSLADE64Map(lua);
 	registerMapObject(lua);
 	registerMapVertex(lua);
 	registerMapLine(lua);

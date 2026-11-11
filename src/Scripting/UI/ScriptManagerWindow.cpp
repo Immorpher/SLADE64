@@ -202,14 +202,14 @@ wxImageList* createTreeImageList()
 // -----------------------------------------------------------------------------
 // ScriptManagerWindow class constructor
 // -----------------------------------------------------------------------------
-ScriptManagerWindow::ScriptManagerWindow() : STopWindow("SLADE Script Manager", "scriptmanager")
+ScriptManagerWindow::ScriptManagerWindow() : STopWindow("SLADE64 Script Manager", "scriptmanager")
 {
 	setupLayout();
 
 	// Open 'scratch box' initially
 	script_scratchbox_.name = "Scratch Box";
 	script_scratchbox_.text =
-		"-- Use this script to write ad-hoc SLADE editor scripts\n"
+		"-- Use this script to write ad-hoc SLADE64 editor scripts\n"
 		"-- Note that this will not be saved between sessions\n\n";
 	script_scratchbox_.read_only = true;
 	openScriptTab(&script_scratchbox_);
@@ -532,7 +532,7 @@ void ScriptManagerWindow::addEditorScriptsNode(
 }
 
 // -----------------------------------------------------------------------------
-// Loads scripts from slade.pk3 into the scripts tree control
+// Loads scripts from slade64.pk3 into the scripts tree control
 // -----------------------------------------------------------------------------
 void ScriptManagerWindow::populateScriptsTree()
 {
@@ -545,7 +545,7 @@ void ScriptManagerWindow::populateScriptsTree()
 	auto root = tree_scripts_->AddRoot("Scripts");
 
 	// Editor scripts (general)
-	auto editor_scripts = tree_scripts_->AppendItem(root, "SLADE Editor Scripts", 1);
+	auto editor_scripts = tree_scripts_->AppendItem(root, "SLADE64 Editor Scripts", 1);
 	tree_scripts_->AppendItem(editor_scripts, "Scratch Box", 0, 0, new ScriptTreeItemData(&script_scratchbox_));
 	for (auto& script : scriptmanager::editorScripts())
 		tree_scripts_->AppendItem(

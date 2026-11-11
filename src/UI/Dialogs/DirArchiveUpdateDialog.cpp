@@ -57,7 +57,7 @@ DirArchiveUpdateDialog::DirArchiveUpdateDialog(wxWindow* parent, DirArchive* arc
 
 	// Message
 	wxString message = wxString::Format(
-		"Contents of the directory \"%s\" have been modified outside of SLADE,\n", archive->filename());
+		"Contents of the directory \"%s\" have been modified outside of SLADE64,\n", archive->filename());
 	message += "please tick the changes below that you wish to apply.";
 	sizer->Add(new wxStaticText(this, -1, message), 0, wxEXPAND | wxALL, ui::padLarge());
 	message = "Note that any unticked changes will be overwritten on disk when the directory is saved.";

@@ -117,7 +117,7 @@ wxSizer* createTitleSizer(wxWindow* parent, const wxString& title, const wxStrin
 // -----------------------------------------------------------------------------
 // PreferencesDialog class constructor
 // -----------------------------------------------------------------------------
-PreferencesDialog::PreferencesDialog(wxWindow* parent) : SDialog(parent, "SLADE Settings", "prefs")
+PreferencesDialog::PreferencesDialog(wxWindow* parent) : SDialog(parent, "SLADE64 Settings", "prefs")
 {
 	// Setup main sizer
 	auto sizer = new wxBoxSizer(wxVERTICAL);

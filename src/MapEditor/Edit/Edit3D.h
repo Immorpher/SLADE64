@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MapEditor/MapEditor.h"
-#include "SLADEMap/MapObject/MapThing.h"
+#include "SLADE64Map/MapObject/MapThing.h"
 
 namespace slade
 {

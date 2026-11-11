@@ -36,7 +36,7 @@
 #include "MapEditor/MapChecks.h"
 #include "MapEditor/MapEditContext.h"
 #include "MapEditor/MapEditor.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 #include "UI/WxUtils.h"
 #include "Utility/SFileDialog.h"
 
@@ -80,7 +80,7 @@ vector<std::pair<MapCheck::StandardCheck, wxString>> std_checks = {
 // -----------------------------------------------------------------------------
 // MapChecksPanel class constructor
 // -----------------------------------------------------------------------------
-MapChecksPanel::MapChecksPanel(wxWindow* parent, SLADEMap* map) : DockPanel{ parent }, map_{ map }
+MapChecksPanel::MapChecksPanel(wxWindow* parent, SLADE64Map* map) : DockPanel{ parent }, map_{ map }
 {
 	// Create controls
 	clb_active_checks_ = new wxCheckListBox(this, -1);

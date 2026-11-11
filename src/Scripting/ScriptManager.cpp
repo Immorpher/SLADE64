@@ -111,11 +111,11 @@ Script* addEditorScriptFromFile(string_view filename, ScriptType type)
 }
 
 // -----------------------------------------------------------------------------
-// Loads all 'general' scripts from slade.pk3 (examples etc.)
+// Loads all 'general' scripts from slade64.pk3 (examples etc.)
 // -----------------------------------------------------------------------------
 void loadGeneralScripts()
 {
-	// Get 'scripts/general' dir of slade.pk3
+	// Get 'scripts/general' dir of slade64.pk3
 	auto scripts_dir = app::archiveManager().programResourceArchive()->dirAtPath("scripts/general");
 	if (scripts_dir)
 		for (auto& entry : scripts_dir->allEntries())
@@ -142,12 +142,12 @@ void loadCustomScripts()
 }
 
 // -----------------------------------------------------------------------------
-// Loads all editor scripts of [type] from slade.pk3 and the user dir
+// Loads all editor scripts of [type] from slade64.pk3 and the user dir
 // (in scripts/[dir])
 // -----------------------------------------------------------------------------
 void loadEditorScripts(ScriptType type, string_view dir)
 {
-	// Get 'scripts/(dir)' dir of slade.pk3
+	// Get 'scripts/(dir)' dir of slade64.pk3
 	auto scripts_dir = app::archiveManager().programResourceArchive()->dirAtPath(fmt::format("scripts/{}", dir));
 	if (scripts_dir)
 	{
@@ -206,7 +206,7 @@ void exportUserScripts(string_view path, ScriptList& list)
 }
 
 // -----------------------------------------------------------------------------
-// Loads text from the entry at [res_path] in slade.pk3 into [target]
+// Loads text from the entry at [res_path] in slade64.pk3 into [target]
 // -----------------------------------------------------------------------------
 void readResourceEntryText(string& target, string_view res_path)
 {
@@ -385,7 +385,7 @@ void scriptmanager::runEntryScript(vector<ArchiveEntry*> entries, int index, wxW
 // -----------------------------------------------------------------------------
 // Runs the map editor script at [index] on [map]
 // -----------------------------------------------------------------------------
-void scriptmanager::runMapScript(SLADEMap* map, int index, wxWindow* parent)
+void scriptmanager::runMapScript(SLADE64Map* map, int index, wxWindow* parent)
 {
 	if (parent)
 		lua::setCurrentWindow(parent);

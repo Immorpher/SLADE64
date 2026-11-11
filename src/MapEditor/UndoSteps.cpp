@@ -1,7 +1,7 @@
 
 #include "Main.h"
 #include "UndoSteps.h"
-#include "SLADEMap/SLADEMap.h"
+#include "SLADE64Map/SLADE64Map.h"
 
 using namespace slade;
 using namespace mapeditor;
