@@ -15,7 +15,6 @@
 ### Optional build-time requirements
 
 * Fluidsynth (deactivate with `-DNO_FLUIDSYNTH=ON`)
-* Lua (deactivate with `-DNO_LUA=ON`)
 
 ### Additional configure switches for cmake
 
@@ -29,7 +28,6 @@ SLADE64 can be built on Windows using [Visual Studio](https://visualstudio.micro
 ### Required vcpkg libraries
 
 * freeimage
-* lua
 * opengl
 * sfml
 * wxwidgets

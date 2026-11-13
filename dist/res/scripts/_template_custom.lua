@@ -1,1 +1,0 @@
--- Custom scripts are simple scripts you can save and run via the Script Manager

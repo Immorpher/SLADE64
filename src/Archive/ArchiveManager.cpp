@@ -75,7 +75,6 @@ bool ArchiveManager::validResDir(string_view dir) const
 	static string paths[] = {
 		"animated.lmp",
 		"config/executables.cfg",
-		"config/nodebuilders.cfg",
 		"fonts/dejavu_sans.ttf",
 		"icons/entry_list/archive.svg",
 		"icons/general/wiki.svg",
@@ -127,9 +126,9 @@ bool ArchiveManager::init()
 		return res_archive_open_;
 	}
 
-	// Find slade64.pk3 (or the old slade64.pk3 name)
+	// Find slade64.pk3 (or the old slade.pk3 name)
 	string dir_slade_pk3;
-	for (const auto* name : { "slade64.pk3", "slade64.pk3" })
+	for (const auto* name : { "slade64.pk3", "slade.pk3" })
 	{
 		for (auto dir : { app::Dir::Resources, app::Dir::Data, app::Dir::Executable, app::Dir::User })
 		{
@@ -200,8 +199,8 @@ bool ArchiveManager::addArchive(shared_ptr<Archive> archive)
 		// Add to resource manager
 		app::resources().addArchive(archive.get());
 
-		// ZDoom also loads any WADs found in the root of a PK3 or directory
-		if ((archive->formatId() == "zip" || archive->formatId() == "folder") && auto_open_wads_root)
+		// Also load any WADs found in the root of a directory
+		if (archive->formatId() == "folder" && auto_open_wads_root)
 		{
 			for (const auto& entry : archive->rootDir()->entries())
 			{
@@ -301,8 +300,6 @@ shared_ptr<Archive> ArchiveManager::openArchive(string_view filename, bool manag
 		new_archive = std::make_shared<WddArchive>();
 	else if (WadArchive::isWadArchive(std_fn))
 		new_archive = std::make_shared<WadArchive>();
-	else if (ZipArchive::isZipArchive(std_fn))
-		new_archive = std::make_shared<ZipArchive>();
 	else if (ResArchive::isResArchive(std_fn))
 		new_archive = std::make_shared<ResArchive>();
 	else if (DatArchive::isDatArchive(std_fn))
@@ -406,8 +403,6 @@ shared_ptr<Archive> ArchiveManager::openArchive(ArchiveEntry* entry, bool manage
 	shared_ptr<Archive> new_archive;
 	if (WadArchive::isWadArchive(entry->data()))
 		new_archive = std::make_shared<WadArchive>();
-	else if (ZipArchive::isZipArchive(entry->data()))
-		new_archive = std::make_shared<ZipArchive>();
 	else if (ResArchive::isResArchive(entry->data()))
 		new_archive = std::make_shared<ResArchive>();
 	else if (LibArchive::isLibArchive(entry->data()))
@@ -555,8 +550,6 @@ shared_ptr<Archive> ArchiveManager::newArchive(string_view format)
 	shared_ptr<Archive> new_archive;
 	if (format == "wad")
 		new_archive = std::make_shared<WadArchive>();
-	else if (format == "zip")
-		new_archive = std::make_shared<ZipArchive>();
 	else if (format == "grp")
 		new_archive = std::make_shared<GrpArchive>();
 	else if (format == "pak")
@@ -918,8 +911,6 @@ bool ArchiveManager::openBaseResource(int index)
 	auto filename = base_resource_paths_[index];
 	if (WadArchive::isWadArchive(filename))
 		base_resource_archive_ = std::make_unique<WadArchive>();
-	else if (ZipArchive::isZipArchive(filename))
-		base_resource_archive_ = std::make_unique<ZipArchive>();
 	else
 		return false;
 

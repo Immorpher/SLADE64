@@ -27,7 +27,6 @@ private:
 	wxButton*          btn_add_                 = nullptr;
 	wxButton*          btn_remove_              = nullptr;
 	wxButton*          btn_detect_              = nullptr;
-	FileLocationPanel* flp_zdoom_pk3_           = nullptr;
 
 	void setupLayout();
 

@@ -227,159 +227,19 @@ bool ZipArchive::open(MemChunk& mc)
 }
 
 // -----------------------------------------------------------------------------
-// Writes the zip archive to a MemChunk
-// Returns true if successful, false otherwise
+// Writing zips is not supported - this class only exists to read the program's
+// own resource archive (slade64.pk3)
 // -----------------------------------------------------------------------------
 bool ZipArchive::write(MemChunk& mc, bool update)
 {
-	bool success = false;
-
-	// Write to a temporary file
-	const auto tempfile = app::path("slade-temp-write.zip", app::Dir::Temp);
-	if (write(tempfile, true))
-	{
-		// Load file into MemChunk
-		success = mc.importFile(tempfile);
-	}
-
-	// Clean up
-	wxRemoveFile(tempfile);
-
-	return success;
+	global::error = "Writing zip archives is not supported";
+	return false;
 }
 
-// -----------------------------------------------------------------------------
-// Writes the zip archive to a file
-// Returns true if successful, false otherwise
-// -----------------------------------------------------------------------------
 bool ZipArchive::write(string_view filename, bool update)
 {
-	// Check for entries with duplicate names (not allowed for zips)
-	auto all_dirs = rootDir()->allDirectories();
-	all_dirs.insert(all_dirs.begin(), rootDir());
-	for (const auto& dir : all_dirs)
-	{
-		if (auto* dup_entry = dir->findDuplicateEntryName())
-		{
-			global::error = fmt::format("Multiple entries named {} found in {}", dup_entry->name(), dup_entry->path());
-			return false;
-		}
-	}
-
-	// Open the file
-	wxFFileOutputStream out(wxutil::strFromView(filename));
-	if (!out.IsOk())
-	{
-		global::error = "Unable to open file for saving. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Open as zip for writing
-	wxZipOutputStream zip(out, 9);
-	if (!zip.IsOk())
-	{
-		global::error = "Unable to create zip for saving";
-		return false;
-	}
-
-	// Open old zip for copying, from the temp file that was copied on opening.
-	// This is used to copy any entries that have been previously saved/compressed
-	// and are unmodified, to greatly speed up zip file saving by not having to
-	// recompress unchanged entries
-	unique_ptr<wxZipInputStream>   inzip;
-	unique_ptr<wxFFileInputStream> in;
-	vector<wxZipEntry*>            c_entries;
-	if (fileutil::fileExists(temp_file_))
-	{
-		in    = std::make_unique<wxFFileInputStream>(temp_file_);
-		inzip = std::make_unique<wxZipInputStream>(*in);
-
-		if (inzip->IsOk())
-		{
-			// Get a list of all entries in the old zip
-			c_entries.resize(inzip->GetTotalEntries(), nullptr);
-			for (unsigned a = 0; a < c_entries.size(); a++)
-			{
-				c_entries[a] = inzip->GetNextEntry();
-
-				// Stop if reading the zip failed
-				if (!c_entries[a])
-					break;
-			}
-			inzip->Reset();
-		}
-		else
-		{
-			in    = nullptr;
-			inzip = nullptr;
-		}
-	}
-
-	// Get a linear list of all entries in the archive
-	vector<ArchiveEntry*> entries;
-	putEntryTreeAsList(entries);
-
-	// Go through all entries
-	auto n_entries = entries.size();
-	ui::setSplashProgressMessage("Writing zip entries");
-	ui::setSplashProgress(0.0f);
-	ui::updateSplash();
-	for (size_t a = 0; a < n_entries; a++)
-	{
-		ui::setSplashProgress(static_cast<float>(a) / static_cast<float>(n_entries));
-
-		if (entries[a]->type() == EntryType::folderType())
-		{
-			// If the current entry is a folder, just write a directory entry and continue
-			zip.PutNextDirEntry(entries[a]->path(true));
-			if (update)
-				entries[a]->setState(ArchiveEntry::State::Unmodified);
-			continue;
-		}
-
-		// Get entry zip index
-		int index = -1;
-		if (entries[a]->exProps().contains("ZipIndex"))
-			index = entries[a]->exProp<int>("ZipIndex");
-
-		auto saname = misc::lumpNameToFileName(entries[a]->name());
-		if (!inzip || entries[a]->state() != ArchiveEntry::State::Unmodified || index < 0
-			|| index >= inzip->GetTotalEntries() || !c_entries[index])
-		{
-			// If the current entry has been changed, or doesn't exist in the old zip,
-			// (re)compress its data and write it to the zip
-			const auto zipentry = new wxZipEntry(entries[a]->path() + saname);
-			zip.PutNextEntry(zipentry);
-			zip.Write(entries[a]->rawData(), entries[a]->size());
-		}
-		else
-		{
-			// If the entry is unmodified and exists in the old zip, just copy it over
-			c_entries[index]->SetName(entries[a]->path() + saname);
-			zip.CopyEntry(c_entries[index], *inzip);
-			inzip->Reset();
-		}
-
-		// Update entry info
-		if (update)
-		{
-			entries[a]->setState(ArchiveEntry::State::Unmodified);
-			entries[a]->exProp("ZipIndex") = static_cast<int>(a);
-		}
-	}
-
-	// Clean up
-	zip.Close();
-	out.Close();
-
-	// Update the temp file
-	if (temp_file_.empty())
-		generateTempFileName(filename);
-	fileutil::copyFile(filename, temp_file_);
-
-	ui::setSplashProgressMessage("");
-
-	return true;
+	global::error = "Writing zip archives is not supported";
+	return false;
 }
 
 // -----------------------------------------------------------------------------
@@ -677,60 +537,4 @@ void ZipArchive::generateTempFileName(string_view filename)
 			n++;
 		}
 	}
-}
-
-
-// -----------------------------------------------------------------------------
-//
-// ZipArchive Class Static Functions
-//
-// -----------------------------------------------------------------------------
-
-
-// -----------------------------------------------------------------------------
-// Checks if the given data is a valid zip archive
-// -----------------------------------------------------------------------------
-bool ZipArchive::isZipArchive(MemChunk& mc)
-{
-	// Check size
-	if (mc.size() < 22)
-		return false;
-
-	// Read first 4 bytes
-	uint32_t sig;
-	mc.seek(0, SEEK_SET);
-	mc.read(&sig, sizeof(uint32_t));
-
-	// Check for signature
-	if (sig != 0x04034b50 && // File header
-		sig != 0x06054b50)   // End of central directory
-		return false;
-
-	// The zip format is horrendous, so this will do for checking
-	return true;
-}
-
-// -----------------------------------------------------------------------------
-// Checks if the file at [filename] is a valid zip archive
-// -----------------------------------------------------------------------------
-bool ZipArchive::isZipArchive(const string& filename)
-{
-	// Open the file for reading
-	wxFile file(filename);
-
-	// Check it opened
-	if (!file.IsOpened())
-		return false;
-
-	// Read first 4 bytes
-	uint32_t sig;
-	file.Read(&sig, sizeof(uint32_t));
-
-	// Check for signature
-	if (sig != 0x04034b50 && // File header
-		sig != 0x06054b50)   // End of central directory
-		return false;
-
-	// The zip format is horrendous, so this will do for checking
-	return true;
 }

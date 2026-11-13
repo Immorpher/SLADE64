@@ -33,8 +33,6 @@
 #include "MainEditor.h"
 #include "App.h"
 #include "Archive/ArchiveManager.h"
-#include "MapEditor/MapEditor.h"
-#include "MapEditor/UI/MapEditorWindow.h"
 #include "UI/ArchiveManagerPanel.h"
 #include "UI/ArchivePanel.h"
 #include "UI/Controls/PaletteChooser.h"
@@ -118,14 +116,6 @@ vector<ArchiveEntry*> maineditor::currentEntrySelection()
 void maineditor::openTextureEditor(Archive* archive, ArchiveEntry* entry)
 {
 	main_window->archiveManagerPanel()->openTextureTab(app::archiveManager().archiveIndex(archive), entry);
-}
-
-// -----------------------------------------------------------------------------
-// Opens the map editor for the current archive tab
-// -----------------------------------------------------------------------------
-void maineditor::openMapEditor(Archive* archive)
-{
-	mapeditor::chooseMap(archive);
 }
 
 // -----------------------------------------------------------------------------

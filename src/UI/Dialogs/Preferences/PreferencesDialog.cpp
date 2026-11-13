@@ -32,7 +32,6 @@
 // -----------------------------------------------------------------------------
 #include "Main.h"
 #include "PreferencesDialog.h"
-#include "ACSPrefsPanel.h"
 #include "AdvancedPrefsPanel.h"
 #include "App.h"
 #include "Archive/ArchiveManager.h"
@@ -50,10 +49,6 @@
 #include "MainEditor/MainEditor.h"
 #include "MainEditor/UI/ArchiveManagerPanel.h"
 #include "MainEditor/UI/MainWindow.h"
-#include "Map3DPrefsPanel.h"
-#include "MapDisplayPrefsPanel.h"
-#include "MapEditorPrefsPanel.h"
-#include "NodesPrefsPanel.h"
 #include "OpenGLPrefsPanel.h"
 #include "PNGPrefsPanel.h"
 #include "TextEditorPrefsPanel.h"
@@ -147,12 +142,6 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : SDialog(parent, "SLADE6
 	addPrefsPage<ColorimetryPrefsPanel>("Colorimetry", true);
 	addPrefsPage<HudOffsetsPrefsPanel>("HUD Offsets View", true);
 	addPrefsPage<AudioPrefsPanel>("Audio");
-	tree_prefs_->AddPage(new wxPanel(tree_prefs_, -1), "Scripting");
-	addPrefsPage<ACSPrefsPanel>("ACS", true);
-	addPrefsPage<MapEditorPrefsPanel>("Map Editor");
-	addPrefsPage<MapDisplayPrefsPanel>("Display", true);
-	addPrefsPage<Map3DPrefsPanel>("3D Mode", true);
-	addPrefsPage<NodesPrefsPanel>("Node Builder", true);
 	tree_prefs_->AddPage(setupAdvancedPanel(), "Advanced");
 
 	// Expand all tree nodes (so it gets sized properly)

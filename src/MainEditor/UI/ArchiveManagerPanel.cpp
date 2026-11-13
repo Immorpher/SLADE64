@@ -43,8 +43,6 @@
 #include "MainEditor/ArchiveOperations.h"
 #include "MainEditor/MainEditor.h"
 #include "MainEditor/UI/MainWindow.h"
-#include "MapEditor/MapEditor.h"
-#include "MapEditor/UI/MapEditorWindow.h"
 #include "TextureXEditor/TextureXEditor.h"
 #include "UI/Controls/STabCtrl.h"
 #include "UI/Dialogs/DirArchiveUpdateDialog.h"
@@ -439,8 +437,6 @@ void ArchiveManagerPanel::refreshRecentFileList() const
 			string icon = "archive";
 			if (strutil::endsWith(fn, ".wad"))
 				icon = "wad";
-			else if (strutil::endsWith(fn, ".zip") || strutil::endsWith(fn, ".pk3") || strutil::endsWith(fn, ".pke"))
-				icon = "zip";
 			else if (wxDirExists(fn))
 				icon = "folder";
 
@@ -554,8 +550,6 @@ void ArchiveManagerPanel::updateRecentListItem(int index) const
 	int icon = 0;
 	if (path.EndsWith(".wad"))
 		icon = 1;
-	else if (path.EndsWith(".zip") || path.EndsWith(".pk3") || path.EndsWith(".pke"))
-		icon = 2;
 	else if (wxDirExists(path))
 		icon = 3;
 	list_recent_->SetItemImage(index, icon);
@@ -853,8 +847,6 @@ void ArchiveManagerPanel::openTab(Archive* archive) const
 		string icon = "archive";
 		if (archive->formatId() == "wad")
 			icon = "wad";
-		else if (archive->formatId() == "zip")
-			icon = "zip";
 		else if (archive->formatId() == "folder")
 			icon = "folder";
 
@@ -1545,13 +1537,6 @@ bool ArchiveManagerPanel::beforeCloseArchive(Archive* archive)
 	if (!archive)
 		return false;
 
-	// Check if a map from the archive is currently open
-	if (mapeditor::window()->IsShown() && mapeditor::window()->hasMapOpen(archive))
-	{
-		if (!mapeditor::window()->Close())
-			return false;
-	}
-
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 
@@ -1799,15 +1784,6 @@ bool ArchiveManagerPanel::handleAction(string_view id)
 	// Create Wad Archive (File->New Archive->wad)
 	else if (id == "aman_newwad")
 		createNewArchive("wad");
-	// Create Zip Archive (File->New Archive->zip)
-	else if (id == "aman_newzip")
-		createNewArchive("zip");
-	// File->New Map
-	else if (id == "aman_newmap")
-	{
-		if (!mapeditor::chooseMap())
-			mapeditor::window()->Show(false);
-	}
 
 	// File->Open
 	else if (id == "aman_open")

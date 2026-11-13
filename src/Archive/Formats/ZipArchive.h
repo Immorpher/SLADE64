@@ -33,10 +33,6 @@ public:
 	ArchiveEntry*         findLast(SearchOptions& options) override;
 	vector<ArchiveEntry*> findAll(SearchOptions& options) override;
 
-	// Static functions
-	static bool isZipArchive(MemChunk& mc);
-	static bool isZipArchive(const string& filename);
-
 private:
 	string temp_file_;
 

@@ -34,7 +34,7 @@
 #include "App.h"
 #include "Archive/Formats/WadArchive.h"
 #include "Game/Configuration.h"
-#include "MapEditor/SectorBuilder.h"
+#include "SectorBuilder.h"
 #include "MapFormat/MapFormatHandler.h"
 #include "Utility/MathStuff.h"
 

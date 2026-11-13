@@ -7,9 +7,6 @@
     <Filter Include="Main Editor">
       <UniqueIdentifier>{fef8e5a6-0991-4153-8f52-5d3f2da4e9d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Map Editor">
-      <UniqueIdentifier>{e7c66597-c337-43fc-bedc-5e753bf3ddb8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ThirdParty">
       <UniqueIdentifier>{b8ed0eb6-a1df-4b4b-8a59-d56cf99d842b}</UniqueIdentifier>
     </Filter>
@@ -76,21 +73,6 @@
     <Filter Include="Main Editor\UI\EntryPanel">
       <UniqueIdentifier>{9c20c338-759f-4b25-b4ee-488df95b1504}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Map Editor\Renderer">
-      <UniqueIdentifier>{57c1dcd4-a300-4838-be69-1edcf651d8bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Map Editor\Renderer\Overlays">
-      <UniqueIdentifier>{2825745b-4b26-4d1f-ab5d-07bed7feb6c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Map Editor\UI">
-      <UniqueIdentifier>{7f918170-2c47-4971-a646-5754ab51b936}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Map Editor\UI\Dialogs">
-      <UniqueIdentifier>{b17c52c7-35bc-4b9f-a8f3-b02a1e4c3882}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Map Editor\UI\PropsPanel">
-      <UniqueIdentifier>{6680c30b-5928-497f-bf0b-28e9a4a723e5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Main Editor\UI\Texture Editor">
       <UniqueIdentifier>{ecfc7349-8974-4e27-a2dc-301f8e30570b}</UniqueIdentifier>
     </Filter>
@@ -100,20 +82,8 @@
     <Filter Include="Archive\EntryType\Data Formats">
       <UniqueIdentifier>{639d4195-f616-4708-bc9b-82e7652914c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Map Editor\Edit">
-      <UniqueIdentifier>{8c15c8af-a29b-46c5-b73c-699f04cea254}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game">
       <UniqueIdentifier>{6484ec95-d6fd-4bdc-96ee-3e1faf24e057}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripting">
-      <UniqueIdentifier>{2503b7fc-d9c2-4a42-822e-3b3de37ebfc1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripting\Export">
-      <UniqueIdentifier>{11e5d755-3751-42e9-8221-b24a5c1bf0cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripting\UI">
-      <UniqueIdentifier>{c751e646-38bb-48e7-b8c7-c188148c104a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Text Editor">
       <UniqueIdentifier>{119f7cbd-9e0c-43eb-90a5-6614f4cedcdc}</UniqueIdentifier>
@@ -426,110 +396,8 @@
     <ClCompile Include="..\src\MainEditor\UI\TextureXEditor\ZTextureEditorPanel.cpp">
       <Filter>Main Editor\UI\Texture Editor</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MapEditor\MapBackupManager.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\MapChecks.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\MapEditor.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\MapTextureManager.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\NodeBuilders.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\SectorBuilder.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\MapRenderer2D.cpp">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\MapRenderer3D.cpp">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\MCAnimations.cpp">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\LineTextureOverlay.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\QuickTextureOverlay3d.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\SectorTextureOverlay.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\GenLineSpecialPanel.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\MapBackupPanel.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\MapCanvas.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\MapChecksPanel.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\ObjectEditPanel.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\ScriptEditorPanel.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\ShapeDrawPanel.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\Dialogs\ActionSpecialDialog.cpp">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\Dialogs\MapTextureBrowser.cpp">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\Dialogs\SectorSpecialDialog.cpp">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\Dialogs\ShowItemDialog.cpp">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\Dialogs\ThingTypeBrowser.cpp">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\PropsPanel\LinePropsPanel.cpp">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\PropsPanel\MapObjectPropsPanel.cpp">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\PropsPanel\MOPGProperty.cpp">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\PropsPanel\SectorPropsPanel.cpp">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\PropsPanel\SidePropsPanel.cpp">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\PropsPanel\ThingPropsPanel.cpp">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\InfoOverlay3d.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\LineInfoOverlay.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\SectorInfoOverlay.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\ThingInfoOverlay.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Overlays\VertexInfoOverlay.cpp">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
+    <ClCompile Include="..\src\SLADE64Map\SectorBuilder.cpp">
+      <Filter>SLADE64Map</Filter>
     </ClCompile>
     <ClCompile Include="_CreatePCH.cpp">
       <Filter>Application</Filter>
@@ -552,44 +420,8 @@
     <ClCompile Include="..\src\Application\SLADE64WxApp.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MapEditor\MapEditContext.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\MapEditorWindow.cpp">
-      <Filter>Map Editor\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Edit\LineDraw.cpp">
-      <Filter>Map Editor\Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Edit\Edit3D.cpp">
-      <Filter>Map Editor\Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\ItemSelection.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UndoSteps.cpp">
-      <Filter>Map Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Renderer\Renderer.cpp">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Edit\Input.cpp">
-      <Filter>Map Editor\Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Edit\ObjectEdit.cpp">
-      <Filter>Map Editor\Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Edit\Edit2D.cpp">
-      <Filter>Map Editor\Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\Edit\MoveObjects.cpp">
-      <Filter>Map Editor\Edit</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\StringUtils.cpp">
       <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapEditor\UI\Dialogs\SpecialPresetDialog.cpp">
-      <Filter>Map Editor\UI\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Archive\Formats\SiNArchive.cpp">
       <Filter>Archive\Formats</Filter>
@@ -686,18 +518,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Graphics\SImage\SImageFormats.cpp">
       <Filter>Graphics\SImage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Lua.cpp">
-      <Filter>Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\UI\ScriptManagerWindow.cpp">
-      <Filter>Scripting\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\ScriptManager.cpp">
-      <Filter>Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\UI\ScriptPanel.cpp">
-      <Filter>Scripting\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\src\TextEditor\Lexer.cpp">
       <Filter>Text Editor</Filter>
@@ -837,24 +657,6 @@
     <ClCompile Include="..\src\Utility\FileUtils.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Scripting\Export\Archive.cpp">
-      <Filter>Scripting\Export</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Export\Game.cpp">
-      <Filter>Scripting\Export</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Export\General.cpp">
-      <Filter>Scripting\Export</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Export\MapEditor.cpp">
-      <Filter>Scripting\Export</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Export\UI.cpp">
-      <Filter>Scripting\Export</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Export\Graphics.cpp">
-      <Filter>Scripting\Export</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Archive\ArchiveDir.cpp">
       <Filter>Archive</Filter>
     </ClCompile>
@@ -885,9 +687,6 @@
     <ClCompile Include="..\src\UI\Dialogs\GfxTintDialog.cpp">
       <Filter>UI\Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\Dialogs\MapEditorConfigDialog.cpp">
-      <Filter>UI\Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\Dialogs\MapReplaceDialog.cpp">
       <Filter>UI\Dialogs</Filter>
     </ClCompile>
@@ -902,9 +701,6 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\Dialogs\TranslationEditorDialog.cpp">
       <Filter>UI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\Dialogs\Preferences\ACSPrefsPanel.cpp">
-      <Filter>UI\Dialogs\Preferences</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\Dialogs\Preferences\AdvancedPrefsPanel.cpp">
       <Filter>UI\Dialogs\Preferences</Filter>
@@ -939,18 +735,6 @@
     <ClCompile Include="..\src\UI\Dialogs\Preferences\InterfacePrefsPanel.cpp">
       <Filter>UI\Dialogs\Preferences</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\Dialogs\Preferences\Map3DPrefsPanel.cpp">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\Dialogs\Preferences\MapDisplayPrefsPanel.cpp">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\Dialogs\Preferences\MapEditorPrefsPanel.cpp">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\Dialogs\Preferences\NodesPrefsPanel.cpp">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\Dialogs\Preferences\OpenGLPrefsPanel.cpp">
       <Filter>UI\Dialogs\Preferences</Filter>
     </ClCompile>
@@ -967,9 +751,6 @@
       <Filter>UI\Dialogs\Preferences</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\Dialogs\SetupWizard\BaseResourceWizardPage.cpp">
-      <Filter>UI\Dialogs\SetupWizard</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\Dialogs\SetupWizard\NodeBuildersWizardPage.cpp">
       <Filter>UI\Dialogs\SetupWizard</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\Dialogs\SetupWizard\SetupWizardDialog.cpp">
@@ -1337,116 +1118,8 @@
     <ClInclude Include="..\src\MainEditor\UI\TextureXEditor\ZTextureEditorPanel.h">
       <Filter>Main Editor\UI\Texture Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\MapEditor\MapBackupManager.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\MapChecks.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\MapEditor.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\MapTextureManager.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\NodeBuilders.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\SectorBuilder.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\MapRenderer2D.h">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\MapRenderer3D.h">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\MCAnimations.h">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\LineTextureOverlay.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\MCOverlay.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\QuickTextureOverlay3d.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\SectorTextureOverlay.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\GenLineSpecialPanel.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\MapBackupPanel.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\MapCanvas.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\MapChecksPanel.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\ObjectEditPanel.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\ScriptEditorPanel.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\ShapeDrawPanel.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\Dialogs\ActionSpecialDialog.h">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\Dialogs\MapTextureBrowser.h">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\Dialogs\SectorSpecialDialog.h">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\Dialogs\ShowItemDialog.h">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\Dialogs\ThingTypeBrowser.h">
-      <Filter>Map Editor\UI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\PropsPanel\LinePropsPanel.h">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\PropsPanel\MapObjectPropsPanel.h">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\PropsPanel\MOPGProperty.h">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\PropsPanel\PropsPanelBase.h">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\PropsPanel\SectorPropsPanel.h">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\PropsPanel\SidePropsPanel.h">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\PropsPanel\ThingPropsPanel.h">
-      <Filter>Map Editor\UI\PropsPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\InfoOverlay3d.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\LineInfoOverlay.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\SectorInfoOverlay.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\ThingInfoOverlay.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Overlays\VertexInfoOverlay.h">
-      <Filter>Map Editor\Renderer\Overlays</Filter>
+    <ClInclude Include="..\src\SLADE64Map\SectorBuilder.h">
+      <Filter>SLADE64Map</Filter>
     </ClInclude>
     <ClInclude Include="..\src\MainEditor\BinaryControlLump.h">
       <Filter>Main Editor</Filter>
@@ -1474,44 +1147,8 @@
     <ClInclude Include="..\src\Application\SLADE64WxApp.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\MapEditor\MapEditContext.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\MapEditorWindow.h">
-      <Filter>Map Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Edit\LineDraw.h">
-      <Filter>Map Editor\Edit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Edit\Edit3D.h">
-      <Filter>Map Editor\Edit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\ItemSelection.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UndoSteps.h">
-      <Filter>Map Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Renderer\Renderer.h">
-      <Filter>Map Editor\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Edit\Input.h">
-      <Filter>Map Editor\Edit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Edit\ObjectEdit.h">
-      <Filter>Map Editor\Edit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Edit\Edit2D.h">
-      <Filter>Map Editor\Edit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\Edit\MoveObjects.h">
-      <Filter>Map Editor\Edit</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\StringUtils.h">
       <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapEditor\UI\Dialogs\SpecialPresetDialog.h">
-      <Filter>Map Editor\UI\Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Archive\Formats\SiNArchive.h">
       <Filter>Archive\Formats</Filter>
@@ -1608,18 +1245,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Graphics\SImage\SImage.h">
       <Filter>Graphics\SImage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\Lua.h">
-      <Filter>Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\UI\ScriptManagerWindow.h">
-      <Filter>Scripting\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\ScriptManager.h">
-      <Filter>Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\UI\ScriptPanel.h">
-      <Filter>Scripting\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\src\TextEditor\Lexer.h">
       <Filter>Text Editor</Filter>
@@ -1765,9 +1390,6 @@
     <ClInclude Include="..\src\Utility\FileUtils.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Scripting\Export\Export.h">
-      <Filter>Scripting\Export</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\SeekableData.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -1804,9 +1426,6 @@
     <ClInclude Include="..\src\UI\Dialogs\GfxTintDialog.h">
       <Filter>UI\Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\Dialogs\MapEditorConfigDialog.h">
-      <Filter>UI\Dialogs</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\MapReplaceDialog.h">
       <Filter>UI\Dialogs</Filter>
     </ClInclude>
@@ -1821,9 +1440,6 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\TranslationEditorDialog.h">
       <Filter>UI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\Dialogs\Preferences\ACSPrefsPanel.h">
-      <Filter>UI\Dialogs\Preferences</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\Preferences\AdvancedPrefsPanel.h">
       <Filter>UI\Dialogs\Preferences</Filter>
@@ -1858,18 +1474,6 @@
     <ClInclude Include="..\src\UI\Dialogs\Preferences\InterfacePrefsPanel.h">
       <Filter>UI\Dialogs\Preferences</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\Dialogs\Preferences\Map3DPrefsPanel.h">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\Dialogs\Preferences\MapDisplayPrefsPanel.h">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\Dialogs\Preferences\MapEditorPrefsPanel.h">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\Dialogs\Preferences\NodesPrefsPanel.h">
-      <Filter>UI\Dialogs\Preferences</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\Preferences\OpenGLPrefsPanel.h">
       <Filter>UI\Dialogs\Preferences</Filter>
     </ClInclude>
@@ -1889,9 +1493,6 @@
       <Filter>UI\Dialogs\Preferences</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\SetupWizard\BaseResourceWizardPage.h">
-      <Filter>UI\Dialogs\SetupWizard</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\Dialogs\SetupWizard\NodeBuildersWizardPage.h">
       <Filter>UI\Dialogs\SetupWizard</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\Dialogs\SetupWizard\SetupWizardDialog.h">

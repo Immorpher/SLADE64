@@ -98,15 +98,11 @@ endif()
 find_package(FreeImage REQUIRED)
 find_package(SFML COMPONENTS ${SFML_FIND_COMPONENTS} REQUIRED)
 find_package(OpenGL REQUIRED)
-if (NOT NO_LUA)
-	find_package(Lua REQUIRED)
-endif()
 include_directories(
 	${FREEIMAGE_INCLUDE_DIR}
 	${SFML_INCLUDE_DIR}
 	${FREETYPE_INCLUDE_DIRS}
 	${FTGL_INCLUDE_DIR}
-	${LUA_INCLUDE_DIR}
 	.
 	..
 	../thirdparty/glad/include
@@ -125,7 +121,6 @@ endif()
 
 set(SLADE64_SOURCES
 )
-set(SLADE64_SCRIPTING_SOURCES)
 # Don't include external libraries here as they should be compiled separately
 file(GLOB_RECURSE SLADE64_SOURCES
 	Application/*.cpp
@@ -136,19 +131,12 @@ file(GLOB_RECURSE SLADE64_SOURCES
 	General/*.cpp
 	Graphics/*.cpp
 	MainEditor/*.cpp
-	MapEditor/*.cpp
 	OpenGL/*.cpp
 	SLADE64Map/*.cpp
 	TextEditor/*.cpp
 	UI/*.cpp
 	Utility/*.cpp
 	)
-if (NOT NO_LUA)
-	file(GLOB_RECURSE SLADE64_SCRIPTING_SOURCES Scripting/*.cpp)
-	set(SLADE64_SOURCES ${SLADE64_SOURCES} ${SLADE64_SCRIPTING_SOURCES})
-else ()
-	ADD_DEFINITIONS(-DNO_LUA)
-endif ()
 set(SLADE64_HEADERS
 )
 file(GLOB_RECURSE SLADE64_HEADERS *.h *.hpp)
@@ -191,7 +179,6 @@ target_link_libraries(slade64
 	${FREETYPE_LIBRARIES}
 	${FTGL_LIBRARIES}
 	${OPENGL_LIBRARIES}
-	${LUA_LIBRARIES}
 )
 
 if(LINUX)

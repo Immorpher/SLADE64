@@ -259,24 +259,3 @@ bool compression::bzip2Compress(MemChunk& in, MemChunk& out)
 	}
 	return (ok == BZ_OK);
 }
-
-// -----------------------------------------------------------------------------
-// Decompress the content of [in] as an LZMA stream to [out]
-// -----------------------------------------------------------------------------
-bool compression::lzmaDecompress(MemChunk& in, MemChunk& out, size_t size)
-{
-	in.seek(0, SEEK_SET);
-	out.clear();
-
-	MemoryReader   source(in);
-	FileReaderLZMA stream(source, size, true);
-	uint8_t*       cache = new uint8_t[size];
-	if (stream.Read(cache, size))
-	{
-		out.write(cache, size);
-		delete[] cache;
-		return true;
-	}
-	delete[] cache;
-	return false;
-}

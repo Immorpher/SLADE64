@@ -37,7 +37,6 @@
 #include "Archive/ArchiveManager.h"
 #include "Archive/Formats/WessArchives.h"
 #include "Archive/Formats/WessSeq.h"
-#include "Archive/Formats/ZipArchive.h"
 #include "ArchiveManagerPanel.h"
 #include "EntryPanel/ANSIEntryPanel.h"
 #include "EntryPanel/AudioEntryPanel.h"
@@ -60,16 +59,12 @@
 #include "MainEditor/EntryOperations.h"
 #include "MainEditor/MainEditor.h"
 #include "MainEditor/UI/MainWindow.h"
-#include "MapEditor/MapEditor.h"
-#include "MapEditor/UI/MapEditorWindow.h"
-#include "Scripting/ScriptManager.h"
 #include "UI/Controls/PaletteChooser.h"
 #include "UI/Controls/SIconButton.h"
 #include "UI/Controls/Splitter.h"
 #include "UI/Dialogs/GfxColouriseDialog.h"
 #include "UI/Dialogs/GfxConvDialog.h"
 #include "UI/Dialogs/GfxTintDialog.h"
-#include "UI/Dialogs/MapEditorConfigDialog.h"
 #include "UI/Dialogs/MapReplaceDialog.h"
 #include "UI/Dialogs/ModifyOffsetsDialog.h"
 #include "UI/Dialogs/NewEntryDialog.h"
@@ -689,22 +684,14 @@ void ArchivePanel::addMenus() const
 		menu_archive->AppendSeparator();
 		SAction::fromId("arch_importfiles")->addToMenu(menu_archive);
 		SAction::fromId("arch_importdir")->addToMenu(menu_archive);
-		SAction::fromId("arch_buildarchive")->addToMenu(menu_archive);
 		menu_archive->AppendSeparator();
 		SAction::fromId("arch_texeditor")->addToMenu(menu_archive);
-		SAction::fromId("arch_mapeditor")->addToMenu(menu_archive);
 		auto menu_clean = createMaintenanceMenu();
 
 		auto maintenance_item = new wxMenuItem(menu_archive, wxID_ANY, "&Maintenance");
 		maintenance_item->SetSubMenu(menu_clean);
 		maintenance_item->SetBitmap(icons::getIcon(icons::Type::Any, "wrench"));
 		menu_archive->Append(maintenance_item);
-
-		auto menu_scripts = new wxMenu();
-#ifndef NO_LUA
-		scriptmanager::populateEditorScriptMenu(menu_scripts, scriptmanager::ScriptType::Archive, "arch_script");
-#endif
-		menu_archive->AppendSubMenu(menu_scripts, "&Run Script");
 	}
 	if (!menu_entry)
 	{
@@ -725,12 +712,6 @@ void ArchivePanel::addMenus() const
 		menu_entry->AppendSeparator();
 		SAction::fromId("arch_entry_import")->addToMenu(menu_entry);
 		SAction::fromId("arch_entry_export")->addToMenu(menu_entry);
-#ifndef NO_LUA
-		menu_entry->AppendSeparator();
-		auto menu_scripts = new wxMenu();
-		scriptmanager::populateEditorScriptMenu(menu_scripts, scriptmanager::ScriptType::Entry, "arch_entry_script");
-		menu_entry->AppendSubMenu(menu_scripts, "&Run Script");
-#endif
 	}
 
 	// Add them to the main window menubar
@@ -1064,62 +1045,6 @@ bool ArchivePanel::cleanupArchive() const
 {
 	wxMessageBox("Not Implemented");
 	return false;
-}
-
-// -----------------------------------------------------------------------------
-// Build pk3/zip archive from the current directory
-// -----------------------------------------------------------------------------
-bool ArchivePanel::buildArchive()
-{
-	// Check the archive is still open
-	auto archive = archive_.lock();
-	if (!archive)
-		return false;
-
-	if (archive->formatId() != "folder")
-	{
-		wxMessageBox("This function is only supported with directories", "Can't build archive", wxICON_ERROR);
-		return false;
-	}
-
-	// Create temporary archive
-	ZipArchive zip;
-
-	// Create dialog
-	filedialog::FDInfo info;
-	if (filedialog::saveFile(info, "Build Archive", zip.fileExtensionString(), this))
-	{
-		ui::showSplash("Building " + info.filenames[0], true);
-		ui::setSplashProgress(0.0f);
-
-		// prevent for "archive in archive" when saving in the current directory
-		if (wxFileExists(info.filenames[0]))
-			wxRemoveFile(info.filenames[0]);
-
-		// Log
-		ui::setSplashProgressMessage("Importing files...");
-		ui::setSplashProgress(-1.0f);
-
-		// Import all files into new archive
-		zip.importDir(archive->filename(), archive_dir_ignore_hidden);
-		ui::setSplashProgress(1.0f);
-		ui::setSplashMessage("Saving archive...");
-		ui::setSplashProgressMessage("");
-
-		// Save the archive
-		if (!zip.save(info.filenames[0]))
-		{
-			ui::hideSplash();
-
-			// If there was an error pop up a message box
-			wxMessageBox(wxString::Format("Error:\n%s", global::error), "Error", wxICON_ERROR);
-			return false;
-		}
-	}
-
-	ui::hideSplash();
-
-	return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -2834,25 +2759,7 @@ bool ArchivePanel::wessAddFullLoop() const
 }
 
 // -----------------------------------------------------------------------------
-// Compiles any selected text entries as ACS scripts
-// -----------------------------------------------------------------------------
-bool ArchivePanel::compileACS(bool hexen) const
-{
-	// Get selected entries
-	auto selection = entry_tree_->selectedEntries();
-
-	// Go through selection
-	for (auto& entry : selection)
-	{
-		// Compile ACS script
-		entryoperations::compileACS(entry, hexen, nullptr, theMainWindow);
-	}
-
-	return true;
-}
-
-// -----------------------------------------------------------------------------
-// Compiles any selected text entries as ACS scripts
+// Optimizes any selected PNG entries
 // -----------------------------------------------------------------------------
 bool ArchivePanel::optimizePNG() const
 {
@@ -3332,16 +3239,10 @@ bool ArchivePanel::handleAction(string_view id)
 	else if (id == "arch_importdir")
 		importDir();
 
-	// Archive->Build Archive
-	else if (id == "arch_buildarchive")
-		buildArchive();
-
 	// Archive->Texture Editor
 	else if (id == "arch_texeditor")
 		maineditor::openTextureEditor(archive.get());
 
-	else if (id == "arch_mapeditor")
-		maineditor::openMapEditor(archive.get());
 
 	// Archive->Convert To...
 	else if (id == "arch_convert")
@@ -3393,11 +3294,6 @@ bool ArchivePanel::handleAction(string_view id)
 		dlg.ShowModal();
 	}
 
-#ifndef NO_LUA
-	// Archive->Scripts->...
-	else if (id == "arch_script")
-		scriptmanager::runArchiveScript(archive.get(), wx_id_offset_);
-#endif
 
 
 	// ------------------------------------------------------------------------
@@ -3479,11 +3375,6 @@ bool ArchivePanel::handleAction(string_view id)
 	else if (id == "arch_entry_openext")
 		openEntryExternal();
 
-#ifndef NO_LUA
-	// Entry->Run Script
-	else if (id == "arch_entry_script")
-		scriptmanager::runEntryScript(entry_tree_->selectedEntries(), wx_id_offset_, maineditor::windowWx());
-#endif
 
 
 	// Context menu actions
@@ -3529,10 +3420,6 @@ bool ArchivePanel::handleAction(string_view id)
 		wessAddFullLoop();
 	else if (id == "arch_voxel_convertvox")
 		voxelConvert();
-	else if (id == "arch_scripts_compileacs")
-		compileACS();
-	else if (id == "arch_scripts_compilehacs")
-		compileACS(true);
 	else if (id == "arch_texturex_convertzd")
 		convertTextures();
 	else if (id == "arch_texturex_finderrors")
@@ -4067,24 +3954,6 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 			SAction::fromId("arch_audio_fullloop")->addToMenu(audio, true);
 	}
 
-	// Add script related menu items if needed
-	if (text_selected || unknown_selected)
-	{
-		wxMenu* scripts;
-		if (context_submenus)
-		{
-			scripts = new wxMenu();
-			context.AppendSubMenu(scripts, "Script");
-		}
-		else
-		{
-			context.AppendSeparator();
-			scripts = &context;
-		}
-		SAction::fromId("arch_scripts_compileacs")->addToMenu(scripts, true);
-		SAction::fromId("arch_scripts_compilehacs")->addToMenu(scripts, true);
-	}
-
 	if (voxel_selected)
 	{
 		wxMenu* voxels;
@@ -4110,16 +3979,6 @@ void ArchivePanel::onEntryListRightClick(wxDataViewEvent& e)
 #endif
 	}
 
-#ifndef NO_LUA
-	// Entry scripts
-	if (!scriptmanager::editorScripts(scriptmanager::ScriptType::Entry).empty())
-	{
-		auto menu_scripts = new wxMenu();
-		scriptmanager::populateEditorScriptMenu(menu_scripts, scriptmanager::ScriptType::Entry, "arch_entry_script");
-		context.AppendSeparator();
-		context.AppendSubMenu(menu_scripts, "Run &Script");
-	}
-#endif
 
 	// New entry/dir options
 	// Would be nice to eventually have each different type of entry that can be
@@ -4291,40 +4150,6 @@ void ArchivePanel::onEntryListActivated(wxDataViewEvent& e)
 		entry->type()->formatId() == "texturex" || entry->type() == EntryType::fromId("pnames")
 		|| entry->type() == EntryType::fromId("zdtextures"))
 		maineditor::openTextureEditor(archive.get(), entry);
-
-	// Map
-	// TODO: Needs to filter the game/port lists in the dialog by the map format
-	else if (entry->type() == EntryType::mapMarkerType())
-	{
-		// Open map editor config dialog
-		MapEditorConfigDialog dlg(this, archive.get(), false);
-		if (dlg.ShowModal() == wxID_OK)
-		{
-			auto info = archive->mapDesc(entry);
-
-			// Check selected game configuration is ok
-			if (!dlg.configMatchesMap(info))
-				wxMessageBox("Selected Game Configuration does not match the map format", "Error", wxICON_ERROR);
-			else
-			{
-				// Load game configuration
-				game::configuration().openConfig(
-					dlg.selectedGame().ToStdString(), dlg.selectedPort().ToStdString(), info.format);
-
-				// Attempt to open map
-				if (mapeditor::window()->openMap(info))
-					mapeditor::window()->Show();
-				else
-				{
-					mapeditor::window()->Hide();
-					wxMessageBox(
-						wxString::Format("Unable to open map %s: %s", entry->name(), global::error),
-						"Invalid map error",
-						wxICON_ERROR);
-				}
-			}
-		}
-	}
 
 	// Other entry
 	else if (entry->type() != EntryType::folderType())

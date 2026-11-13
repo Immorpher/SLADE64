@@ -33,7 +33,6 @@
 #include "ColourPrefsPanel.h"
 #include "General/ColourConfiguration.h"
 #include "MainEditor/MainEditor.h"
-#include "MapEditor/MapEditor.h"
 #include "UI/WxUtils.h"
 
 using namespace slade;
@@ -80,7 +79,6 @@ ColourPrefsPanel::ColourPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent)
 		auto config = choice_configs_->GetStringSelection().ToStdString();
 		colourconfig::readConfiguration(config);
 		refreshPropGrid();
-		mapeditor::forceRefresh(true);
 	});
 
 	wxWindowBase::Layout();
@@ -207,5 +205,4 @@ void ColourPrefsPanel::applyPreferences()
 	pg_colours_->Refresh();
 	pg_colours_->RefreshEditor();
 	maineditor::windowWx()->Refresh();
-	mapeditor::forceRefresh(true);
 }

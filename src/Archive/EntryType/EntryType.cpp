@@ -33,7 +33,6 @@
 #include "EntryType.h"
 #include "App.h"
 #include "Archive/ArchiveManager.h"
-#include "Archive/Formats/ZipArchive.h"
 #include "General/Console.h"
 #include "MainEditor/MainEditor.h"
 #include "Utility/Parser.h"

@@ -34,7 +34,6 @@
 #include "SetupWizardDialog.h"
 #include "BaseResourceWizardPage.h"
 #include "General/UI.h"
-#include "NodeBuildersWizardPage.h"
 #include "UI/WxUtils.h"
 
 using namespace slade;
@@ -62,7 +61,6 @@ SetupWizardDialog::SetupWizardDialog(wxWindow* parent) :
 	// Create pages
 	// pages_.push_back(new TempFolderWizardPage(this));
 	pages_.push_back(new BaseResourceWizardPage(this));
-	pages_.push_back(new NodeBuildersWizardPage(this));
 
 	// Hide all pages
 	for (auto& page : pages_)

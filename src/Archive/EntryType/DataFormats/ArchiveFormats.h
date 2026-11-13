@@ -9,15 +9,6 @@ public:
 	int isThisFormat(MemChunk& mc) override { return WadArchive::isWadArchive(mc) ? MATCH_TRUE : MATCH_FALSE; }
 };
 
-class ZipDataFormat : public EntryDataFormat
-{
-public:
-	ZipDataFormat() : EntryDataFormat("archive_zip") {}
-	~ZipDataFormat() = default;
-
-	int isThisFormat(MemChunk& mc) override { return ZipArchive::isZipArchive(mc) ? MATCH_TRUE : MATCH_FALSE; }
-};
-
 class LibDataFormat : public EntryDataFormat
 {
 public:

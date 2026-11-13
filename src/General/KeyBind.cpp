@@ -559,185 +559,6 @@ void KeyBind::initBinds()
 	addBind("txed_tex_new_file", Keypress("N", KPM_CTRL | KPM_ALT), "New Texture from File", group);
 	addBind("txed_tex_delete", Keypress("delete"), "Delete Texture", group);
 
-	// Map Editor (map*)
-	group = "Map Editor General";
-	addBind("map_edit_accept", Keypress("return"), "Accept edit", group);
-	addBind("map_edit_accept", Keypress("num_enter"));
-	addBind("map_edit_cancel", Keypress("escape"), "Cancel edit", group);
-	addBind("map_toggle_3d", Keypress("Q"), "Toggle 3d mode", group);
-	addBind("map_screenshot", Keypress("P", KPM_CTRL | KPM_SHIFT), "Take Screenshot", group);
-
-	// Map Editor 2D (me2d*)
-	group = "Map Editor 2D Mode";
-	addBind("me2d_clear_selection", Keypress("C"), "Clear selection", group);
-	addBind("me2d_pan_view", Keypress("mouse3"), "Pan view", group);
-	addBind("me2d_pan_view", Keypress("space", KPM_CTRL));
-	addBind("me2d_move", Keypress("Z"), "Toggle item move mode", group);
-	addBind("me2d_zoom_in_m", Keypress("mwheelup"), "Zoom in (towards mouse)", group);
-	addBind("me2d_zoom_out_m", Keypress("mwheeldown"), "Zoom out (towards mouse)", group);
-	addBind("me2d_zoom_in", Keypress("="), "Zoom in (towards screen center)", group);
-	addBind("me2d_zoom_out", Keypress("-"), "Zoom out (towards screen center)", group);
-	addBind("me2d_show_object", Keypress("=", KPM_SHIFT), "Zoom in, show current object", group);
-	addBind("me2d_show_object", Keypress("mwheelup", KPM_SHIFT));
-	addBind("me2d_show_all", Keypress("-", KPM_SHIFT), "Zoom out, show full map", group);
-	addBind("me2d_show_all", Keypress("mwheeldown", KPM_SHIFT));
-	addBind("me2d_left", Keypress("left"), "Scroll left", group);
-	addBind("me2d_right", Keypress("right"), "Scroll right", group);
-	addBind("me2d_up", Keypress("up"), "Scroll up", group);
-	addBind("me2d_down", Keypress("down"), "Scroll down", group);
-	addBind("me2d_grid_inc", Keypress("["), "Increment grid level", group);
-	addBind("me2d_grid_dec", Keypress("]"), "Decrement grid level", group);
-	addBind("me2d_grid_toggle_snap", Keypress("G", KPM_SHIFT), "Toggle Grid Snap", group);
-	addBind("me2d_mode_vertices", Keypress("V"), "Vertices mode", group);
-	addBind("me2d_mode_lines", Keypress("L"), "Lines mode", group);
-	addBind("me2d_mode_sectors", Keypress("S"), "Sectors mode", group);
-	addBind("me2d_mode_things", Keypress("T"), "Things mode", group);
-	addBind("me2d_flat_type", Keypress("F", KPM_CTRL), "Cycle flat type", group);
-	addBind("me2d_split_line", Keypress("S", KPM_CTRL | KPM_SHIFT), "Split nearest line", group);
-	addBind("me2d_lock_hilight", Keypress("H", KPM_CTRL), "Lock/unlock hilight", group);
-	addBind("me2d_begin_linedraw", Keypress("space"), "Begin line drawing", group);
-	addBind("me2d_begin_shapedraw", Keypress("space", KPM_SHIFT), "Begin shape drawing", group);
-	addBind("me2d_create_object", Keypress("insert"), "Create object", group);
-	addBind("me2d_delete_object", Keypress("delete"), "Delete object", group);
-	addBind("me2d_copy_properties", Keypress("C", KPM_CTRL | KPM_SHIFT), "Copy object properties", group);
-	addBind("me2d_paste_properties", Keypress("V", KPM_CTRL | KPM_SHIFT), "Paste object properties", group);
-	addBind("me2d_begin_object_edit", Keypress("E"), "Begin object edit", group);
-	addBind("me2d_toggle_selection_numbers", Keypress("N"), "Toggle selection numbers", group);
-	addBind("me2d_mirror_x", Keypress("M", KPM_CTRL), "Mirror selection horizontally", group);
-	addBind("me2d_mirror_y", Keypress("M", KPM_CTRL | KPM_SHIFT), "Mirror selection vertically", group);
-	addBind("me2d_object_properties", Keypress("return"), "Object Properties", group, false, 100);
-
-	// Map Editor 2D Lines mode (me2d_line*)
-	group = "Map Editor 2D Lines Mode";
-	addBind("me2d_line_change_texture", Keypress("T", KPM_CTRL), "Change texture(s)", group);
-	addBind("me2d_line_flip", Keypress("F"), "Flip line(s)", group);
-	addBind("me2d_line_flip_nosides", Keypress("F", KPM_SHIFT), "Flip line(s) but not sides", group);
-	addBind("me2d_line_tag_edit", Keypress("T", KPM_SHIFT), "Begin tag edit", group);
-
-	// Map Editor 2D Sectors mode (me2d_sector*)
-	group = "Map Editor 2D Sectors Mode";
-	addBind("me2d_sector_light_up16", Keypress("'"), "Light level up 16", group);
-	addBind("me2d_sector_light_up", Keypress("'", KPM_SHIFT), "Light level up 1", group);
-	addBind("me2d_sector_light_down16", Keypress(";"), "Light level down 16", group);
-	addBind("me2d_sector_light_down", Keypress(";", KPM_SHIFT), "Light level down 1", group);
-	addBind("me2d_sector_floor_up8", Keypress(".", KPM_CTRL), "Floor height up 8", group);
-	addBind("me2d_sector_floor_up", Keypress(".", KPM_CTRL | KPM_SHIFT), "Floor height up 1", group);
-	addBind("me2d_sector_floor_down8", Keypress(",", KPM_CTRL), "Floor height down 8", group);
-	addBind("me2d_sector_floor_down", Keypress(",", KPM_CTRL | KPM_SHIFT), "Floor height down 1", group);
-	addBind("me2d_sector_ceil_up8", Keypress(".", KPM_ALT), "Ceiling height up 8", group);
-	addBind("me2d_sector_ceil_up", Keypress(".", KPM_ALT | KPM_SHIFT), "Ceiling height up 1", group);
-	addBind("me2d_sector_ceil_down8", Keypress(",", KPM_ALT), "Ceiling height down 8", group);
-	addBind("me2d_sector_ceil_down", Keypress(",", KPM_ALT | KPM_SHIFT), "Ceiling height down 1", group);
-	addBind("me2d_sector_height_up8", Keypress("."), "Height up 8", group);
-	addBind("me2d_sector_height_up", Keypress(".", KPM_SHIFT), "Height up 1", group);
-	addBind("me2d_sector_height_down8", Keypress(","), "Height down 8", group);
-	addBind("me2d_sector_height_down", Keypress(",", KPM_SHIFT), "Height down 1", group);
-	addBind("me2d_sector_change_texture", Keypress("T", KPM_CTRL), "Change texture(s)", group);
-	addBind("me2d_sector_join", Keypress("J"), "Join sectors", group);
-	addBind("me2d_sector_join_keep", Keypress("J", KPM_SHIFT), "Join sectors (keep lines)", group);
-
-	// Map Editor 2D Things mode (me2d_thing*)
-	group = "Map Editor 2D Things Mode";
-	addBind("me2d_thing_change_type", Keypress("T", KPM_CTRL), "Change type", group);
-	addBind("me2d_thing_quick_angle", Keypress("D"), "Quick angle edit", group);
-
-	// Map Editor 3D (me3d*)
-	group = "Map Editor 3D Mode";
-	addBind("me3d_toggle_fog", Keypress("F"), "Toggle fog", group);
-	addBind("me3d_toggle_fullbright", Keypress("B"), "Toggle full brightness", group);
-	addBind("me3d_adjust_brightness", Keypress("B", KPM_SHIFT), "Adjust brightness", group);
-	addBind("me3d_toggle_gravity", Keypress("G"), "Toggle camera gravity", group);
-	addBind("me3d_release_mouse", Keypress("tab"), "Release mouse cursor", group);
-	addBind("me3d_clear_selection", Keypress("C"), "Clear selection", group);
-	addBind("me3d_toggle_things", Keypress("T"), "Toggle thing display", group);
-	addBind("me3d_thing_style", Keypress("T", KPM_SHIFT), "Cycle thing render style", group);
-	addBind("me3d_toggle_hilight", Keypress("H"), "Toggle hilight", group);
-	addBind("me3d_copy_tex_type", Keypress("C", KPM_CTRL), "Copy texture or thing type", group);
-	addBind("me3d_copy_tex_type", Keypress("mouse3"));
-	addBind("me3d_paste_tex_type", Keypress("V", KPM_CTRL), "Paste texture or thing type", group);
-	addBind("me3d_paste_tex_type", Keypress("mouse3", KPM_CTRL));
-	addBind("me3d_paste_tex_adj", Keypress("mouse3", KPM_SHIFT), "Flood-fill texture", group);
-	addBind("me3d_toggle_info", Keypress("I"), "Toggle information overlay", group);
-	addBind("me3d_quick_texture", Keypress("T", KPM_CTRL), "Quick Texture", group);
-	addBind("me3d_generic_up8", Keypress("mwheelup", KPM_CTRL), "Raise target 8", group);
-	addBind("me3d_generic_up", Keypress("mwheelup", KPM_CTRL | KPM_SHIFT), "Raise target 1", group);
-	addBind("me3d_generic_down8", Keypress("mwheeldown", KPM_CTRL), "Lower target 8", group);
-	addBind("me3d_generic_down", Keypress("mwheeldown", KPM_CTRL | KPM_SHIFT), "Lower target 1", group);
-
-	// Map Editor 3D Camera (me3d_camera*)
-	group = "Map Editor 3D Mode Camera";
-	addBind("me3d_camera_forward", Keypress("W"), "Camera forward", group, true);
-	addBind("me3d_camera_back", Keypress("S"), "Camera backward", group, true);
-	addBind("me3d_camera_left", Keypress("A"), "Camera strafe left", group, true);
-	addBind("me3d_camera_right", Keypress("D"), "Camera strafe right", group, true);
-	addBind("me3d_camera_up", Keypress("up"), "Camera move up", group, true);
-	addBind("me3d_camera_down", Keypress("down"), "Camera move down", group, true);
-	addBind("me3d_camera_turn_left", Keypress("left"), "Camera turn left", group, true);
-	addBind("me3d_camera_turn_right", Keypress("right"), "Camera turn right", group, true);
-
-	// Map Editor 3D Light (me3d_light*)
-	group = "Map Editor 3D Mode Light";
-	addBind("me3d_light_up16", Keypress("'"), "Sector light level up 16", group);
-	addBind("me3d_light_up", Keypress("'", KPM_SHIFT), "Sector light level up 1", group);
-	addBind("me3d_light_down16", Keypress(";"), "Sector light level down 16", group);
-	addBind("me3d_light_down", Keypress(";", KPM_SHIFT), "Sector light level down 1", group);
-	addBind("me3d_light_toggle_link", Keypress("L", KPM_CTRL), "Toggle linked flat light levels", group);
-
-	// Map Editor 3D Offsets (me3d_xoff*, me3d_yoff*)
-	group = "Map Editor 3D Mode Offsets";
-	addBind("me3d_xoff_up8", Keypress("num_4"), "X offset up 8", group);
-	addBind("me3d_xoff_up", Keypress("num_left"), "X offset up 1", group);
-	addBind("me3d_xoff_down8", Keypress("num_6"), "X offset down 8", group);
-	addBind("me3d_xoff_down", Keypress("num_right"), "X offset down 1", group);
-	addBind("me3d_yoff_up8", Keypress("num_8"), "Y offset up 8", group);
-	addBind("me3d_yoff_up", Keypress("num_up"), "Y offset up 1", group);
-	addBind("me3d_yoff_down8", Keypress("num_2"), "Y offset down 8", group);
-	addBind("me3d_yoff_down", Keypress("num_down"), "Y offset down 1", group);
-	addBind("me3d_wall_reset", Keypress("R"), "Reset offsets and scaling", group);
-#ifdef __WXGTK__
-	addBind("me3d_xoff_up", Keypress("num_left", KPM_SHIFT));
-	addBind("me3d_xoff_down", Keypress("num_right", KPM_SHIFT));
-	addBind("me3d_yoff_up", Keypress("num_up", KPM_SHIFT));
-	addBind("me3d_yoff_down", Keypress("num_down", KPM_SHIFT));
-#endif
-
-	// Map Editor 3D Scaling (me3d_scale*)
-	group = "Map Editor 3D Mode Scaling";
-	addBind("me3d_scalex_up_l", Keypress("num_4", KPM_CTRL), "X scale up (large)", group);
-	addBind("me3d_scalex_up_s", Keypress("num_left", KPM_CTRL), "X scale up (small)", group);
-	addBind("me3d_scalex_down_l", Keypress("num_6", KPM_CTRL), "X scale down (large)", group);
-	addBind("me3d_scalex_down_s", Keypress("num_right", KPM_CTRL), "X scale down (small)", group);
-	addBind("me3d_scaley_up_l", Keypress("num_8", KPM_CTRL), "Y scale up (large)", group);
-	addBind("me3d_scaley_up_s", Keypress("num_up", KPM_CTRL), "Y scale up (small)", group);
-	addBind("me3d_scaley_down_l", Keypress("num_2", KPM_CTRL), "Y scale down (large)", group);
-	addBind("me3d_scaley_down_s", Keypress("num_down", KPM_CTRL), "Y scale down (small)", group);
-
-	// Map Editor 3D Walls (me3d_wall*)
-	group = "Map Editor 3D Mode Walls";
-	addBind("me3d_wall_toggle_link_ofs", Keypress("O", KPM_CTRL), "Toggle linked wall offsets", group);
-	addBind("me3d_wall_autoalign_x", Keypress("A", KPM_CTRL), "Auto-align textures on X", group);
-	addBind("me3d_wall_unpeg_lower", Keypress("L"), "Toggle lower unpegged", group);
-	addBind("me3d_wall_unpeg_upper", Keypress("U"), "Toggle upper unpegged", group);
-
-	// Map Editor 3D Flats (me3d_flat*)
-	group = "Map Editor 3D Mode Flats";
-	addBind("me3d_flat_height_up8", Keypress("num_plus"), "Height up 8", group);
-	addBind("me3d_flat_height_up8", Keypress("mwheelup"));
-	addBind("me3d_flat_height_up", Keypress("num_plus", KPM_SHIFT), "Height up 1", group);
-	addBind("me3d_flat_height_up", Keypress("mwheelup", KPM_SHIFT));
-	addBind("me3d_flat_height_down8", Keypress("num_minus"), "Height down 8", group);
-	addBind("me3d_flat_height_down8", Keypress("mwheeldown"));
-	addBind("me3d_flat_height_down", Keypress("num_minus", KPM_SHIFT), "Height down 1", group);
-	addBind("me3d_flat_height_down", Keypress("mwheeldown", KPM_SHIFT));
-
-	// Map Editor 3D Things (me3d_thing*)
-	group = "Map Editor 3D Mode Things";
-	addBind("me3d_thing_remove", Keypress("delete"), "Remove", group);
-	addBind("me3d_thing_up8", Keypress("num_8"), "Z up 8", group);
-	addBind("me3d_thing_up", Keypress("num_up"), "Z up 1", group);
-	addBind("me3d_thing_down8", Keypress("num_2"), "Z down 8", group);
-	addBind("me3d_thing_down", Keypress("num_down"), "Z down 1", group);
-
 	// Set above keys as defaults
 	for (auto& keybind : keybinds)
 	{
@@ -808,9 +629,19 @@ bool KeyBind::readBinds(Tokenizer& tz)
 	// Parse until ending }
 	while (!tz.checkOrEnd("}"))
 	{
+		// Ignore binds that no longer exist (eg. from removed features)
+		auto name  = tz.current().text;
+		bool known = false;
+		for (const auto& kb : keybinds)
+			if (kb.name_ == name)
+			{
+				known = true;
+				break;
+			}
+
 		// Clear any current binds for the key
-		auto name = tz.current().text;
-		bind(name).keys_.clear();
+		if (known)
+			bind(name).keys_.clear();
 
 		// Read keys
 		while (true)
@@ -832,13 +663,14 @@ bool KeyBind::readBinds(Tokenizer& tz)
 				key = keystr;
 
 			// Add the key
-			addBind(
-				name,
-				Keypress(
-					key,
-					mods.find('a') != string::npos,
-					mods.find('c') != string::npos,
-					mods.find('s') != string::npos));
+			if (known)
+				addBind(
+					name,
+					Keypress(
+						key,
+						mods.find('a') != string::npos,
+						mods.find('c') != string::npos,
+						mods.find('s') != string::npos));
 
 			// Check for more keys
 			if (!tz.advIfNext(","))

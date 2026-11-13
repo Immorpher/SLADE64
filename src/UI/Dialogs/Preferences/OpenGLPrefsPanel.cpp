@@ -73,7 +73,7 @@ OpenGLPrefsPanel::OpenGLPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent), l
 
 	cb_gl_point_sprite_->SetToolTip(
 		"Only disable this if you are experiencing graphical glitches like things disappearing");
-	ntc_font_size_->SetToolTip("The size of the font to use in OpenGL, eg. for info overlays in the map editor");
+	ntc_font_size_->SetToolTip("The size of the font to use in OpenGL, eg. for info overlays");
 }
 
 // -----------------------------------------------------------------------------

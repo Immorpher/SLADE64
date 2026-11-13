@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <zlib.h>
 #include <bzlib.h>
-#include "../lzma/C/LzmaDec.h"
 
 #undef Status
 
@@ -270,71 +269,6 @@ private:
 	void FillBuffer ();
 
 	FileReaderBZ2 &operator= (const FileReaderBZ2 &) { return *this; }
-};
-
-// Wraps around a FileReader to decompress a lzma stream
-class FileReaderLZMA : public FileReaderBase
-{
-public:
-	FileReaderLZMA (FileReader &file, size_t uncompressed_size, bool zip);
-	~FileReaderLZMA ();
-
-	long Read (void *buffer, long len);
-
-	FileReaderLZMA &operator>> (uint8_t &v)
-	{
-		Read (&v, 1);
-		return *this;
-	}
-
-	FileReaderLZMA &operator>> (int8_t &v)
-	{
-		Read (&v, 1);
-		return *this;
-	}
-
-	FileReaderLZMA &operator>> (uint16_t &v)
-	{
-		Read (&v, 2);
-		v = wxUINT16_SWAP_ON_BE(v);
-		return *this;
-	}
-
-	FileReaderLZMA &operator>> (int16_t &v)
-	{
-		Read (&v, 2);
-		v = wxINT16_SWAP_ON_BE(v);
-		return *this;
-	}
-
-	FileReaderLZMA &operator>> (uint32_t &v)
-	{
-		Read (&v, 4);
-		v = wxUINT32_SWAP_ON_BE(v);
-		return *this;
-	}
-
-	FileReaderLZMA &operator>> (int32_t &v)
-	{
-		Read (&v, 4);
-		v = wxINT32_SWAP_ON_BE(v);
-		return *this;
-	}
-
-private:
-	enum { BUFF_SIZE = 4096 };
-
-	FileReader &File;
-	bool SawEOF;
-	CLzmaDec Stream;
-	size_t Size;
-	size_t InPos, InSize;
-	size_t OutProcessed;
-	uint8_t InBuff[BUFF_SIZE];
-
-	void FillBuffer ();
-
-	FileReaderLZMA &operator= (const FileReaderLZMA &) { return *this; }
 };
 
 class MemoryReader : public FileReader

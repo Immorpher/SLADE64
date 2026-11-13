@@ -34,7 +34,6 @@
 #include "Game.h"
 #include "App.h"
 #include "Archive/ArchiveManager.h"
-#include "Archive/Formats/ZipArchive.h"
 #include "Configuration.h"
 #include "TextEditor/TextLanguage.h"
 #include "Utility/Parser.h"
@@ -64,7 +63,6 @@ unique_ptr<std::thread>   zscript_parse_thread;
 } // namespace slade::game
 CVAR(String, game_configuration, "", CVar::Flag::Save)
 CVAR(String, port_configuration, "", CVar::Flag::Save)
-CVAR(String, zdoom_pk3_path, "", CVar::Flag::Save)
 
 
 // -----------------------------------------------------------------------------
@@ -405,44 +403,13 @@ void game::init()
 		}
 	}
 
-	// Load last configuration if any
-	if (!game_configuration.value.empty())
-		config_current.openConfig(game_configuration, port_configuration);
+	// SLADE64 only targets Doom 64, so always use the Doom 64 game configuration
+	if (!config_current.openConfig("doom64"))
+		log::warning("Unable to load the Doom 64 game configuration");
 
 	// Load custom special presets
 	if (!loadCustomSpecialPresets())
 		log::warning("An error occurred loading user special_presets.cfg");
-
-	// Load zdoom.pk3 stuff
-	if (wxFileExists(zdoom_pk3_path))
-	{
-		zscript_parse_thread = std::make_unique<std::thread>([=]() {
-			ZipArchive zdoom_pk3;
-			if (!zdoom_pk3.open(zdoom_pk3_path))
-				return;
-
-			// ZScript
-			auto zscript_entry = zdoom_pk3.entryAtPath("zscript.txt");
-
-			if (!zscript_entry)
-			{
-				// Bail out if no entry is found.
-				log::warning(1, "Could not find \'zscript.txt\' in " + zdoom_pk3_path);
-			}
-			else
-			{
-				zscript_base.parseZScript(zscript_entry);
-
-				auto lang = TextLanguage::fromId("zscript");
-				if (lang)
-					lang->loadZScript(zscript_base);
-
-				// MapInfo
-				config_current.parseMapInfo(zdoom_pk3);
-			}
-		});
-		zscript_parse_thread->detach();
-	}
 
 	// Update custom definitions when an archive is opened or closed
 	app::archiveManager().signals().archive_added.connect([](unsigned) { updateCustomDefinitions(); });

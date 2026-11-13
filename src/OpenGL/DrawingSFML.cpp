@@ -35,7 +35,8 @@
 #include "Archive/ArchiveEntry.h"
 #include "Archive/ArchiveManager.h"
 #include "Drawing.h"
-#include "MapEditor/UI/MapCanvas.h"
+#include "General/UI.h"
+#include "OpenGL.h"
 #include "Utility/MathStuff.h"
 
 using namespace slade;

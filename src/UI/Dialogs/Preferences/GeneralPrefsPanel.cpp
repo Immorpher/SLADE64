@@ -73,7 +73,7 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent)
 	}));
 
 	cb_wads_root_->SetToolTip(
-		"When opening a zip or directory, automatically open all wad entries in the root directory");
+		"When opening a directory, automatically open all wad entries in the root directory");
 
 	cb_archive_dir_ignore_hidden_->SetToolTip(
 		"When opening a directory, ignore any files or subdirectories beginning with a '.'");

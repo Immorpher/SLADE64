@@ -51,7 +51,6 @@ EXTERN_CVAR(Bool, wad_force_uppercase)
 EXTERN_CVAR(Int, autosave_entry_changes)
 EXTERN_CVAR(Bool, percent_encoding)
 EXTERN_CVAR(Bool, auto_entry_replace)
-EXTERN_CVAR(Bool, save_archive_with_map)
 EXTERN_CVAR(Bool, confirm_entry_delete)
 EXTERN_CVAR(Bool, confirm_entry_revert)
 EXTERN_CVAR(Int, dir_archive_change_action)
@@ -236,7 +235,6 @@ wxPanel* EditingPrefsPanel::setupGeneralTab()
 	cb_zip_percent_encoding_ = new wxCheckBox(panel, -1, "Use percent encoding if needed outside of Wad Archives");
 	cb_auto_entry_replace_   = new wxCheckBox(
         panel, -1, "Automatically replace entries with same name as drag-and-dropped files");
-	cb_save_archive_with_map_ = new wxCheckBox(panel, -1, "Save the map's parent archive when saving a map");
 	cb_confirm_entry_delete_  = new wxCheckBox(panel, -1, "Show confirmation dialog on deleting an entry");
 	cb_confirm_entry_revert_  = new wxCheckBox(panel, -1, "Show confirmation dialog on reverting entry changes");
 	choice_entry_mod_         = new wxChoice(panel, -1);
@@ -253,7 +251,6 @@ wxPanel* EditingPrefsPanel::setupGeneralTab()
 		vector<wxObject*>{ cb_wad_force_uppercase_,
 						   cb_zip_percent_encoding_,
 						   cb_auto_entry_replace_,
-						   cb_save_archive_with_map_,
 						   cb_confirm_entry_delete_,
 						   cb_confirm_entry_revert_,
 						   wxutil::createLabelHBox(panel, "Action on unsaved entry changes:", choice_entry_mod_),
@@ -304,7 +301,6 @@ void EditingPrefsPanel::init()
 	cb_wad_force_uppercase_->SetValue(wad_force_uppercase);
 	cb_zip_percent_encoding_->SetValue(percent_encoding);
 	cb_auto_entry_replace_->SetValue(auto_entry_replace);
-	cb_save_archive_with_map_->SetValue(save_archive_with_map);
 	choice_entry_mod_->SetSelection(autosave_entry_changes);
 	cb_confirm_entry_delete_->SetValue(confirm_entry_delete);
 	cb_confirm_entry_revert_->SetValue(confirm_entry_revert);
@@ -322,7 +318,6 @@ void EditingPrefsPanel::applyPreferences()
 	wad_force_uppercase       = cb_wad_force_uppercase_->GetValue();
 	percent_encoding          = cb_zip_percent_encoding_->GetValue();
 	auto_entry_replace        = cb_auto_entry_replace_->GetValue();
-	save_archive_with_map     = cb_save_archive_with_map_->GetValue();
 	autosave_entry_changes    = choice_entry_mod_->GetSelection();
 	confirm_entry_delete      = cb_confirm_entry_delete_->GetValue();
 	confirm_entry_revert      = cb_confirm_entry_revert_->GetValue();

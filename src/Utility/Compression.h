@@ -14,5 +14,4 @@ bool zipExplode(MemChunk& in, MemChunk& out, size_t size, int flags);
 bool zipUnshrink(MemChunk& in, MemChunk& out, size_t maxsize);
 bool bzip2Decompress(MemChunk& in, MemChunk& out, size_t maxsize = 0);
 bool bzip2Compress(MemChunk& in, MemChunk& out);
-bool lzmaDecompress(MemChunk& in, MemChunk& out, size_t size);
 } // namespace slade::compression

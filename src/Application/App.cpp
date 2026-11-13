@@ -47,12 +47,9 @@
 #include "Graphics/Palette/PaletteManager.h"
 #include "Graphics/SImage/SIFormat.h"
 #include "MainEditor/MainEditor.h"
-#include "MapEditor/NodeBuilders.h"
 #include "OpenGL/Drawing.h"
 #include "OpenGL/GLTexture.h"
 #include "SLADE64WxApp.h"
-#include "Scripting/Lua.h"
-#include "Scripting/ScriptManager.h"
 #include "TextEditor/TextLanguage.h"
 #include "TextEditor/TextStyle.h"
 #include "UI/Dialogs/SetupWizard/SetupWizardDialog.h"
@@ -323,15 +320,11 @@ void readConfigFile()
 		if (tz.advIf("keys", 2))
 			KeyBind::readBinds(tz);
 
-		// Read nodebuilder paths
+		// Skip legacy nodebuilder paths (no longer used)
 		if (tz.advIf("nodebuilder_paths", 2))
 		{
 			while (!tz.checkOrEnd("}"))
-			{
-				auto path = wxString::FromUTF8(tz.peek().text.c_str());
-				nodebuilders::addBuilderPath(tz.current().text, wxutil::strToView(path));
 				tz.adv(2);
-			}
 
 			tz.adv(); // Skip ending }
 		}
@@ -509,10 +502,6 @@ bool app::init(const vector<string>& args, double ui_scale)
 	SAction::setBaseWxId(26000);
 	SAction::initActions();
 
-#ifndef NO_LUA
-	// Init lua
-	lua::init();
-#endif
 
 	// Init UI
 	ui::init(ui_scale);
@@ -557,9 +546,6 @@ bool app::init(const vector<string>& args, double ui_scale)
 	log::info("Loading colour configuration");
 	colourconfig::init();
 
-	// Init nodebuilders
-	nodebuilders::init();
-
 	// Init game executables
 	executables::init();
 
@@ -575,10 +561,6 @@ bool app::init(const vector<string>& args, double ui_scale)
 	log::info("Loading game configurations");
 	game::init();
 
-#ifndef NO_LUA
-	// Init script manager
-	scriptmanager::init();
-#endif
 
 	// Show the main window
 	maineditor::windowWx()->Show(true);
@@ -654,10 +636,6 @@ void app::saveConfigFile()
 	file.Write(KeyBind::writeBinds());
 	file.Write("}\n");
 
-	// Write nodebuilder paths
-	file.Write("\n");
-	nodebuilders::saveBuilderPaths(file);
-
 	// Write game exe paths
 	file.Write("\nexecutable_paths\n{\n");
 	file.Write(executables::writePaths());
@@ -702,10 +680,6 @@ void app::exit(bool save_config)
 		// Save custom special presets
 		game::saveCustomSpecialPresets();
 
-#ifndef NO_LUA
-		// Save custom scripts
-		scriptmanager::saveUserScripts();
-#endif
 	}
 
 	// Close all open archives
@@ -726,10 +700,6 @@ void app::exit(bool save_config)
 			log::warning("Could not clean up temporary file \"{}\": {}", item.path().string(), error.message());
 	}
 
-#ifndef NO_LUA
-	// Close lua
-	lua::close();
-#endif
 
 	// Close DUMB
 	dumb_exit();

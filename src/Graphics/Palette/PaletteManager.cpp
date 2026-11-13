@@ -34,7 +34,6 @@
 #include "PaletteManager.h"
 #include "App.h"
 #include "Archive/ArchiveManager.h"
-#include "Archive/Formats/ZipArchive.h"
 #include "General/Misc.h"
 #include "Utility/FileUtils.h"
 #include "Utility/StringUtils.h"

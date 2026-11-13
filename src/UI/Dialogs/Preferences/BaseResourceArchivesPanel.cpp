@@ -49,7 +49,6 @@ using namespace slade;
 // -----------------------------------------------------------------------------
 EXTERN_CVAR(Int, base_resource)
 EXTERN_CVAR(String, dir_last)
-EXTERN_CVAR(String, zdoom_pk3_path)
 
 
 // -----------------------------------------------------------------------------
@@ -94,7 +93,6 @@ BaseResourceArchivesPanel::BaseResourceArchivesPanel(wxWindow* parent) : PrefsPa
 	btn_add_                 = new wxButton(this, -1, "Add Archive");
 	btn_remove_              = new wxButton(this, -1, "Remove Archive");
 	btn_detect_              = new wxButton(this, -1, "Detect Archives");
-	flp_zdoom_pk3_ = new FileLocationPanel(this, zdoom_pk3_path, false, "Browse ZDoom PK3", "Pk3 Files (*.pk3)|*.pk3");
 
 	setupLayout();
 
@@ -120,9 +118,6 @@ void BaseResourceArchivesPanel::setupLayout()
 	sizer->Add(btn_add_, { 0, 1 }, { 1, 1 }, wxEXPAND);
 	sizer->Add(btn_remove_, { 1, 1 }, { 1, 1 }, wxEXPAND);
 	sizer->Add(btn_detect_, { 2, 1 }, { 1, 1 }, wxEXPAND);
-
-	// ZDoom.pk3 path
-	sizer->Add(wxutil::createLabelHBox(this, "ZDoom PK3 Path:", flp_zdoom_pk3_), { 4, 0 }, { 1, 2 }, wxEXPAND);
 
 	sizer->AddGrowableRow(3, 1);
 	sizer->AddGrowableCol(0, 1);
@@ -279,8 +274,6 @@ void BaseResourceArchivesPanel::init()
 	// Select the currently open base archive if any
 	if (base_resource >= 0)
 		list_base_archive_paths_->Select(base_resource);
-
-	flp_zdoom_pk3_->setLocation(zdoom_pk3_path);
 }
 
 // -----------------------------------------------------------------------------
@@ -289,7 +282,6 @@ void BaseResourceArchivesPanel::init()
 void BaseResourceArchivesPanel::applyPreferences()
 {
 	app::archiveManager().openBaseResource(selectedPathIndex());
-	zdoom_pk3_path = wxutil::strToView(flp_zdoom_pk3_->location());
 }
 
 

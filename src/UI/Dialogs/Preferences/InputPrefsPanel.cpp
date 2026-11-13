@@ -32,8 +32,6 @@
 #include "Main.h"
 #include "InputPrefsPanel.h"
 #include "General/UI.h"
-#include "MapEditor/MapEditor.h"
-#include "MapEditor/UI/MapEditorWindow.h"
 #include "UI/WxUtils.h"
 
 using namespace slade;
@@ -437,9 +435,6 @@ void InputPrefsPanel::applyPreferences()
 
 	// Update sorted keybinds list
 	KeyBind::updateSortedBindsList();
-
-	// Update map editor menus
-	mapeditor::window()->setupMenu();
 }
 
 

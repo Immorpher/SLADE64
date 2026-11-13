@@ -40,7 +40,6 @@ public:
 	bool importDir();
 	bool convertArchiveTo() const;
 	bool cleanupArchive() const;
-	bool buildArchive();
 
 	// Entry manipulation actions
 	bool renameEntry(bool each = false) const;
@@ -78,7 +77,6 @@ public:
 	bool wessSeqConvert(bool to_wess) const;
 	bool wessAddFullLoop() const;
 	bool optimizePNG() const;
-	bool compileACS(bool hexen = false) const;
 	bool convertTextures() const;
 	bool findTextureErrors() const;
 	bool cleanTextureIwadDupes() const;

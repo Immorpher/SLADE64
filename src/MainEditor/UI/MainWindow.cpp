@@ -38,8 +38,6 @@
 #include "ArchivePanel.h"
 #include "General/Misc.h"
 #include "Graphics/Icons.h"
-#include "MapEditor/MapEditor.h"
-#include "Scripting/ScriptManager.h"
 #include "SLADE64WxApp.h"
 #include "UI/Controls/BaseResourceChooser.h"
 #include "UI/Controls/ConsolePanel.h"
@@ -262,7 +260,6 @@ void MainWindow::setupLayout()
 	// File menu
 	auto file_new_menu = new wxMenu("");
 	SAction::fromId("aman_newarchive")->addToMenu(file_new_menu, true, "&Archive");
-	SAction::fromId("aman_newmap")->addToMenu(file_new_menu, true, "&Map");
 	auto file_menu = new wxMenu("");
 	file_menu->AppendSubMenu(file_new_menu, "&New");
 	SAction::fromId("aman_open")->addToMenu(file_menu);
@@ -297,11 +294,6 @@ void MainWindow::setupLayout()
 	view_menu->AppendSubMenu(toolbar_menu_, "Toolbars");
 	menu->Append(view_menu, "&View");
 
-	// Tools menu
-	auto tools_menu = new wxMenu("");
-	SAction::fromId("main_runscript")->addToMenu(tools_menu);
-	menu->Append(tools_menu, "&Tools");
-
 	// Help menu
 	auto help_menu = new wxMenu("");
 	SAction::fromId("main_about")->addToMenu(help_menu);
@@ -330,7 +322,6 @@ void MainWindow::setupLayout()
 	// Create Archive toolbar
 	auto tbg_archive = new SToolBarGroup(toolbar_, "_Archive");
 	tbg_archive->addActionButton("arch_texeditor");
-	tbg_archive->addActionButton("arch_mapeditor");
 	tbg_archive->addActionButton("arch_run");
 	auto* b_maint = tbg_archive->addActionButton(
 		"arch_maintenance", "Maintenance", "wrench", "Archive maintenance/cleanup tools");
@@ -419,11 +410,6 @@ bool MainWindow::exitProgram()
 		if (wxMessageBox("Are you sure you want to exit SLADE64?", "SLADE64", wxICON_QUESTION | wxYES_NO, this) != wxYES)
 			return false;
 	}
-
-	// Check if we can close the map editor
-	if (mapeditor::windowCreated() && mapeditor::windowWx()->IsShown())
-		if (!mapeditor::windowWx()->Close())
-			return false;
 
 	// Close all archives
 	if (!panel_archivemanager_->closeAll())
@@ -524,15 +510,6 @@ bool MainWindow::handleAction(string_view id)
 		m_mgr->Update();
 		return true;
 	}
-
-#ifndef NO_LUA
-	// Tools->Run Script
-	if (id == "main_runscript")
-	{
-		scriptmanager::open();
-		return true;
-	}
-#endif
 
 	// Help->About
 	if (id == "main_about")

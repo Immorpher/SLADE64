@@ -23,7 +23,6 @@ private:
 	wxCheckBox* cb_wad_force_uppercase_   = nullptr;
 	wxCheckBox* cb_zip_percent_encoding_  = nullptr;
 	wxCheckBox* cb_auto_entry_replace_    = nullptr;
-	wxCheckBox* cb_save_archive_with_map_ = nullptr;
 	wxChoice*   choice_entry_mod_         = nullptr;
 	wxCheckBox* cb_confirm_entry_delete_  = nullptr;
 	wxCheckBox* cb_confirm_entry_revert_  = nullptr;
