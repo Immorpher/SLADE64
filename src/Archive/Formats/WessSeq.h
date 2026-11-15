@@ -564,8 +564,9 @@ namespace seqdetail
 	}
 } // namespace seqdetail
 
-// Converts a Standard MIDI file to the raw bytes of a WSD sequence
-inline bool midiToSeq(const uint8_t* midi, size_t size, Bytes& seq, std::string& err)
+// Converts a Standard MIDI file to the raw bytes of a WSD sequence.
+// With [cull_empty], channels that never play a note don't get a track
+inline bool midiToSeq(const uint8_t* midi, size_t size, Bytes& seq, std::string& err, bool cull_empty = true)
 {
 	using namespace seqdetail;
 
@@ -603,6 +604,13 @@ inline bool midiToSeq(const uint8_t* midi, size_t size, Bytes& seq, std::string&
 
 	std::vector<SeqTrack> out;
 
+	// Only cull empty tracks if the song has at least one track with notes
+	bool any_notes = false;
+	for (const auto& tr : mt)
+		for (const auto& ev : tr.events)
+			if (!ev.meta && ev.type == 0x90 && ev.d2 > 0)
+				any_notes = true;
+
 	for (const auto& tr : mt)
 	{
 		// One Doom track per MIDI channel used in this MIDI track
@@ -614,7 +622,23 @@ inline bool midiToSeq(const uint8_t* midi, size_t size, Bytes& seq, std::string&
 		for (size_t g = 0; g < channels.size(); g++)
 		{
 			const uint8_t ch = channels[g];
-			SeqTrack      t;
+
+			// Skip empty tracks (channels that never play a note), they would only
+			// waste one of the limited track slots of the Doom 64 sound engine
+			if (cull_empty && any_notes)
+			{
+				bool has_note = false;
+				for (const auto& ev : tr.events)
+					if (!ev.meta && ev.chan == ch && ev.type == 0x90 && ev.d2 > 0)
+					{
+						has_note = true;
+						break;
+					}
+				if (!has_note)
+					continue;
+			}
+
+			SeqTrack t;
 			t.ppq = static_cast<uint16_t>(division);
 			t.qpm = static_cast<uint16_t>(qpm);
 
